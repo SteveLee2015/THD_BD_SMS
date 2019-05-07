@@ -28,7 +28,7 @@ public class CardInfoPresenter extends BasePresenter implements CardInfoContract
         model.sendCardCmd(context);
     }
 
-    @Override
+    /*@Override
     public String getCardInfo() {
         String ss = model.getCardInfo();
         view.hideLoading();
@@ -39,5 +39,5 @@ public class CardInfoPresenter extends BasePresenter implements CardInfoContract
             view.onSuccess();
         }
         return model.getCardInfo();
-    }
+    }*/
 }

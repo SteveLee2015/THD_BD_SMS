@@ -29,7 +29,8 @@ public class ProgressDialog {
     private MaterialDialog materialDialog;
 
     public void show(Context mContext) {
-        materialDialog = new MaterialDialog.Builder(mContext)
+
+            materialDialog = new MaterialDialog.Builder(mContext)
 //                .title(R.string.progress_dialog_title)
                 .content("请稍等...")
                 .progress(true, 0)
@@ -40,6 +41,8 @@ public class ProgressDialog {
     }
 
     public void dismiss() {
-        materialDialog.dismiss();
+        if(materialDialog!=null && materialDialog.isShowing()){
+            materialDialog.dismiss();
+        }
     }
 }

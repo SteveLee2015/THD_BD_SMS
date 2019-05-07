@@ -1,11 +1,16 @@
 package thd.bd.sms.activity;
 
 import android.location.BDUnknownException;
+import android.location.CardInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -24,7 +29,6 @@ public class CardInfoActivity extends BaseActivity implements CardInfoContract.V
 
     private static final String TAG = "CardInfoActivity";
     private CardInfoPresenter cardInfoPresenter;
-    private String cardInfoStr;
 
     @Override
     protected int getContentView() {
@@ -48,12 +52,14 @@ public class CardInfoActivity extends BaseActivity implements CardInfoContract.V
 
     @Override
     public void onSuccess() {
-        Toast.makeText(this, "发送成功", Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        EventBus.getDefault().register(this);
 
         cardInfoPresenter = new CardInfoPresenter(this);
         cardInfoPresenter.attachView(this);
@@ -62,26 +68,56 @@ public class CardInfoActivity extends BaseActivity implements CardInfoContract.V
     @Override
     protected void onResume() {
         super.onResume();
-        cardInfoExit.setText(cardInfoStr);
     }
 
     @OnClick(R.id.card_info_btn)
     public void onViewClicked() {
         cardInfoPresenter.sendCardCmd(this);
-        cardInfoStr = cardInfoPresenter.getCardInfo();
 
-        Log.e(TAG, "onViewClicked: =========="+ cardInfoStr);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         cardInfoPresenter.detachView();
-//        try {
-//            cmdManager.removeBDEventListener(localInfoListener, bdBeamStatusListener ,bdCmdTimeOutListener , bdLocationListener , bdLocReportListener);
-//        } catch (BDUnknownException e) {
-//            e.printStackTrace();
-//        }
-//        cmdManager.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getCardInfo(CardInfo cardInfo){
+        hideLoading();
+
+        if(cardInfo.getCardAddress()==null && "".equals(cardInfo.getCardAddress())){
+            return;
+        }
+        StringBuffer cardInfoStr = new StringBuffer();
+
+        cardInfoStr.append("mCardAddress : " + cardInfo.getCardAddress());
+        cardInfoStr.append("\n");
+
+        cardInfoStr.append("mSerialNum : " + cardInfo.getSerialNum());
+        cardInfoStr.append("\n");
+
+        cardInfoStr.append("mBroadCastAddress : " + cardInfo.getBroadCastAddress());
+        cardInfoStr.append("\n");
+
+        cardInfoStr.append("mCardType : " + cardInfo.getCardType());
+        cardInfoStr.append("\n");
+
+        cardInfoStr.append("mSericeFeq : " + cardInfo.getSericeFeq());
+        cardInfoStr.append("\n");
+
+        cardInfoStr.append("mCommLevel : " + cardInfo.getCommLevel());
+        cardInfoStr.append("\n");
+
+        cardInfoStr.append("checkEncryption : " + cardInfo.getCheckEncryption());
+        cardInfoStr.append("\n");
+
+        cardInfoStr.append("mSubordinatesNum : " + cardInfo.getSubordinatesNum());
+        cardInfoStr.append("\n");
+
+        Log.e(TAG, "BDEventListener.LocalInfoListener: =========="+ cardInfoStr);
+
+        cardInfoExit.setText(cardInfoStr.toString());
     }
 }

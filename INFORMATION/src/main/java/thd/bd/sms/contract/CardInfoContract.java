@@ -8,7 +8,7 @@ public interface CardInfoContract {
 
     interface Model {
         void sendCardCmd(Context context);
-        String getCardInfo();
+//        String getCardInfo();
     }
 
     interface View extends BaseView {
@@ -26,6 +26,6 @@ public interface CardInfoContract {
 
     interface Presenter {
         void sendCardCmd(Context context);
-        String getCardInfo();
+//        String getCardInfo();
     }
 }

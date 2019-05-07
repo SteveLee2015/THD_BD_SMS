@@ -21,7 +21,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         setContentView(getContentView());
 
         WinUtils.hiddenKeyBoard(this);
-//        EventBus.getDefault().register(this);
+
         unbinder = ButterKnife.bind(this);
     }
 
@@ -31,6 +31,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         unbinder.unbind();
-//        EventBus.getDefault().unregister(BaseActivity.this);
+
     }
 }
