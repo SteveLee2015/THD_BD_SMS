@@ -1,0 +1,72 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao' // apply plugin
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "thd.bd.sms"
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    //配置签名信息
+    signingConfigs{
+        release{
+            storeFile file("C:\\Users\\lerry\\.android\\debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDir 'libs'
+            jni.srcDirs = []    //disable automatic ndk-build
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    greendao {
+        schemaVersion 1 //数据库版本号
+        daoPackage 'com.aserbao.aserbaosandroid.functions.database.greenDao.db'
+// 设置DaoMaster、DaoSession、Dao 包名
+        targetGenDir 'src.main.java'//设置DaoMaster、DaoSession、Dao目录,请注意，这里路径用.不要用/
+        generateTests false //设置为true以自动生成单元测试。
+        targetGenDirTests 'src.main.java' //应存储生成的单元测试的基本目录。默认为 src / androidTest / java。
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    //控件注解方式引入方法
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    implementation 'com.jakewharton:butterknife-annotations:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    //北斗后台服务jar
+    implementation files('libs/bd_cmd_manager.jar')
+    //百度地图定位sdk
+    implementation files('libs/BaiduLBS_Android.jar')
+    //utils中log.jar
+    implementation files('libs/log.jar')
+    //greendao配置
+    implementation 'org.greenrobot:greendao:3.2.2'
+    // add library
+    implementation files('libs/eventbus-3.0.0.jar')
+    //Material-dialogs
+    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+}
