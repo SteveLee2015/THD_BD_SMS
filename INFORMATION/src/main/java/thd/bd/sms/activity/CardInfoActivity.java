@@ -4,6 +4,7 @@ import android.location.BDUnknownException;
 import android.location.CardInfo;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -57,6 +58,7 @@ public class CardInfoActivity extends BaseActivity implements CardInfoContract.V
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
         EventBus.getDefault().register(this);

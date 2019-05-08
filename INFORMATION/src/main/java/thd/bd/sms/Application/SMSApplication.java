@@ -15,6 +15,8 @@ import android.location.CardInfo;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.baidu.mapapi.CoordType;
+import com.baidu.mapapi.SDKInitializer;
 import com.forlong401.log.transaction.log.manager.LogManager;
 import com.thd.cmd.manager.BDCmdManager;
 import com.thd.cmd.manager.helper.BDConstants;
@@ -33,10 +35,8 @@ public class SMSApplication extends Application {
     private static SMSApplication smsApplication;
     public boolean openCrash = true; // 关闭或打开 crah重启
     public BDCmdManager bdCmdManager;
-//    private static CardInfo cardInfoBean = new CardInfo();
 
     private static final String TAG = "SMSApplication";
-    private boolean isFirst = true;
 
     public static SMSApplication getInstance(){
         if(smsApplication!=null){
@@ -77,11 +77,7 @@ public class SMSApplication extends Application {
         public void onCardInfo(CardInfo cardInfo) {
             Log.i("TEST", "======================>cardInfo " + cardInfo.getCardAddress());
 
-//            setCardInfoBean(cardInfo);
-//            if(!isFirst){
-                EventBus.getDefault().post(cardInfo);
-//            }
-//            isFirst = false;
+            EventBus.getDefault().post(cardInfo);
         }
     };
 
@@ -95,7 +91,7 @@ public class SMSApplication extends Application {
             for (Integer beam : bdBeam.getBeamWaves()) {
                 beams += (beam +",");
             }
-            Log.e(TAG, "SMSApplication89: ==========波束=========="+beams );
+            Log.e(TAG, "SMSApplication96: ==========波束=========="+beams );
             beams ="";
         }
     };
@@ -151,9 +147,22 @@ public class SMSApplication extends Application {
         //第三方日志收集器
         LogManager.getManager(getApplicationContext()).registerCrashHandler();
 
+        initMap();
+
         initBDService();
     }
 
+    private void initMap() {
+        // 在使用 SDK 各组间之前初始化 context 信息，传入 ApplicationContext
+        SDKInitializer.initialize(this);
+        //自4.3.0起，百度地图SDK所有接口均支持百度坐标和国测局坐标，用此方法设置您使用的坐标类型.
+        //包括BD09LL和GCJ02两种坐标，默认是BD09LL坐标。
+        SDKInitializer.setCoordType(CoordType.BD09LL);
+    }
+
+    /**
+     * 注册北斗接收监听器
+     */
     private void initBDService() {
         registerReceiver();
         try {
@@ -195,11 +204,4 @@ public class SMSApplication extends Application {
         Log.e(TAG, "onTrimMemory: ==========关闭后台服务啦。。。。" );
     }
 
-//    public CardInfo getCardInfoBean() {
-//        return cardInfoBean;
-//    }
-//
-//    public void setCardInfoBean(CardInfo cardInfoBean) {
-//        SMSApplication.cardInfoBean = cardInfoBean;
-//    }
 }
