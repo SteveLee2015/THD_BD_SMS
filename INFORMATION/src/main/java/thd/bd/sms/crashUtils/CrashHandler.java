@@ -9,7 +9,7 @@ import android.util.Log;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 
-import thd.bd.sms.MainActivity;
+import thd.bd.sms.MapActivity;
 
 /**
  * 处理 未捕获的异常  开发中关闭  上线后打开
@@ -87,7 +87,7 @@ public class CrashHandler implements UncaughtExceptionHandler {
 	}
 
 	public void restartApp(){
-		Intent intent = new Intent(context,MainActivity.class);
+		Intent intent = new Intent(context,MapActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		context.startActivity(intent);
 		//结束进程之前可以把你程序的注销或者退出代码放在这段代码之前
@@ -96,7 +96,7 @@ public class CrashHandler implements UncaughtExceptionHandler {
 
 	public void reStartApp(){
 
-		Intent intent = new Intent(context.getApplicationContext(), MainActivity.class);
+		Intent intent = new Intent(context.getApplicationContext(), MapActivity.class);
 		PendingIntent restartIntent = PendingIntent.getActivity(
 				context.getApplicationContext(), 0, intent,PendingIntent.FLAG_CANCEL_CURRENT);
 		//退出程序

@@ -29,7 +29,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/MAppTheme1"
         android:name=".Application.SMSApplication">
 
         <meta-data
@@ -37,7 +37,7 @@
             android:value="uk0WQ6V5uYiITHhgwqjZ4w6mhk4sfeUi" >
         </meta-data>
 
-        <activity android:name=".MainActivity"
+        <activity android:name=".MapActivity"
             android:launchMode="singleInstance"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
@@ -50,6 +50,10 @@
         </activity>
 
         <activity android:name=".activity.CardInfoActivity">
+
+        </activity>
+
+        <activity android:name=".activity.BSIActivity">
 
         </activity>
 

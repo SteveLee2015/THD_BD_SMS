@@ -1,5 +1,6 @@
 package thd.bd.sms;
 
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -7,7 +8,10 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
+import android.widget.Button;
+import android.widget.ImageView;
 
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
@@ -20,13 +24,22 @@ import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 import thd.bd.sms.Application.BaseActivity;
+import thd.bd.sms.activity.BSIActivity;
+import thd.bd.sms.activity.CardInfoActivity;
 
-public class MainActivity extends BaseActivity implements SensorEventListener {
+public class MapActivity extends BaseActivity implements SensorEventListener {
 
 
     @BindView(R.id.bmapView)
     MapView bmapView;
+    @BindView(R.id.main_my_loction)
+    ImageView mainMyLoction;
+    @BindView(R.id.main_bsi_btn)
+    Button mainBsiBtn;
+    @BindView(R.id.main_cardinfo_btn)
+    Button mainCardinfoBtn;
 
     private BaiduMap mBaiduMap;
     private BitmapDescriptor mCurrentMarker;
@@ -37,8 +50,8 @@ public class MainActivity extends BaseActivity implements SensorEventListener {
     private SensorManager mSensorManager;
     private Double lastX = 0.0;
     private int mCurrentDirection = 0;
-//    private double mCurrentLat = 0.0;
-//    private double mCurrentLon = 0.0;
+    private double mCurrentLat = 0.0;
+    private double mCurrentLon = 0.0;
 
 
     @Override
@@ -76,13 +89,10 @@ public class MainActivity extends BaseActivity implements SensorEventListener {
     public void onComLocation(Location location) {
         super.onComLocation(location);
 
-        LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         myLocation(latLng);
-
-//        mCurrentLat = location.getLatitude();
-//        mCurrentLon = location.getLongitude();
-
-//        Toast.makeText(this,"location="+mCurrentLat+","+mCurrentLon,Toast.LENGTH_SHORT).show();
+        mCurrentLat = location.getLatitude();
+        mCurrentLon = location.getLongitude();
 
     }
 
@@ -97,7 +107,6 @@ public class MainActivity extends BaseActivity implements SensorEventListener {
                 .latitude(myLocation.latitude)
                 .longitude(myLocation.longitude).build();
         mBaiduMap.setMyLocationData(locData);
-
 
 
         Log.e("LERRYTEST_MAP", "=========MapActivity113=======location==" + myLocation.latitude + "," + myLocation.longitude);
@@ -156,5 +165,23 @@ public class MainActivity extends BaseActivity implements SensorEventListener {
     protected void onPause() {
         bmapView.onPause();
         super.onPause();
+    }
+
+
+    @OnClick({R.id.main_my_loction,R.id.main_bsi_btn, R.id.main_cardinfo_btn})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.main_my_loction:
+                myLocation(new LatLng(mCurrentLat, mCurrentLon));
+                break;
+            case R.id.main_bsi_btn:
+                Intent intent = new Intent(this,BSIActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.main_cardinfo_btn:
+                Intent intent1 = new Intent(this,CardInfoActivity.class);
+                startActivity(intent1);
+                break;
+        }
     }
 }

@@ -8,4 +8,17 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- 顶部title风格 -->
+    <style name="mTitleStyle">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">@dimen/dp_48</item>
+        <item name="android:background">#cccccc</item>
+    </style>
+
+    <style name="MAppTheme1" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="colorPrimary">#cccccc</item>
+        <item name="colorPrimaryDark">#cccccc</item>
+    </style>
+
 </resources>

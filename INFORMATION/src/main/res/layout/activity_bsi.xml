@@ -3,28 +3,26 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_gravity="center">
+    android:orientation="vertical">
 
     <include
         android:id="@+id/message_title"
         layout="@layout/bd_title_layout"
         android:focusable="true"/>
 
-
     <EditText
-        android:id="@+id/card_info_exit"
+        android:id="@+id/bsi_info_edit"
         android:layout_width="match_parent"
-        android:minHeight="@dimen/dp_200"
-        android:minLines="10"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/dp_20"/>
+        android:minLines="15"
+        android:minHeight="@dimen/dp_200"
+        android:layout_margin="10dp"/>
 
     <Button
-        android:id="@+id/card_info_btn"
+        android:id="@+id/bsi_btn"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/dp_60"
-        android:text="读卡"
+        android:layout_height="wrap_content"
+        android:text="读波束"
         android:layout_gravity="center"/>
 
 </LinearLayout>

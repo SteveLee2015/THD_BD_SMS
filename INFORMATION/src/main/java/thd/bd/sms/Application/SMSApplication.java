@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import thd.bd.sms.crashUtils.CrashHandler;
+import thd.bd.sms.service.LocationService;
 
 public class SMSApplication extends Application {
 
@@ -35,6 +36,7 @@ public class SMSApplication extends Application {
     private static SMSApplication smsApplication;
     public boolean openCrash = true; // 关闭或打开 crah重启
     public BDCmdManager bdCmdManager;
+    public static LocationService locationService;
 
     private static final String TAG = "SMSApplication";
 
@@ -93,6 +95,7 @@ public class SMSApplication extends Application {
             }
             Log.e(TAG, "SMSApplication96: ==========波束=========="+beams );
             beams ="";
+            EventBus.getDefault().post(bdBeam);
         }
     };
 
@@ -158,6 +161,11 @@ public class SMSApplication extends Application {
         //自4.3.0起，百度地图SDK所有接口均支持百度坐标和国测局坐标，用此方法设置您使用的坐标类型.
         //包括BD09LL和GCJ02两种坐标，默认是BD09LL坐标。
         SDKInitializer.setCoordType(CoordType.BD09LL);
+
+        /***
+         * 初始化定位sdk，建议在Application中创建
+         */
+        locationService = new LocationService(getApplicationContext());
     }
 
     /**

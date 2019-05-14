@@ -1,12 +1,15 @@
 package thd.bd.sms.activity;
 
-import android.location.BDUnknownException;
 import android.location.CardInfo;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
@@ -29,6 +32,10 @@ public class CardInfoActivity extends BaseActivity implements CardInfoContract.V
 
 
     private static final String TAG = "CardInfoActivity";
+    @BindView(R.id.return_home_layout)
+    LinearLayout returnHomeLayout;
+    @BindView(R.id.title_name)
+    TextView titleName;
     private CardInfoPresenter cardInfoPresenter;
 
     @Override
@@ -62,6 +69,7 @@ public class CardInfoActivity extends BaseActivity implements CardInfoContract.V
         super.onCreate(savedInstanceState);
 
         EventBus.getDefault().register(this);
+        titleName.setText("读卡界面");
 
         cardInfoPresenter = new CardInfoPresenter(this);
         cardInfoPresenter.attachView(this);
@@ -72,9 +80,18 @@ public class CardInfoActivity extends BaseActivity implements CardInfoContract.V
         super.onResume();
     }
 
-    @OnClick(R.id.card_info_btn)
-    public void onViewClicked() {
-        cardInfoPresenter.sendCardCmd(this);
+
+    @OnClick({R.id.card_info_btn,R.id.return_home_layout})
+    public void onViewClicked(View view) {
+        switch (view.getId()){
+            case R.id.bsi_btn:
+                cardInfoPresenter.sendCardCmd(this);
+                break;
+
+            case R.id.return_home_layout:
+                CardInfoActivity.this.finish();
+                break;
+        }
 
     }
 
@@ -86,10 +103,10 @@ public class CardInfoActivity extends BaseActivity implements CardInfoContract.V
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getCardInfo(CardInfo cardInfo){
+    public void getCardInfo(CardInfo cardInfo) {
         hideLoading();
 
-        if(cardInfo.getCardAddress()==null && "".equals(cardInfo.getCardAddress())){
+        if (cardInfo.getCardAddress() == null && "".equals(cardInfo.getCardAddress())) {
             return;
         }
         StringBuffer cardInfoStr = new StringBuffer();
@@ -118,8 +135,18 @@ public class CardInfoActivity extends BaseActivity implements CardInfoContract.V
         cardInfoStr.append("mSubordinatesNum : " + cardInfo.getSubordinatesNum());
         cardInfoStr.append("\n");
 
-        Log.e(TAG, "BDEventListener.LocalInfoListener: =========="+ cardInfoStr);
+        Log.e(TAG, "BDEventListener.LocalInfoListener: ==========" + cardInfoStr);
 
         cardInfoExit.setText(cardInfoStr.toString());
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && event.getAction() == KeyEvent.ACTION_DOWN) {
+
+            this.finish();
+        }
+
+        return super.onKeyDown(keyCode, event);
     }
 }
