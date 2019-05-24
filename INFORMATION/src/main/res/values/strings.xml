@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">THD_BD_SMS</string>
+
+    <string name="loading1">正在加载...</string>
+
+    <string name="jiaoshi">校  时</string>
+
+    <string-array name="friend_loc_oper">
+        <item>导航</item>
+        <item>地图显示</item>
+        <item>回复短报文</item>
+        <item>删除</item>
+        <item>全部删除</item>
+    </string-array>
+
+    <string name="friend_loc_del_success">友邻位置删除成功!</string>
+    <string name="friend_loc_del_fail">友邻位置删除失败!</string>
+    <string name="common_cancle_btn">取   消</string>
 </resources>

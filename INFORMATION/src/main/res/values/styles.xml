@@ -19,6 +19,76 @@
         <item name="android:windowNoTitle">true</item>
         <item name="colorPrimary">#cccccc</item>
         <item name="colorPrimaryDark">#cccccc</item>
+        <!--Theme.NoTitleBar-->
+    </style>
+
+    <style name="bsi_relaylayout_style">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+    </style>
+
+    <!-- 顶部tab文字风格 -->
+    <style name="mTabTxtStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:textColor">@color/colorSettingText</item>
+        <item name="android:textSize">@dimen/sp_14</item>
+    </style>
+
+    <!-- bsi风格 -->
+    <style name="bsi_title_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/sp_14</item>
+        <item name="android:textColor">@color/colorSettingText</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_alignParentLeft">true</item>
+    </style>
+
+    <style name="bsi_signal_style">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="setting_text_style">
+        <item name="android:textColor">@color/colorSettingText</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/sp_14</item>
+    </style>
+
+    <!-- listview item 文字风格3 -->
+    <style name="listItem_Font_A3">
+        <item name="android:textSize">@dimen/sp_11</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/colorSettingText</item>
+    </style>
+
+    <style name="button_text_style">
+        <item name="android:textSize">@dimen/sp_14</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/colorMainBlue</item>
+    </style>
+
+    <style name="setting_card_style">
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:textSize">@dimen/sp_14</item>
+    </style>
+
+    <!-- 自定义仿IOS的AlertDialog的样式 -->
+    <style name="AlertDialogStyle" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
     </style>
 
 </resources>

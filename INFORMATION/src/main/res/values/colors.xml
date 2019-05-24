@@ -3,4 +3,25 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
+    <color name="colorMainBlue">#52C2E8</color>
+    <!--<color name="colorMainTitle">#555C6C</color>-->
+    <!--<color name="colorMainTitle">#BCBBBB</color>-->
+    <!--<color name="colorMainTitle">#585F6F</color>-->
+    <color name="colorMainTitle">#99CCFF</color>
+    <!--<color name="colorMainTitle">#A3B7B5</color>-->
+
+    <color name="colorWhite">#ffffff</color>
+    <color name="colorBlack">#000000</color>
+
+    <color name="colorLine">#EBB658</color>
+    <color name="colorBackground">#F3F3F7</color>
+    <color name="colorSettingText">#7D8DA4</color>
+
+    <!-- 通用颜色 -->
+    <color name="red">#FFFF0000</color>
+    <color name="text_hint">#D4D4D4</color>
+
+    <color name="bd_rdss_no_signal">#DCDCDC</color>
+    <color name="bd_rdss_have_signal">#5284EB</color>
 </resources>

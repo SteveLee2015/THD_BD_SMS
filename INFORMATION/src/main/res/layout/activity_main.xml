@@ -1,39 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MapActivity">
+    android:orientation="vertical">
 
-    <com.baidu.mapapi.map.MapView
-        android:id="@+id/bmapView"
-        android:layout_weight="1"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="@dimen/dp_1"
+        android:layout_above="@+id/main_bottom_layout"/>
 
-    </com.baidu.mapapi.map.MapView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_58"
+        android:id="@+id/main_bottom_layout"
+        android:orientation="horizontal"
+        android:layout_centerInParent="true"
+        android:background="@mipmap/main_bottom_base"
+        android:layout_alignParentBottom="true">
+
+        <LinearLayout
+            android:id="@+id/main_map_layout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/main_map_img"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_30"
+                android:layout_marginTop="@dimen/dp_3"
+                android:src="@mipmap/map_clicked"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="地图"
+                android:layout_marginBottom="@dimen/dp_3"
+                android:textSize="@dimen/sp_11"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/main_communication_layout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/main_communication_img"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_30"
+                android:layout_marginTop="@dimen/dp_3"
+                android:src="@mipmap/communication_unclick"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="通信"
+                android:layout_marginBottom="@dimen/dp_3"
+                android:textSize="@dimen/sp_11"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:visibility="invisible">
+
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/main_friends_layout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/main_friends_img"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_30"
+                android:layout_marginTop="@dimen/dp_3"
+                android:src="@mipmap/friends_unclick"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="友邻"
+                android:layout_marginBottom="@dimen/dp_3"
+                android:textSize="@dimen/sp_11"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/main_setting_layout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/main_setting_img"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_30"
+                android:layout_marginTop="@dimen/dp_3"
+                android:src="@mipmap/setting_unclick"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="设置"
+                android:layout_marginBottom="@dimen/dp_3"
+                android:textSize="@dimen/sp_11"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/main_bottom_fragmentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/main_bottom_layout">
+
+    </FrameLayout>
 
     <ImageView
-        android:id="@+id/main_my_loction"
+        android:id="@+id/main_center_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@mipmap/location_fill"
+        android:background="@mipmap/main_center_img"
         android:layout_alignParentBottom="true"
-        android:layout_marginLeft="@dimen/dp_20"
-        android:layout_marginBottom="@dimen/dp_50"/>
-
-    <Button
-        android:id="@+id/main_bsi_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="读波束"/>
-
-    <Button
-        android:id="@+id/main_cardinfo_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/main_bsi_btn"
-        android:text="读卡"/>
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="@dimen/dp_30"/>
 
 </RelativeLayout>

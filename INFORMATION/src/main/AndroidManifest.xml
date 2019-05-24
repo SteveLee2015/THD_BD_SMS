@@ -19,9 +19,15 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
     <!-- 访问网络，网络定位需要上网-->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
     <!-- SD卡读取权限，用户写入离线定位数据-->
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
         tools:ignore="ProtectedPermissions"></uses-permission>
+
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
 
     <application
         android:allowBackup="true"
@@ -30,14 +36,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/MAppTheme1"
-        android:name=".Application.SMSApplication">
+        android:name=".application.SMSApplication">
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="uk0WQ6V5uYiITHhgwqjZ4w6mhk4sfeUi" >
         </meta-data>
 
-        <activity android:name=".MapActivity"
+        <activity android:name=".activity.MainActivity"
             android:launchMode="singleInstance"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
@@ -49,13 +55,36 @@
 
         </activity>
 
-        <activity android:name=".activity.CardInfoActivity">
+        <activity android:name=".activity.BSIActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
         </activity>
 
-        <activity android:name=".activity.BSIActivity">
+        <activity android:name=".activity.ReplyMessageActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
         </activity>
+
+        <activity android:name=".activity.BDContactActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        </activity>
+
+        <activity android:name=".activity.BDTimeActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        </activity>
+
+        <activity android:name=".activity.MainCenterActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        </activity>
+
+        <activity android:name=".activity.StatelliteStatusActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        </activity>
+
 
     </application>
 
