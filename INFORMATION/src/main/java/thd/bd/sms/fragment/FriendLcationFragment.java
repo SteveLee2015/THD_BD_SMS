@@ -28,9 +28,10 @@ import java.util.List;
 import java.util.Map;
 
 import thd.bd.sms.R;
+import thd.bd.sms.activity.FriendLocationDetailActivity;
 import thd.bd.sms.activity.FriendLocationMapActivity;
-import thd.bd.sms.activity.ReplyMessageActivity;
 import thd.bd.sms.base.BaseFragment;
+import thd.bd.sms.bean.FriendBDPoint;
 import thd.bd.sms.database.FriendsLocationDatabaseOperation;
 import thd.bd.sms.utils.Config;
 import thd.bd.sms.utils.ReceiverAction;
@@ -43,23 +44,49 @@ import static android.content.Context.NOTIFICATION_SERVICE;
  * 
  */
 public class FriendLcationFragment extends BaseFragment {
+
+	private final String TAG = "FriendLcationFragment";
 	
 	private Context mContext;
 	private ListView listView;
 
-	private List<Map<String,Object>> list= new ArrayList<Map<String,Object>>();
+	private List<FriendBDPoint> list= new ArrayList();
 	private FriendsLocationDatabaseOperation oper;
 	private FriendsAdapter adapter;
 	private TextView tvInfo;
-	
+
+
+
+	/**
+	 * 数据更新广播
+	 */
+	BroadcastReceiver newInfoReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			String action = intent.getAction();
+			if (ReceiverAction.APP_ACTION_FRIEND_LOCATION_21.equals(action)) {
+				//更新数据
+				if (oper!=null && adapter !=null) {
+					list=oper.getAllGroupById();
+					adapter.notifyDataSetChanged();
+				}
+
+			}
+		}
+	};
 
 	@Override
 	public View initView() {
 		mContext = getActivity();
 		addReceiver();
 		oper = new FriendsLocationDatabaseOperation(mContext);
-		list=oper.getAllLocationList();
-		View view = View.inflate(getActivity(),R.layout.fragment_friend_loaction, null);
+		list = oper.getAllGroupById();
+		Log.e(TAG, "LERRY_YOULIN=======================FriendLcationFragment86=============list=="+list.size() );
+
+
+		View view = View.inflate(getActivity(),R.layout.activity_friend_loaction, null);
 		listView = (ListView) view.findViewById(R.id.lv_friends);
 		tvInfo = (TextView) view.findViewById(R.id.tv_info);
 		if (list.size()==0) {
@@ -118,11 +145,11 @@ public class FriendLcationFragment extends BaseFragment {
 							Log.e("LERRYTEST_MAP" ,"=========FriendLcationFragment115====点击了地图显示=====");
 
                 			//显示地图
-                			String endName = String.valueOf(list.get(index).get("FRIEND_ID"));
-            				String lonStr = String.valueOf(list.get(index).get("FRIEND_LON"));
-            				String latStr = String.valueOf(list.get(index).get("FRIEND_LAT"));
-            				double lon = Double.parseDouble(lonStr);
-            				double lat = Double.parseDouble(latStr);
+                			String endName = String.valueOf(list.get(index).getFriendID());
+//            				String lonStr = String.valueOf(list.get(index).get);
+//            				String latStr = String.valueOf(list.get(index).get("FRIEND_LAT"));
+//            				double lon = Double.parseDouble(lonStr);
+//            				double lat = Double.parseDouble(latStr);
                 			
 							// 方案I 发送地图显示广播
                 			/*Intent intent = new Intent();
@@ -132,16 +159,16 @@ public class FriendLcationFragment extends BaseFragment {
                 			intent.putExtra(ReceiverAction.KEY_BD_FRIEND_ID, endName);
                 			mActivity.sendBroadcast(intent);*/
 
-							Intent intent = new Intent(getActivity(),FriendLocationMapActivity.class);
-							intent.putExtra("latitude",String.valueOf(list.get(position).get(
-									"FRIEND_LAT")));
-							intent.putExtra("longitude",String.valueOf(list.get(position).get(
-									"FRIEND_LON")));
-							startActivity(intent);
-
-
-							Log.e("LERRYTEST_MAP", "=========FriendLcationFragment141================"+
-									list.get(position).get("FRIEND_LAT")+","+list.get(position).get("FRIEND_LON"));
+//							Intent intent = new Intent(getActivity(),FriendLocationMapActivity.class);
+//							intent.putExtra("latitude",String.valueOf(list.get(position).get(
+//									"FRIEND_LAT")));
+//							intent.putExtra("longitude",String.valueOf(list.get(position).get(
+//									"FRIEND_LON")));
+//							startActivity(intent);
+//
+//
+//							Log.e("LERRYTEST_MAP", "=========FriendLcationFragment141================"+
+//									list.get(position).get("FRIEND_LAT")+","+list.get(position).get("FRIEND_LON"));
 
 							/*//方案II 调用远程服务
 							SMSapp app = (SMSapp) mActivity.getApplication();
@@ -156,11 +183,11 @@ public class FriendLcationFragment extends BaseFragment {
 
 						}else if (which==0) {
                 			//导航 路径规划
-                			String endName = String.valueOf(list.get(index).get("FRIEND_ID"));
+                			/*String endName = String.valueOf(list.get(index).get("FRIEND_ID"));
             				String lonStr = String.valueOf(list.get(index).get("FRIEND_LON"));
             				String latStr = String.valueOf(list.get(index).get("FRIEND_LAT"));
             				double lon = Double.parseDouble(lonStr);
-            				double lat = Double.parseDouble(latStr);
+            				double lat = Double.parseDouble(latStr);*/
                 			
 							/*//发送导航广播
                 			Intent intent = new Intent();
@@ -171,7 +198,7 @@ public class FriendLcationFragment extends BaseFragment {
                 			mActivity.sendBroadcast(intent);*/
 
 //							goToBaiduMap(39.919625,116.403969,"");
-							goToBaiduMap(Double.parseDouble(latStr),Double.parseDouble(lonStr),"");
+							//goToBaiduMap(Double.parseDouble(latStr),Double.parseDouble(lonStr),"");
                 			
 						}else if (which==4) {
                 			//全部删除
@@ -202,9 +229,9 @@ public class FriendLcationFragment extends BaseFragment {
 
 						}else if (which ==3) {
                 			//从数据库中删除数据
-                			Map<String, Object> map=list.get(index);
-                			String id=String.valueOf(map.get("F_ID"));
-                			boolean istrue=oper.delete(Long.valueOf(id));
+							FriendBDPoint bdPoint = list.get(index);
+                			String address = bdPoint.getFriendID();
+                			boolean istrue=oper.deleteAllGroupByAddress(address);
                 			oper.close();
                 			if(istrue){
                 				Toast.makeText(mContext, mContext.getResources().getString(R.string.friend_loc_del_success), Toast.LENGTH_SHORT).show();
@@ -223,12 +250,23 @@ public class FriendLcationFragment extends BaseFragment {
              	return false;
 			}
 		});
+
+		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Intent intent = new Intent(getActivity(),FriendLocationDetailActivity.class);
+				intent.putExtra("friend_address",list.get(position).getFriendID());
+				startActivity(intent);
+			}
+		});
 	}
+
+
 
 	/**
 	 * 跳转百度地图
 	 */
-	private void goToBaiduMap(double mLat,double mLng,String mAddressStr) {
+	/*private void goToBaiduMap(double mLat,double mLng,String mAddressStr) {
 		if (!isInstalled("com.baidu.BaiduMap")) {
 			Toast.makeText(getActivity(),"请先安装百度地图客户端",Toast.LENGTH_LONG).show();
 			return;
@@ -240,7 +278,7 @@ public class FriendLcationFragment extends BaseFragment {
 				"&mode=driving" + // 导航路线方式
 				"&src=andr.baidu.openAPIdemo"));
 		startActivity(intent); // 启动调用
-	}
+	}*/
 
 
 	/**
@@ -249,7 +287,7 @@ public class FriendLcationFragment extends BaseFragment {
 	 * @param packageName
 	 * @return
 	 */
-	private boolean isInstalled(String packageName) {
+	/*private boolean isInstalled(String packageName) {
 		PackageManager manager = mContext.getPackageManager();
 		//获取所有已安装程序的包信息
 		List<PackageInfo> installedPackages = manager.getInstalledPackages(0);
@@ -260,28 +298,8 @@ public class FriendLcationFragment extends BaseFragment {
 			}
 		}
 		return false;
-	}
+	}*/
 
-
-	/**
-	 * 数据更新广播
-	 */
-	BroadcastReceiver newInfoReceiver = new BroadcastReceiver() {
-		
-		@Override
-		public void onReceive(Context context, Intent intent) {
-
-			String action = intent.getAction();
-			if (ReceiverAction.APP_ACTION_FRIEND_LOCATION_21.equals(action)) {
-				//更新数据
-				if (oper!=null && adapter !=null) {
-					list=oper.getAllLocationList();
-					adapter.notifyDataSetChanged();
-				}
-				
-			}
-		}
-	};
 
 	/**
 	 * 数据适配器
@@ -325,21 +343,33 @@ public class FriendLcationFragment extends BaseFragment {
 						.findViewById(R.id.friends_loc_lat);
 				viewHolder.height = (TextView) contentView
 						.findViewById(R.id.friends_loc_height);
+
+
+				viewHolder.company = (TextView) contentView
+						.findViewById(R.id.item_friends_company_txt);
+				viewHolder.company.setText("单位");
+				viewHolder.idTxt = (TextView) contentView
+						.findViewById(R.id.item_friends_id_txt);
+				viewHolder.idTxt.setText("友邻ID");
+				viewHolder.count = (TextView) contentView
+						.findViewById(R.id.item_friends_count_txt);
+				viewHolder.count.setText("数量");
+
+
 				contentView.setTag(viewHolder);
 			} else {
 				viewHolder = (ViewHolder) contentView.getTag();
 			}
 			if (list != null) {
 				viewHolder.userId.setText(String.valueOf(list.get(position)
-						.get("FRIEND_ID")));
-				viewHolder.time.setText(String.valueOf(list.get(position).get(
-						"FRIEND_REPORT_TIME")));
-				viewHolder.lon.setText(String.valueOf(list.get(position).get(
-						"FRIEND_LON")));
-				viewHolder.lat.setText(String.valueOf(list.get(position).get(
-						"FRIEND_LAT")));
-				viewHolder.height.setText(String.valueOf(list.get(position)
-						.get("FRIEND_HEIGHT")));
+						.getFriendID()));
+				viewHolder.time.setText(String.valueOf(list.get(position).getReceiveTime()));
+//				viewHolder.lon.setText(String.valueOf(list.get(position).get(
+//						"FRIEND_LON")));
+//				viewHolder.lat.setText(String.valueOf(list.get(position).get(
+//						"FRIEND_LAT")));
+//				viewHolder.height.setText(String.valueOf(list.get(position)
+//						.get("FRIEND_HEIGHT")));
 			}
 			return contentView;
 		}
@@ -358,5 +388,7 @@ public class FriendLcationFragment extends BaseFragment {
 		TextView lon;
 		TextView lat;
 		TextView height;
+
+		TextView company,idTxt,count;
 	}
 }

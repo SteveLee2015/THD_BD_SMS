@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground" >
+    android:background="@color/colorBackground"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/message_title"
+        layout="@layout/bd_title_layout"
+        android:focusable="true"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/tv_info"
@@ -17,4 +24,4 @@
         android:layout_height="match_parent" >
     </ListView>
 
-</RelativeLayout>
+</LinearLayout>

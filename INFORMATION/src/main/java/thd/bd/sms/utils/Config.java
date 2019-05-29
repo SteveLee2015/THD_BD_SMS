@@ -133,8 +133,8 @@ public class Config {
     public static final String RN_WAITING = "等待RN连续位置报告";
     
     /**RD连续报位**/
-    public static final String RD_RUNNING = "正在RD连续位置报告";
-    public static final String RD_WAITING = "等待RD连续位置报告";
+    public static final String RD_RUNNING = "正在连续报告";
+    public static final String RD_WAITING = "连续位置报告";
     
     /**状态连续报位**/
     public static final String SMS_RUNNING = "正在连续状态报告";

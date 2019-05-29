@@ -19,7 +19,7 @@ import thd.bd.sms.bean.FriendBDPoint;
  */
 public class BDFriendLocationOperation {
      
-	public static final String KEY_TITLE = "title";
+	/*public static final String KEY_TITLE = "title";
 	public static final String KEY_BODY = "body";
 	public static final String KEY_ROWID = "_id";
 	public static final String KEY_CREATED = "created";
@@ -35,11 +35,11 @@ public class BDFriendLocationOperation {
 		sqliteDatabase=databaseHelper.getReadableDatabase();
 	}
 	
-	/**
+	*//**
 	 * 增加友邻位置
 	 * @param
 	 * @return
-	 */
+	 *//*
 	public long insert(String friendCount, String receiveTime, String currentID, String friendID, String friendLon, String friendLonDir, String friendLat, String friendLatDir){
 		ContentValues contentValues=new ContentValues();
 		contentValues.put(FriendLocationNavColumns.RECEIVE_TIME,receiveTime);
@@ -53,11 +53,11 @@ public class BDFriendLocationOperation {
 		long id=sqliteDatabase.insert(FriendLocationNavColumns.TABLE_NAME, null, contentValues) ;
 		return id;
 	}
-	/**
+	*//**
 	 * 增加友邻位置
 	 * @param
 	 * @return
-	 */
+	 *//*
 	public long insert(FriendBDPoint friendBDPoint){
 		ContentValues contentValues=new ContentValues();
 		contentValues.put(FriendLocationNavColumns.RECEIVE_TIME,friendBDPoint.getReceiveTime());
@@ -72,11 +72,11 @@ public class BDFriendLocationOperation {
 		return id;
 	}
 
-	/**
+	*//**
 	 * 删除
 	 * @param rowId
 	 * @return
-	 */
+	 *//*
 	public boolean delete(long rowId){
 		boolean istrue=sqliteDatabase.delete(FriendLocationNavColumns.TABLE_NAME,KEY_ROWID +"="+rowId,null)>0;
 		return istrue;
@@ -87,23 +87,32 @@ public class BDFriendLocationOperation {
 		return istrue;
 	}
 	
-	/**
+	*//**
 	 * 全部删除
 	 * @param
 	 * @return
-	 */
+	 *//*
 	public boolean delete(){
 		boolean istrue=sqliteDatabase.delete(FriendLocationNavColumns.TABLE_NAME,null,null)>0;
 		return istrue;
 	}
+
+	*//**
+	 * 删除该id号的所有数据
+	 * @param address
+	 * @return
+	 *//**//*
+	public boolean deleteAllAboutAddress(String address){
+		boolean istrue=sqliteDatabase.delete(FriendLocationNavColumns.TABLE_NAME,KEY_ROWID +"="+rowId,null)>0;
+		return istrue;
+	}*//*
 	
-	
-	/**
+	*//**
 	 * 根据_id 查询
 	 * @param rowId
 	 * @return
 	 * @throws SQLException
-	 */
+	 *//*
 	public FriendBDPoint getByRowID(long rowId) throws SQLException {
 		//查询
 		Cursor mCursor=sqliteDatabase.query(true,FriendLocationNavColumns.TABLE_NAME,
@@ -134,12 +143,12 @@ public class BDFriendLocationOperation {
 	}
 	
 	
-	/**
+	*//**
 	 * 根据接收时间 查询
 	 * @param
 	 * @return
 	 * @throws SQLException
-	 */
+	 *//*
 	public List<FriendBDPoint> getByReceiveTime(String receiveTime) throws SQLException {
 		//查询
 		Cursor mCursor=sqliteDatabase.query(true,FriendLocationNavColumns.TABLE_NAME,
@@ -229,11 +238,57 @@ public class BDFriendLocationOperation {
 		mCursor.close();
 		return mFriendLoctionNavs;
 	}
-	
-	/**
+
+
+	public List<FriendBDPoint> getAllGroupById() throws SQLException {
+		Cursor mCursor=sqliteDatabase.query(true,FriendLocationNavColumns.TABLE_NAME,
+				new String[]{
+						FriendLocationNavColumns._ID,
+						FriendLocationNavColumns.RECEIVE_TIME,
+						FriendLocationNavColumns.FRIEND_COUNT,
+						FriendLocationNavColumns.FRIEND_CURRENT_ID,
+						FriendLocationNavColumns.FRIEND_ID,
+						FriendLocationNavColumns.FRIEND_LON,
+						FriendLocationNavColumns.FRIEND_LON_DIR,
+						FriendLocationNavColumns.FRIEND_LAT_DIR,
+						FriendLocationNavColumns.FRIEND_LAT},null, null, FriendLocationNavColumns._ID,null,FriendLocationNavColumns.RECEIVE_TIME +" desc",null);
+
+		List<FriendBDPoint> mFriendLoctionNavs=new ArrayList<FriendBDPoint>();
+
+		while (mCursor.moveToNext()) {
+			FriendBDPoint nav = new FriendBDPoint();
+
+			nav.setRowId(mCursor.getLong(mCursor
+					.getColumnIndex(FriendLocationNavColumns._ID)));
+			nav.setReceiveTime(mCursor.getString(mCursor
+					.getColumnIndex(FriendLocationNavColumns.RECEIVE_TIME)));
+			nav.setFriendCount(mCursor.getString(mCursor
+					.getColumnIndex(FriendLocationNavColumns.FRIEND_COUNT)));
+			nav.setCurrentID(mCursor.getString(mCursor
+					.getColumnIndex(FriendLocationNavColumns.FRIEND_CURRENT_ID)));
+			nav.setFriendID(mCursor.getString(mCursor
+					.getColumnIndex(FriendLocationNavColumns.FRIEND_ID)));
+			nav.setLon(mCursor.getString(mCursor
+					.getColumnIndex(FriendLocationNavColumns.FRIEND_LON)));
+			nav.setLat(mCursor.getString(mCursor
+					.getColumnIndex(FriendLocationNavColumns.FRIEND_LAT)));
+			nav.setLatDirection(mCursor.getString(mCursor
+					.getColumnIndex(FriendLocationNavColumns.FRIEND_LAT_DIR)));
+			nav.setLonDirection(mCursor.getString(mCursor
+					.getColumnIndex(FriendLocationNavColumns.FRIEND_LON_DIR)));
+
+			mFriendLoctionNavs.add(nav);
+		}
+		mCursor.close();
+		return mFriendLoctionNavs;
+	}
+
+
+
+	*//**
 	 * 获取所有的上报时间
 	 * @return
-	 */
+	 *//*
 	public List<String> getReceiveTime() {
 
 		Cursor mCursor = sqliteDatabase.query(true,
@@ -277,5 +332,5 @@ public class BDFriendLocationOperation {
 	public void close(){
 		databaseHelper.close();
 		sqliteDatabase.close();
-	}
+	}*/
 }

@@ -74,9 +74,9 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/main_center_daohang_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:paddingRight="@dimen/dp_20"
                 android:gravity="center"
                 android:layout_weight="1"
                 android:orientation="vertical">
@@ -112,6 +112,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
+                android:id="@+id/main_center_state_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -133,6 +134,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/main_center_RNReport_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -148,12 +150,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
-                    android:text="RN位置报告"
+                    android:text="连续位置报告"
                     style="@style/setting_text_style"/>
 
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/main_center_RDReport_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -169,7 +172,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
-                    android:text="RD位置报告"
+                    android:text="RD连续位置报告"
                     style="@style/setting_text_style" />
 
             </LinearLayout>
@@ -185,12 +188,10 @@
             android:layout_marginBottom="@dimen/dp_20"
             android:orientation="horizontal">
 
-
-
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:id="@+id/main_center_SOS_layout"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:paddingLeft="@dimen/dp_20"
                 android:gravity="center"
                 android:layout_weight="1"
                 android:orientation="vertical">
@@ -198,13 +199,57 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/boshu" />
+                    android:src="@mipmap/sos" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
-                    android:text="波束"
+                    android:text="SOS"
+                    style="@style/setting_text_style"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/RN_location_info_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/rn_report_blue" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_4"
+                    android:text="RN定位信息"
+                    style="@style/setting_text_style"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/RD_location_info_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/rd_report_blue" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_4"
+                    android:text="RD定位信息"
                     style="@style/setting_text_style"/>
 
             </LinearLayout>

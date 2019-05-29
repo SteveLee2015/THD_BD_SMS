@@ -13,7 +13,68 @@
         <item>全部删除</item>
     </string-array>
 
+    <!-- 定位类型 -->
+    <string-array name="bdloc_type_array">
+        <item>单次定位</item>
+        <item>连续定位</item>
+    </string-array>
+
+    <string-array name="test_height_spinner">
+        <item>有高程</item>
+        <item>无高程</item>
+        <item>测高一</item>
+        <item>测高二</item>
+    </string-array>
+
+    <string-array name="bdloc_zuobiao_array">
+        <item>2000大地坐标</item>
+        <item>高斯平面坐标</item>
+        <item>麦卡托平面坐标</item>
+        <item>空间直角坐标</item>
+        <item>北京54</item>
+    </string-array>
+
+    <!-- 报告类型 -->
+    <string-array name="report_type_array">
+        <item>状态报告</item>
+        <item>RN位置报告</item>
+        <item>RD位置报告</item>
+    </string-array>
+
     <string name="friend_loc_del_success">友邻位置删除成功!</string>
     <string name="friend_loc_del_fail">友邻位置删除失败!</string>
     <string name="common_cancle_btn">取   消</string>
+
+    <string name="common_x_value">0.00</string>
+    <string name="common_y_value">0.00</string>
+    <string name="common_z_value">0.00m</string>
+    <string name="common_metre">米</string>
+    <string name="common_hour_value">时</string>
+    <string name="common_minute_value">分</string>
+    <string name="common_second_value">秒</string>
+
+    <string name="common_lon_str">经    度:</string>
+    <string name="common_lat_str">纬    度:</string>
+    <string name="common_height_str">高    程:</string>
+
+    <string name="common_lon_value">000.000000°</string>
+    <string name="common_lat_value">00°000000°</string>
+    <!--<string name="common_height_value">0.00m</string>-->
+    <string name="common_dadi_heigh_value">0.00m | 0.0</string>
+    <string name="bdloc_lon_str">经        度</string>
+    <string name="bdloc_lat_str">纬        度</string>
+    <string name="bdloc_height_str">高        程</string>
+    <string name="bdloc_time_str">时        间</string>
+    <string name="common_height_value">0.00m</string>
+    <string name="common_time_value">00:00:00</string>
+    <string name="bdloc_zuobiao_str">坐标类型</string>
+
+    <string name="bd1_loc_type">定位方式</string>
+    <string name="location_pd"> 定位频度</string>
+    <string name="test_height_type">测高方式</string>
+    <string name="tianxian_height">天线高</string>
+
+    <string name="common_z_cood">Z  坐    标:</string>
+    <string name="common_x_cood">X  坐    标:</string>
+    <string name="common_y_cood">Y  坐    标:</string>
 </resources>

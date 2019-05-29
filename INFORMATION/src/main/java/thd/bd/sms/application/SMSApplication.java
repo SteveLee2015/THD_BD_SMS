@@ -40,8 +40,11 @@ import java.util.List;
 import java.util.Map;
 
 import thd.bd.sms.R;
+import thd.bd.sms.activity.MainActivity;
 import thd.bd.sms.bean.BDContactColumn;
+import thd.bd.sms.bean.FriendsLocation;
 import thd.bd.sms.database.BDMessageDatabaseOperation;
+import thd.bd.sms.database.FriendsLocationDatabaseOperation;
 import thd.bd.sms.fragment.CommunicationFragment;
 import thd.bd.sms.sharedpreference.Constant;
 import thd.bd.sms.sharedpreference.SharedPreferencesHelper;
@@ -49,7 +52,10 @@ import thd.bd.sms.utils.Config;
 import thd.bd.sms.utils.CrashHandler;
 import thd.bd.sms.service.LocationService;
 import thd.bd.sms.utils.DBhelper;
+import thd.bd.sms.utils.DateUtils;
 import thd.bd.sms.utils.ReceiverAction;
+import thd.bd.sms.utils.Utils;
+
 
 public class SMSApplication extends Application {
 
@@ -106,8 +112,31 @@ public class SMSApplication extends Application {
             EventBus.getDefault().postSticky(cardInfo);
 //            EventBus.getDefault().post(cardInfo);
 
-            SharedPreferencesHelper.put(Constant.SP_CARD_INFO_COMMLEVEL, cardInfo.getCommLevel());
-            SharedPreferencesHelper.put(Constant.SP_CARD_INFO_CHECKENCRYPITION, cardInfo.getCheckEncryption());
+            //卡等级
+            if(cardInfo.getCommLevel()==0){
+                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_COMMLEVEL, 0);
+            }else {
+                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_COMMLEVEL, cardInfo.getCommLevel());
+            }
+            //是否加密
+            if(cardInfo.getCheckEncryption()==null){
+                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_CHECKENCRYPITION, "");
+            }else {
+                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_CHECKENCRYPITION, cardInfo.getCheckEncryption());
+            }
+
+            //频度
+            if(cardInfo.getSericeFeq()==0){
+                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_SERICEFEQ, 0);
+            }else {
+                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_SERICEFEQ, cardInfo.getSericeFeq());
+            }
+            //是否有卡+卡号
+            if(cardInfo.getCardAddress()==null){
+                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_ADDRESS, "");
+            }else {
+                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_ADDRESS, cardInfo.getCardAddress());
+            }
         }
     };
 
@@ -134,7 +163,7 @@ public class SMSApplication extends Application {
         @Override
         public void onTimeOut(Map<Integer, Long> map) {
             for (Integer key : map.keySet()) {
-                Log.i("TEST1", "==========key =" + key + ", value =" + map.get(key));
+                Log.w("TEST1", "==========key =" + key + ", value =" + map.get(key));
             }
         }
     };
@@ -145,7 +174,9 @@ public class SMSApplication extends Application {
     private BDEventListener.BDLocationListener bdLocationListener = new BDEventListener.BDLocationListener() {
         @Override
         public void onLocationChange(BDLocation bdLocation) {
-            Toast.makeText(appContext, "bdLocationListener lat =" + bdLocation.getLatitude() + ",lon =" + bdLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+            EventBus.getDefault().post(bdLocation);
+            bdLocation.dumpInfo();
+
             Log.e("TEST", "=================> bdLocationListener lat =" + bdLocation.getLatitude() + ",lon =" + bdLocation.getLongitude());
         }
     };
@@ -158,9 +189,22 @@ public class SMSApplication extends Application {
         public void onLocReport(BDLocationReport bdLocationReport) {
             Toast.makeText(appContext, "bdLocReportListener lat =" + bdLocationReport.getLatitude() + ",lon =" + bdLocationReport.getLongitude(), Toast.LENGTH_SHORT).show();
             Log.e("TEST", "=================> bdLocReportListener lat =" + bdLocationReport.getLatitude() + ",lon =" + bdLocationReport.getLongitude());
+            boolean isAdd = mAddLocationReportToDatabase(bdLocationReport, Config.RD_DWR);
+            notifcation(ReceiverAction.APP_ACTION_FRIEND_LOCATION_21);
+            notificationSMS(bdLocationReport.mUserAddress,bdLocationReport.mLatitude+","+bdLocationReport.mLongitude);
         }
     };
 
+    /**
+     * 通知数据有更新
+     */
+    private void notifcation(String action) {
+
+        Intent intent = new Intent();
+        intent.setAction(action);
+        appContext.sendBroadcast(intent);
+
+    }
 
     @Override
     public void onCreate() {
@@ -213,6 +257,7 @@ public class SMSApplication extends Application {
     }
 
 
+
     private void registerReceiver() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BDConstants.BD_MESSAGE_BROAD_ACTION);
@@ -220,7 +265,9 @@ public class SMSApplication extends Application {
     }
 
     private void unRegisterReceiver() {
-        unregisterReceiver(receiver);
+        if(receiver!=null){
+            unregisterReceiver(receiver);
+        }
     }
 
     @Override
@@ -357,6 +404,97 @@ public class SMSApplication extends Application {
         notificationManager.notify(Config.NOTIFICATION_SMS, notification);
         //notificationManager.cancel(100);//通知以后自动消失了
     }
+
+
+
+    /**
+     * 保存友邻位置到数据库
+     *
+     * @param report
+     * @return
+     */
+    private boolean mAddLocationReportToDatabase(BDLocationReport report, int flag) {
+
+        FriendsLocationDatabaseOperation oper = new FriendsLocationDatabaseOperation(appContext);
+
+
+        double latitude = report.getLatitude();
+        double longitude = report.getLongitude();
+
+        //2.1 转换为 °的问题
+        double latitudeNew = Utils.changeLonLatMinuteToDegree(Double.valueOf(latitude));
+        double longitudeNew = Utils.changeLonLatMinuteToDegree(Double.valueOf(longitude));
+
+
+        //latitude = Double.parseDouble(latiFormat);
+        //longitude = Double.parseDouble(longiFormat);
+
+        report.setLatitude(latitudeNew);
+        report.setLongitude(longitudeNew);
+
+        String reportTime = report.getReportTime();
+
+        Log.e(TAG, "mAddLocationReportToDatabase: =============reportTime=="+reportTime );
+
+        //本地时间
+        String time = "00:00:00.00";
+        if (reportTime.length() >= 6) {
+            String hh = reportTime.substring(0, 2);
+            int anInt = Integer.parseInt(hh);
+            int beijingTime = (anInt + 8) % 24;
+            String mm = reportTime.substring(2, 4);
+            String ss = reportTime.substring(4, 6);
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-dd");
+            String ymd = simpleDateFormat.format(new Date());
+
+            time = ymd +"\t"+ beijingTime + ":" + mm + ":" + ss;
+        }
+
+        /*String[] split = cbTime[0].split(":");
+        if (split != null) {
+            String hh = split[0];
+            if (hh.length() > 2) {
+                //去除 年月日  2016-12-08 15:27:3 崩溃bug
+                String[] arr = hh.split("\\s+");
+                for (String ss : arr) {
+                    System.out.println(ss);
+                }
+                if (arr.length > 1) {
+                    hh = arr[arr.length - 1];
+                }
+            }
+            int anInt = Integer.parseInt(hh);
+            int reportTimeInt = 0;
+            //怎么区分 rd 时间  和  rn时间
+            switch (flag) {
+                case Config.RN_RD_WAA:
+                    reportTimeInt = (anInt + 8) % 24;
+                    break;
+                case Config.RD_DWR:
+                    reportTimeInt = anInt;
+                    break;
+            }
+
+            //int reportTimeInt = (anInt+8)%24;
+
+            int i = reportTime.indexOf(":");
+            String otherStr = reportTime.substring(i, reportTime.length());
+            reportTime = reportTimeInt + otherStr;
+        }*/
+
+        FriendsLocation fl = new FriendsLocation();
+        fl.setUserId(report.getUserAddress());
+        fl.setLat(String.valueOf(report.getLatitude()));
+        fl.setLon(String.valueOf(report.getLongitude()));
+        fl.setHeight(String.valueOf(report.getHeight()));
+        fl.setReportTime(time);
+        boolean isTrue = oper.insert(fl);
+        Log.e(TAG, "mAddLocationReportToDatabase: =======是否保存到数据库========"+isTrue +",========time=="+time);
+        oper.close();
+        return isTrue;
+    }
+
 
 
     /**

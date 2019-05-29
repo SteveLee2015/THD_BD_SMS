@@ -23,6 +23,9 @@ import com.thd.cmd.manager.BDCmdManager;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.OnClick;
 import thd.bd.sms.R;
@@ -72,6 +75,7 @@ public class MainActivity extends BaseActivity {
      * Fragment接收从FragmentActivity传来的数据：调用getArguments()接收数据包，返回Bundle对象；
      */
     private Bundle bundle;
+    private List<Fragment> fragmentList = new ArrayList<>();
 
     @Override
     protected int getContentView() {
@@ -225,9 +229,13 @@ public class MainActivity extends BaseActivity {
 //                Log.i(TAG,"switchContent_keep data= "+data);
                 to.setArguments(bundle);
 
+                fragmentList.add(to);
+
+                Log.i(TAG, "MainActivity255: =======未添加过该fragment，添加并隐藏上一个========" );
                 // 隐藏当前的fragment，add下一个fragment到Activity中
                 getSupportFragmentManager().beginTransaction().hide(from).add(R.id.main_bottom_fragmentLayout, to).commit();
             } else {
+                Log.i(TAG, "MainActivity258: =======添加过该fragment要隐藏了========" );
                 // 隐藏当前的fragment，显示下一个fragment
                 getSupportFragmentManager().beginTransaction().hide(from).show(to).commit();
             }

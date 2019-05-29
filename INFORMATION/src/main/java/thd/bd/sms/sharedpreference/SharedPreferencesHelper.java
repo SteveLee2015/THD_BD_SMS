@@ -27,6 +27,8 @@ public class SharedPreferencesHelper {
             editor.putBoolean(key, (Boolean) value);
         } else if (value.getClass() == Integer.class) {
             editor.putInt(key, (Integer) value);
+        }else if (value.getClass() == Float.class) {
+            editor.putFloat(key, (Float) value);
         }
         editor.commit();
     }
@@ -68,12 +70,12 @@ public class SharedPreferencesHelper {
         return sharedPreferences.getAll();
     }
 
-    public static String getLastLat() {
-        return sharedPreferences.getString(Constant.SP_KEY_RN_LOCATION_LAT, "");
+    public static double getLastLat() {
+        return sharedPreferences.getFloat(Constant.SP_KEY_RN_LOCATION_LAT, 0.0f);
     }
 
-    public static String getLastLng() {
-        return sharedPreferences.getString(Constant.SP_KEY_RN_LOCATION_LON, "");
+    public static double getLastLng() {
+        return sharedPreferences.getFloat(Constant.SP_KEY_RN_LOCATION_LON, 0.0f);
     }
 
     public static int getRecordedCount() {
@@ -90,5 +92,31 @@ public class SharedPreferencesHelper {
 
     public static boolean getIsCheckedPhone(String name) {
         return sharedPreferences.getBoolean(name, false);
+    }
+
+    //频度
+    public static int getSericeFeq() {
+        return sharedPreferences.getInt(Constant.SP_CARD_INFO_SERICEFEQ, 0);
+    }
+    //是否有卡+卡号
+    public static String getCardAddress() {
+        return sharedPreferences.getString(Constant.SP_CARD_INFO_ADDRESS, "");
+    }
+
+    //RD高度
+    public static float getRDHeight() {
+        return sharedPreferences.getFloat(Constant.SP_KEY_RD_LOCATION_EARTHHEIGHT, 0.0f);
+    }
+
+    public static String getRDTime() {
+        return sharedPreferences.getString(Constant.SP_KEY_RD_LOCATION_TIME, "");
+    }
+
+    public static float getRDLat() {
+        return sharedPreferences.getFloat(Constant.SP_KEY_RD_LOCATION_LAT, 0.0f);
+    }
+
+    public static float getRDLon() {
+        return sharedPreferences.getFloat(Constant.SP_KEY_RD_LOCATION_LON, 0.0f);
     }
 }

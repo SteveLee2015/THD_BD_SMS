@@ -24,6 +24,8 @@ import butterknife.Unbinder;
 import thd.bd.sms.R;
 import thd.bd.sms.activity.BDTimeActivity;
 import thd.bd.sms.activity.BSIActivity;
+import thd.bd.sms.activity.RDLocationSetActivity;
+import thd.bd.sms.activity.ReportSetActivity;
 
 public class SettingFragment extends Fragment {
     private static final String TAG = "SettingFragment";
@@ -41,8 +43,10 @@ public class SettingFragment extends Fragment {
     Unbinder unbinder;
     @BindView(R.id.setting_time_layout)
     LinearLayout settingTimeLayout;
-    @BindView(R.id.setting_boshu_layout)
-    LinearLayout settingBoshuLayout;
+    @BindView(R.id.setting_report_layout)
+    LinearLayout settingReportLayout;
+    @BindView(R.id.setting_RDLocation_layout)
+    LinearLayout settingRDLocationLayout;
     private View view;
 
     private CardInfo cardInfo;
@@ -120,7 +124,7 @@ public class SettingFragment extends Fragment {
         unbinder.unbind();
     }
 
-    @OnClick({R.id.setting_time_layout,R.id.setting_boshu_layout})
+    @OnClick({R.id.setting_time_layout, R.id.setting_report_layout,R.id.setting_RDLocation_layout})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.setting_time_layout:
@@ -128,8 +132,12 @@ public class SettingFragment extends Fragment {
                 startActivity(intent);
                 break;
 
-            case R.id.setting_boshu_layout:
-                intent = new Intent(getActivity(), BSIActivity.class);
+            case R.id.setting_report_layout:
+                intent = new Intent(getActivity(), RDLocationSetActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.setting_RDLocation_layout:
+                intent = new Intent(getActivity(), ReportSetActivity.class);
                 startActivity(intent);
                 break;
         }

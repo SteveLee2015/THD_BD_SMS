@@ -24,4 +24,5 @@
 
     <color name="bd_rdss_no_signal">#DCDCDC</color>
     <color name="bd_rdss_have_signal">#5284EB</color>
+    <color name="color_botton">#D9EBF6</color>
 </resources>

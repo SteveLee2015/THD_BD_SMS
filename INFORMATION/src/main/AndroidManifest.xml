@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="thd.bd.sms">
 
+    <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+
     <!-- 这个权限用于进行网络定位-->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"></uses-permission>
     <!-- 这个权限用于访问GPS定位-->
@@ -84,6 +86,75 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
         </activity>
+
+        <activity android:name=".activity.LocActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        </activity>
+
+        <activity android:name=".activity.FriendLocationMapActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        </activity>
+
+        <activity android:name=".activity.RDLocationSetActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        </activity>
+
+        <activity android:name=".activity.ReportSetActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        </activity>
+
+
+        <activity android:name=".activity.FriendLocationDetailActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        </activity>
+
+
+
+
+
+        <!-- 连续定位服务 -->
+        <service android:name=".service.CycleLocService">
+            <intent-filter>
+                <action android:name="thd.bd.sms.CycleLocService"/>
+            </intent-filter>
+        </service>
+
+        <!-- 连续报告基类 -->
+        <service android:name=".service.CycleReportService">
+            <intent-filter>
+                <action android:name="thd.bd.sms.CycleReportService"/>
+            </intent-filter>
+        </service>
+        <!-- 连续rd位置报告 -->
+        <service android:name=".service.CycleReportRDLocService">
+            <intent-filter>
+                <action android:name="thd.bd.sms.CycleReportRDLocService"/>
+            </intent-filter>
+        </service>
+
+        <!-- 连续rn位置报告 -->
+        <service android:name=".service.CycleReportRNLocService">
+            <intent-filter>
+                <action android:name="thd.bd.sms.CycleReportRNLocService"/>
+            </intent-filter>
+        </service>
+        <!-- 连续短报文状态报告服务 -->
+        <service android:name=".service.CycleReportStatuService">
+            <intent-filter>
+                <action android:name="thd.bd.sms.CycleReportStatuService"/>
+            </intent-filter>
+        </service>
+        <!-- 连续短报文sos报告服务 -->
+        <service android:name=".service.CycleReportSOSService">
+            <intent-filter>
+                <action android:name="thd.bd.sms.CycleReportSOSService"/>
+            </intent-filter>
+        </service>
 
 
     </application>

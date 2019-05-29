@@ -70,6 +70,8 @@ public class FriendsFragment extends Fragment {
 
     }
 
+
+
     private void initView() {
         tabpager = (ViewPager) view.findViewById(R.id.tabpager);
         tabpager.setOnPageChangeListener(new MyOnPageChangeListener());
@@ -121,9 +123,15 @@ public class FriendsFragment extends Fragment {
         Display currDisplay = getActivity().getWindowManager().getDefaultDisplay();//获取屏幕当前分辨率
         int displayWidth = currDisplay.getWidth();
         int displayHeight = currDisplay.getHeight();
-        one = displayWidth / 4; //设置水平动画平移大小
+        one = displayWidth / 3; //设置水平动画平移大小
         two = one * 2;
-        initViewPage(item);
+//        initViewPage(item);
+        initViewPage(0);
+
+        mTab1View.setBackgroundColor(getResources().getColor(R.color.colorLine));
+        tv_tb1.setTextColor(getResources().getColor(R.color.colorLine));
+        mTab2View.setBackgroundColor(getResources().getColor(R.color.colorWhite));
+        mTab3View.setBackgroundColor(getResources().getColor(R.color.colorWhite));
     }
 
     /**
@@ -153,6 +161,8 @@ public class FriendsFragment extends Fragment {
                     if (friendBadgeView != null) {
                         friendBadgeView.hide();
                     }
+                    mTab1View.setBackgroundColor(getResources().getColor(R.color.colorLine));
+                    tv_tb1.setTextColor(getResources().getColor(R.color.colorLine));
                     if (currIndex == 1) {
                         animation = new TranslateAnimation(one, 0, 0, 0);
                         mTab2View.setBackgroundColor(getResources().getColor(R.color.colorWhite));

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 import thd.bd.sms.base.DatabaseHelper;
 import thd.bd.sms.base.DatabaseHelper.FriendsLocationColumns;
+import thd.bd.sms.bean.FriendBDPoint;
 import thd.bd.sms.bean.FriendLocation;
 import thd.bd.sms.bean.FriendsLocation;
 
@@ -76,6 +78,18 @@ public class FriendsLocationDatabaseOperation {
 		contentValues.put(FriendsLocationColumns.FRIENDS_HEIGHT,flag.getHeight());
 		long id=sqliteDatabase.insert(FriendsLocationColumns.TABLE_NAME, null, contentValues) ;
 		return id>0;
+	}
+
+	/**
+	 * 删除
+	 * @param address
+	 * @return
+	 */
+	public boolean deleteAllGroupByAddress(String address){
+		databaseHelper=new DatabaseHelper(context);
+		sqliteDatabase = databaseHelper.getWritableDatabase();
+		boolean istrue=sqliteDatabase.delete(FriendsLocationColumns.TABLE_NAME,FriendsLocationColumns.FRIENDS_ID +"="+address,null)>0;
+		return istrue;
 	}
 
 	/**
@@ -144,6 +158,81 @@ public class FriendsLocationDatabaseOperation {
 		mCursor.close();
 		return list;
 	}
+
+
+	public List<FriendBDPoint> getAllGroupById() throws SQLException {
+		databaseHelper=new DatabaseHelper(context);
+		sqliteDatabase=databaseHelper.getReadableDatabase();
+		//查询
+		Cursor mCursor = sqliteDatabase.rawQuery("select *,count(*) from BD_FRIEND_LOCATION group by FRIENDS_ID order by REPORT_TIME",null);
+
+//		Cursor mCursor=sqliteDatabase.query(true,FriendsLocationColumns.TABLE_NAME,
+//				new String[]{FriendsLocationColumns._ID,FriendsLocationColumns.FRIENDS_ID ,FriendsLocationColumns.REPORT_TIME,
+//						FriendsLocationColumns.FRIENDS_LON,FriendsLocationColumns.FRIENDS_LAT,
+//						FriendsLocationColumns.FRIENDS_HEIGHT},null, null, FriendsLocationColumns.FRIENDS_ID,null,FriendsLocationColumns.REPORT_TIME+" desc",null);
+
+		List<FriendBDPoint> list = new ArrayList<FriendBDPoint>();
+		int count = mCursor.getCount();
+		for (int i = 0; i < count; i++) {
+
+			if (mCursor.moveToNext()) {
+				FriendBDPoint nav = new FriendBDPoint();
+				nav.setFriendID(mCursor.getString(mCursor
+						.getColumnIndex(FriendsLocationColumns.FRIENDS_ID)));
+
+				nav.setReceiveTime(mCursor.getString(mCursor
+						.getColumnIndex(FriendsLocationColumns.REPORT_TIME)));
+				nav.setFriendCount(mCursor.getString(mCursor
+						.getColumnIndex("count(*)")));
+
+				list.add(nav);
+			}
+		}
+
+		mCursor.close();
+		return list;
+	}
+
+	/**
+	 * 根据用户address获取所有数据
+	 * @return
+	 * @throws SQLException
+	 */
+	public List<Map<String ,Object>> getAllByAddress(String address) throws SQLException {
+		databaseHelper=new DatabaseHelper(context);
+		sqliteDatabase=databaseHelper.getReadableDatabase();
+		//查询
+//		Cursor mCursor=sqliteDatabase.query(true,FriendsLocationColumns.TABLE_NAME,
+//				new String[]{FriendsLocationColumns._ID,FriendsLocationColumns.FRIENDS_ID ,FriendsLocationColumns.REPORT_TIME,
+//						FriendsLocationColumns.FRIENDS_LON,FriendsLocationColumns.FRIENDS_LAT,
+//						FriendsLocationColumns.FRIENDS_HEIGHT},FriendsLocationColumns.FRIENDS_ID + "=" +address, null, null,null,FriendsLocationColumns._ID+" desc",null);
+
+		Cursor mCursor = sqliteDatabase.rawQuery("select * from BD_FRIEND_LOCATION where FRIENDS_ID = "+"'"+address+"'",null);
+		int count = mCursor.getCount();
+		Log.e("FriendsOperation", "LERRY_YOULIN==================FriendsLocationDatabaseOperation213=======address=="+address+"====count=="+count);
+		List<Map<String ,Object>> list=new ArrayList<Map<String,Object>>();
+
+		Map<String,String> userAddressMap=new HashMap<String,String>();
+		while(mCursor.moveToNext()){
+			String userAddress=mCursor.getString(mCursor.getColumnIndex(FriendsLocationColumns.FRIENDS_ID));
+
+
+			if(true){
+				Map<String,Object> map=new HashMap<String,Object>();
+				map.put("F_ID",mCursor.getString(mCursor.getColumnIndex(FriendsLocationColumns._ID)) );
+				map.put("FRIEND_ID",userAddress);
+				map.put("FRIEND_REPORT_TIME", mCursor.getString(mCursor.getColumnIndex(FriendsLocationColumns.REPORT_TIME)));
+				map.put("FRIEND_LON", mCursor.getString(mCursor.getColumnIndex(FriendsLocationColumns.FRIENDS_LON)));
+				map.put("FRIEND_LAT", mCursor.getString(mCursor.getColumnIndex(FriendsLocationColumns.FRIENDS_LAT)));
+				map.put("FRIEND_HEIGHT", mCursor.getString(mCursor.getColumnIndex(FriendsLocationColumns.FRIENDS_HEIGHT)));
+				list.add(map);
+				userAddressMap.put(userAddress, "exists");
+			}
+		}
+		mCursor.close();
+		return list;
+	}
+
 	/**
 	 * 得到数据   所有的数据
 	 * @return

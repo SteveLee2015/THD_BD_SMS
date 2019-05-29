@@ -1,6 +1,7 @@
 package thd.bd.sms.utils;
 
 
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,6 +9,9 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
+
+import java.util.List;
 
 public class SysUtils {
 
@@ -58,6 +62,30 @@ public class SysUtils {
         }).show();
     }
 
+    /**
+     * 判断一个服务是否在运行
+     * @param mContext
+     * @param className
+     * @return
+     */
+    public static boolean isServiceRunning(Context mContext, String className) {
+        boolean isRunning = false;
+        ActivityManager activityMananger = (ActivityManager) mContext
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> serviceList = activityMananger
+                .getRunningServices(Integer.MAX_VALUE);
+        if (serviceList.size() <= 0) {
+            return false;
+        }
+        for (int i = 0; i < serviceList.size(); i++) {
+            Log.i("AppUtils", serviceList.get(i).service.getClassName());
+            if (serviceList.get(i).service.getClassName().equals(className) == true) {
+                isRunning = true;
+                break;
+            }
+        }
+        return isRunning;
+    }
 
 
 }

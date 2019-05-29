@@ -19,6 +19,16 @@ public class DBLocation implements Parcelable {
     public double mGroundSpeed; //地面速度 米/秒
     public double mGroundDirection; //地面航向
 
+    public String getTimeStr() {
+        return timeStr;
+    }
+
+    public void setTimeStr(String timeStr) {
+        this.timeStr = timeStr;
+    }
+
+    private String timeStr;
+
     public DBLocation() {
 
     }

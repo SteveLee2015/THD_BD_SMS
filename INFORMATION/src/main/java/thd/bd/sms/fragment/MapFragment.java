@@ -106,10 +106,11 @@ public class MapFragment extends Fragment implements SensorEventListener {
         super.onDestroyView();
         // 与onCreateView相对应,当该Fragment的视图被移除时调用
         unbinder.unbind();
-        bmapView.onDestroy();
+        if(bmapView!=null){
+            bmapView.onDestroy();
+        }
         // 关闭定位图层
         mBaiduMap.setMyLocationEnabled(false);
-        bmapView.onDestroy();
         bmapView = null;
         EventBus.getDefault().unregister(this);
     }

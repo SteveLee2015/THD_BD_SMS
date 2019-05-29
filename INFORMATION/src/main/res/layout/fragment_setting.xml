@@ -134,7 +134,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/setting_boshu_layout"
+                android:id="@+id/setting_report_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -150,12 +150,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
-                    android:text="波束"
+                    android:text="报告参数"
                     style="@style/setting_text_style"/>
 
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/setting_RDLocation_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -165,13 +166,13 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/time" />
+                    android:src="@mipmap/rd_par" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
-                    android:text="校时"
+                    android:text="RD定位设置"
                     style="@style/setting_text_style" />
 
             </LinearLayout>

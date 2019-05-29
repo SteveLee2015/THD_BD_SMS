@@ -1,0 +1,142 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="@dimen/dp_10"
+    android:background="@color/colorBackground"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="10dp"
+        android:orientation="vertical">
+
+        <!--定位方式-->
+        <LinearLayout style="@style/lineLayout_parent">
+
+            <TextView
+                style="@style/locTxtStyle1"
+                android:text="@string/bd1_loc_type" />
+
+            <thd.bd.sms.view.CustomListView
+                android:id="@+id/bd_report_coodr_type"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="5">
+
+            </thd.bd.sms.view.CustomListView>
+        </LinearLayout>
+        <!--定位频度-->
+        <LinearLayout style="@style/lineLayout_parent">
+
+            <TextView
+                style="@style/locTxtStyle1"
+                android:text="@string/location_pd" />
+
+            <LinearLayout style="@style/lineLayout_editor_text">
+
+                <EditText
+                    android:id="@+id/location_step"
+                    style="@style/locTxtStyle_other"
+                    android:enabled="false"
+                    android:inputType="number"
+                    android:maxLength="9"
+                    android:text="61"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="秒" />
+            </LinearLayout>
+        </LinearLayout>
+        <!--测高方式-->
+        <LinearLayout style="@style/lineLayout_parent">
+
+            <TextView
+                style="@style/locTxtStyle1"
+                android:text="@string/test_height_type" />
+
+            <thd.bd.sms.view.CustomListView
+                android:id="@+id/bd_check_height_type"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="5"></thd.bd.sms.view.CustomListView>
+        </LinearLayout>
+
+        <!--高程-->
+        <LinearLayout style="@style/lineLayout_parent">
+
+            <TextView
+                style="@style/locTxtStyle1"
+                android:text="@string/bdloc_height_str" />
+
+            <LinearLayout style="@style/lineLayout_editor_text">
+
+                <EditText
+                    android:id="@+id/height_value"
+                    style="@style/locTxtStyle_other"
+                    android:inputType="numberDecimal|number"
+                    android:text="0" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/common_metre" />
+            </LinearLayout>
+        </LinearLayout>
+        <!--天线高-->
+        <LinearLayout style="@style/lineLayout_parent">
+
+            <TextView
+                style="@style/locTxtStyle1"
+                android:text="@string/tianxian_height" />
+
+            <LinearLayout
+
+                style="@style/lineLayout_editor_text">
+
+                <EditText
+                    android:id="@+id/tianxian_height_value"
+                    style="@style/locTxtStyle_other"
+                    android:enabled="false"
+                    android:inputType="numberDecimal|number"
+                    android:text="0" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/common_metre" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/bdset_submit_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/dp_40"
+                android:background="@drawable/btn_bg_selector"
+                android:padding="5dp"
+                android:text="确定"
+                android:textColor="@color/colorSettingText"
+                android:textSize="@dimen/sp_14" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

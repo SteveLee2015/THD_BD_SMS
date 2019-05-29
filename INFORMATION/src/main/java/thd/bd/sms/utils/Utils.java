@@ -15,6 +15,7 @@ import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.baidu.mapapi.model.LatLng;
 import com.thd.cmd.manager.entity.EncodeMode;
@@ -1533,6 +1534,29 @@ public class Utils {
         return MESSAGE_MAX_LENGHTH;
     }
 
+
+    public static double changeLonLatMinuteToDegree(double num) {
+        if (num != 0.0D && num >= 100.0D) {
+            String value = String.valueOf(num);
+            int index = value.indexOf(".");
+            return Double.valueOf(value.substring(0, index - 2)) + Double.valueOf(value.substring(index - 2)) / 60.0D;
+        } else {
+            return 0.0D;
+        }
+    }
+
+    /**
+     * 检查北斗SIM卡是否安装
+     * @param mContext
+     */
+    public static boolean checkBDSimCard(Context mContext) {
+        if(SharedPreferencesHelper.getCardAddress()==null || "".equals(SharedPreferencesHelper.getCardAddress())){
+            Toast.makeText(mContext,"请打开短报文开关,并安装北斗卡",Toast.LENGTH_SHORT).show();
+            return false;
+        }else {
+            return true;
+        }
+    }
 
     /**
      * 将GPS设备采集的原始GPS坐标转换成百度坐标

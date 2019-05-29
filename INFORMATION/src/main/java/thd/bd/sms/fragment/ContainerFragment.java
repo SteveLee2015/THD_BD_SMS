@@ -88,7 +88,7 @@ public class ContainerFragment extends BaseFragment {
 			}
 		});
 		
-		friend2.setOnClickListener(new OnClickListener() {
+		/*friend2.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -101,7 +101,7 @@ public class ContainerFragment extends BaseFragment {
 				}
 				groupBadgeView.hide();
 			}
-		});
+		});*/
 	}
 
 	private void openFriendFragment1() {

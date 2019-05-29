@@ -27,6 +27,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import thd.bd.sms.R;
 import thd.bd.sms.base.BaseActivity;
+import thd.bd.sms.utils.WinUtils;
 
 public class FriendLocationMapActivity extends BaseActivity {
     private static final String TAG = "MapActivity";
@@ -58,6 +59,7 @@ public class FriendLocationMapActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+        WinUtils.setWinTitleColor(this);
 
 
         //绑定初始化ButterKnife

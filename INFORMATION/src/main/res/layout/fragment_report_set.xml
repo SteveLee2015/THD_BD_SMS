@@ -1,0 +1,182 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorBackground"
+                android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="28dp"
+        android:orientation="vertical">
+        <!--报告方式-->
+        <LinearLayout
+            android:id="@+id/ll_to_change"
+            style="@style/lineLayout_parent">
+
+            <TextView
+                style="@style/locTxtStyle1"
+                android:text="报告方式"/>
+
+            <thd.bd.sms.view.CustomListView
+                android:id="@+id/report_type"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/dp_40"
+                android:layout_gravity="center"
+                android:layout_weight="5">
+            </thd.bd.sms.view.CustomListView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_desc"
+            style="@style/lineLayout_parent">
+
+            <TextView
+                style="@style/locTxtStyle1"
+                android:text="报告方式"/>
+
+            <LinearLayout
+                style="@style/lineLayout_editor_text2">
+
+                <TextView
+                    android:id="@+id/tv_dest"
+                    style="@style/locTxtStyle2"/>
+            </LinearLayout>
+        </LinearLayout>
+        <!--平台号码-->
+        <LinearLayout
+            style="@style/lineLayout_parent">
+
+            <TextView
+                style="@style/locTxtStyle1"
+                android:text="平台号码"/>
+
+            <LinearLayout
+                style="@style/lineLayout_editor_text2">
+
+                <EditText
+                    android:id="@+id/report_num"
+                    style="@style/locTxtStyle2"
+                    android:maxLength="7"
+                    android:hint="请输入报告号码!"
+                    android:inputType="number"/>
+            </LinearLayout>
+        </LinearLayout>
+        <!--报告频度-->
+        <LinearLayout
+            style="@style/lineLayout_parent">
+
+            <TextView
+                style="@style/locTxtStyle1"
+                android:text="报告频度"/>
+
+            <LinearLayout
+
+                style="@style/lineLayout_editor_text"
+                >
+
+                <EditText
+                    android:id="@+id/report_frequency"
+                    style="@style/locTxtStyle_other"
+                    android:hint="请输入报告时间频率"
+                    android:inputType="number"
+                    android:maxLength="9"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="秒"/>
+            </LinearLayout>
+        </LinearLayout>
+        <!--天线高-->
+        <LinearLayout
+            android:id="@+id/ll_tianxian"
+            style="@style/lineLayout_parent">
+
+            <TextView
+                style="@style/locTxtStyle1"
+                android:text="@string/tianxian_height"/>
+
+            <LinearLayout
+                style="@style/lineLayout_editor_text">
+
+                <EditText
+                    android:id="@+id/tianxian_height_value"
+                    style="@style/locTxtStyle_other"
+                    android:enabled="false"
+                    android:gravity="center"
+                    android:hint="请输入天线高度!"
+                    android:inputType="numberDecimal|number"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/common_metre"/>
+            </LinearLayout>
+        </LinearLayout>
+        <!--状态码-->
+        <LinearLayout
+            android:id="@+id/ll_zhuangtai"
+            style="@style/lineLayout_parent">
+
+            <TextView
+                style="@style/locTxtStyle1"
+                android:text="状态代码"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="@dimen/dp_40"
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/dp_4"
+                android:layout_weight="5"
+                android:background="@mipmap/search_background"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Spinner
+                    android:id="@+id/spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!--按钮-->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/bdset_submit_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="40sp"
+                android:background="@drawable/btn_bg_selector"
+                android:text="保存"
+                android:textColor="@color/colorSettingText"
+                android:textSize="14sp"/>
+
+            <Button
+                android:id="@+id/contact"
+                android:layout_width="wrap_content"
+                android:layout_height="40sp"
+                android:layout_marginLeft="30dp"
+                android:background="@drawable/btn_bg_selector"
+                android:text="联系人"
+                android:textColor="@color/colorSettingText"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,6 +1,7 @@
 package thd.bd.sms.base;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -38,6 +40,7 @@ import com.thd.cmd.manager.BDCmdManager;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -49,6 +52,7 @@ import thd.bd.sms.bean.GpsLocationEvent;
 import thd.bd.sms.bean.SatelliteInfo;
 import thd.bd.sms.sharedpreference.Constant;
 import thd.bd.sms.sharedpreference.SharedPreferencesHelper;
+import thd.bd.sms.utils.Config;
 import thd.bd.sms.utils.SysUtils;
 import thd.bd.sms.utils.WinUtils;
 import thd.bd.sms.service.LocationService;
@@ -81,7 +85,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     private double mCurrentLon = 0.0;
 
     private final int BD_BSI_MESSAGE = 5;
+    android.os.PowerManager.WakeLock wakeLock;
+    private PowerManager pm = null;
 
+    @SuppressLint("InvalidWakeLockTag")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -91,6 +98,11 @@ public abstract class BaseActivity extends AppCompatActivity {
         WinUtils.hiddenKeyBoard(this);
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        //保持cpu一直运行，不管屏幕是否黑屏
+        pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "CPUKeepRunning");
+        wakeLock.acquire();
 
         unbinder = ButterKnife.bind(this);
 
@@ -114,6 +126,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         locationManager.removeUpdates(locationListener);
         locationManager.removeGpsStatusListener(mGpslistener);
         GspStatesManager.getInstance().removeStatellitesListener(mSatellitesListener);
+        GspStatesManager.getInstance().removeLocationListener(mRnLocationlistener);
 
         if (mCurrentLat != 0.0 && mCurrentLon != 0.0) {
             SharedPreferencesHelper.put(Constant.SP_KEY_RN_LOCATION_LAT, mCurrentLat);
@@ -196,6 +209,28 @@ public abstract class BaseActivity extends AppCompatActivity {
 //            location.setLongitude(gga.getLongitude());
 //            location.setLatitude(gga.getLatitude());
 //            EventBus.getDefault().post(new GpsLocationEvent(location));
+            Location location = new Location("");
+            location.setLatitude(gga.getLatitude());
+            location.setLongitude(gga.getLongitude());
+            location.setAltitude(gga.getAltitude());
+            location.setTime(gga.getTime());
+            onComLocation(location);
+//            Log.e(TAG, "LERRYTEST_MAP: ===============有权限了，去放肆吧=GspStatesManager.ISatellitesListener========");
+
+        }
+    };
+
+    GspStatesManager.ILocationListener mRnLocationlistener = new GspStatesManager.ILocationListener() {
+        @Override
+        public void onLocationChanged(DBLocation location) {
+
+            Location location1 = new Location("");
+            location1.setLatitude(location.getLatitude());
+            location1.setLongitude(location.getLongitude());
+            location1.setAltitude(location.getAltitude());
+            location1.setTime(location.getTime());
+            onComLocation(location1);
+//            Log.e(TAG, "LERRYTEST_MAP: ===============有权限了，去放肆吧=GspStatesManager.ILocationListener========");
         }
     };
 
@@ -314,6 +349,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 // 有权限了，去放肆吧。
 //                        Toast.makeText(getActivity(), "有权限", Toast.LENGTH_SHORT).show();
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
+                Log.e(TAG, "LERRYTEST_MAP: ===============有权限了，去放肆吧=========");
             }
         } else {
             Toast.makeText(this, "系统检测到未开启GPS定位服务", Toast.LENGTH_SHORT).show();
@@ -394,8 +430,10 @@ public abstract class BaseActivity extends AppCompatActivity {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
         locationManager.addGpsStatusListener(mGpslistener);
         GspStatesManager.getInstance().addSatellitesListener(mSatellitesListener);
+        GspStatesManager.getInstance().addLocationListener(mRnLocationlistener);
 
         if(isFirstLocation){//如果是第一次登陆
             if (isNetConn) {//如果有网络，就用网络定位，如果没有网络也没有GPS，就只有听天由命了
@@ -409,8 +447,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                         +"============"+SharedPreferencesHelper.getLastLng());
 
 
-                double lat = Double.parseDouble(SharedPreferencesHelper.getLastLat());
-                double lon = Double.parseDouble(SharedPreferencesHelper.getLastLng());
+                double lat = (double)SharedPreferencesHelper.getLastLat();
+                double lon = (double)SharedPreferencesHelper.getLastLng();
                 Location location = new Location("");
                 location.setLatitude(lat);
                 location.setLongitude(lon);

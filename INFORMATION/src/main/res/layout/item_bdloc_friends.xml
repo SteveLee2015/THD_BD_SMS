@@ -9,6 +9,17 @@
     android:paddingRight="15dp"
     android:paddingBottom="10dp">
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dp_5">
+
+        <ImageView
+            android:layout_width="@dimen/dp_50"
+            android:layout_height="@dimen/dp_50"
+            android:src="@mipmap/friends_clicked"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -23,6 +34,7 @@
             android:orientation="horizontal">
             <!-- 友邻ID-->
             <TextView
+                android:id="@+id/item_friends_company_txt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -53,6 +65,7 @@
             android:orientation="horizontal">
             <!-- 经度-->
             <TextView
+                android:id="@+id/item_friends_id_txt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -69,6 +82,7 @@
                 android:textSize="@dimen/sp_14" />
             <!--纬度-->
             <TextView
+                android:id="@+id/item_friends_hide_txt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -92,6 +106,7 @@
             android:orientation="horizontal">
             <!-- 高程-->
             <TextView
+                android:id="@+id/item_friends_count_txt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

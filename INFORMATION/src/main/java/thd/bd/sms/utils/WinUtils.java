@@ -23,7 +23,7 @@ public class WinUtils {
 	 * @param widthPer
 	 * @param heightPer
 	 */
-	public static void setDialogPosition(Activity mActivity , float widthPer, float heightPer) {
+	/*public static void setDialogPosition(Activity mActivity , float widthPer, float heightPer) {
 		DisplayMetrics metrics = new DisplayMetrics();
 		WindowManager m = mActivity.getWindowManager();
 		m.getDefaultDisplay().getMetrics(metrics);
@@ -31,7 +31,7 @@ public class WinUtils {
 		p.height = (int) ((metrics.heightPixels)*heightPer);// 高度设置为屏幕的
 		p.width = (int) ((metrics.widthPixels)*widthPer);//宽度
 		mActivity.getWindow().setAttributes(p);
-	}
+	}*/
 	
 	/**
 	 * 隐藏输入键盘
