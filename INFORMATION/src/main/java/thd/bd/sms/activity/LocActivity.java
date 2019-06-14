@@ -1,18 +1,14 @@
 package thd.bd.sms.activity;
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.res.Configuration;
-import android.location.BDBeam;
 import android.location.BDLocation;
 import android.location.BDRDSSManager;
 import android.location.BDUnknownException;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
@@ -23,7 +19,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,23 +32,25 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import butterknife.Unbinder;
+import butterknife.BindView;
+import butterknife.OnClick;
 import thd.bd.sms.R;
 import thd.bd.sms.base.BaseActivity;
+import thd.bd.sms.bean.BDCache;
 import thd.bd.sms.bean.DBLocation;
 import thd.bd.sms.bean.LocationParam;
 import thd.bd.sms.bean.LocationSet;
 import thd.bd.sms.database.LocSetDatabaseOperation;
 import thd.bd.sms.service.CycleLocService;
+import thd.bd.sms.service.CycleReportRDLocService;
+import thd.bd.sms.service.CycleReportRNLocService;
 import thd.bd.sms.sharedpreference.Constant;
 import thd.bd.sms.sharedpreference.SharedPreferencesHelper;
 import thd.bd.sms.utils.Config;
-import thd.bd.sms.utils.ReceiverAction;
 import thd.bd.sms.utils.SysUtils;
 import thd.bd.sms.utils.Utils;
 import thd.bd.sms.utils.WinUtils;
 import thd.bd.sms.view.CustomListView;
-import thd.bd.sms.view.GspStatesManager;
 import thd.bd.sms.view.OnCustomListListener;
 
 /**
@@ -64,6 +62,10 @@ import thd.bd.sms.view.OnCustomListListener;
 public class LocActivity extends BaseActivity implements OnClickListener {
 
     private static final String TAG = "LocActivity";
+    @BindView(R.id.return_home_layout)
+    LinearLayout returnHomeLayout;
+    @BindView(R.id.title_name)
+    TextView titleName;
     private Context mContext = LocActivity.this;
     private CustomListView customListView = null;
     private TextView mLongitude = null;
@@ -86,7 +88,7 @@ public class LocActivity extends BaseActivity implements OnClickListener {
 
     private LocationSet mLocationSet;
 
-    private RelativeLayout ll_loc_submit;//rd按钮
+    private LinearLayout ll_loc_submit;//rd按钮
     private Button loc_btn;
     private ImageView settingRdIv;
     private Button loc_now_btn;
@@ -118,8 +120,8 @@ public class LocActivity extends BaseActivity implements OnClickListener {
         oper = new LocSetDatabaseOperation(mContext);
         //mLocationSet = oper.getFirst();
         mLocationSet = oper.getByStatus(LocationSet.LOCATIONSET_STATUS_USING);
-        String locationFeq = mLocationSet.getLocationFeq();
-        frequcnce = Integer.parseInt(locationFeq);
+//        String locationFeq = mLocationSet.getLocationFeq();
+//        frequcnce = Integer.parseInt(locationFeq);
 
         IntentFilter filter = new IntentFilter();
 
@@ -145,7 +147,7 @@ public class LocActivity extends BaseActivity implements OnClickListener {
             dwr.setAltitude(SharedPreferencesHelper.getRDHeight());
             dwr.setTimeStr(SharedPreferencesHelper.getRDTime());
 
-            if(SharedPreferencesHelper.getRDLat()!=0.0){
+            if (SharedPreferencesHelper.getRDLat() != 0.0) {
                 updateView(dwr);
             }
 
@@ -157,14 +159,14 @@ public class LocActivity extends BaseActivity implements OnClickListener {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getRDLocation(BDLocation bdLocation){
+    public void getRDLocation(BDLocation bdLocation) {
         dwr = new DBLocation();
         dwr.setLatitude(bdLocation.getLatitude());
         dwr.setLongitude(bdLocation.getLongitude());
         dwr.setAltitude(bdLocation.getEarthHeight());
         dwr.setTimeStr(bdLocation.mLocationTime);
         updateView(dwr);
-        Log.w("LERRYTEST_RD定位" ,"========LocActivity167================bdLocation.getLatitude()=="+bdLocation.getLatitude()+",bdLocation.getLongitude()========"+bdLocation.getLongitude());
+        Log.w("LERRYTEST_RD定位", "========LocActivity167================bdLocation.getLatitude()==" + bdLocation.getLatitude() + ",bdLocation.getLongitude()========" + bdLocation.getLongitude());
     }
 
     private void initListener() {
@@ -241,7 +243,7 @@ public class LocActivity extends BaseActivity implements OnClickListener {
         mLocationSet = oper.getByStatus(LocationSet.LOCATIONSET_STATUS_USING);
         String locationFeq = mLocationSet.getLocationFeq();
         frequcnce = Integer.parseInt(locationFeq);
-        Log.w("LERRYTEST_RD定位" ,"=========LocActivity314=========frequcnce=="+frequcnce);
+        Log.w("LERRYTEST_RD定位", "=========LocActivity314=========frequcnce==" + frequcnce);
 
         if (Config.FLAG_RD == flag) {
             setTitle("RD定位信息");
@@ -259,7 +261,7 @@ public class LocActivity extends BaseActivity implements OnClickListener {
             boolean isStartLoc = SysUtils.isServiceRunning(mContext, classNameLoc);
 
             if (type == 1) {
-                Log.w("LERRYTEST_RD定位" ,"=========LocActivity255=========isStartLoc=="+isStartLoc);
+                Log.w("LERRYTEST_RD定位", "=========LocActivity255=========isStartLoc==" + isStartLoc);
                 if (isStartLoc) {
                     loc_btn.setText("停止连续定位");
                 } else {
@@ -458,7 +460,9 @@ public class LocActivity extends BaseActivity implements OnClickListener {
      * 初始化UI
      */
     public void initUI() {
-        ll_loc_submit = (RelativeLayout) this.findViewById(R.id.ll_loc_submit);
+        titleName.setText("RD定位信息");
+
+        ll_loc_submit = (LinearLayout) this.findViewById(R.id.ll_loc_submit);
         loc_btn = (Button) this.findViewById(R.id.loc_btn);
         settingRdIv = (ImageView) this.findViewById(R.id.setting_rd);
         loc_now_btn = (Button) this.findViewById(R.id.loc_now_btn);
@@ -490,6 +494,16 @@ public class LocActivity extends BaseActivity implements OnClickListener {
                         return;
                     }
 
+                    if(SysUtils.isServiceRunning(this,CycleReportRNLocService.class.getName())){
+                        Toast.makeText(mContext, getResources().getString(R.string.stop_RN_report), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    if(SysUtils.isServiceRunning(this,CycleReportRDLocService.class.getName())){
+                        Toast.makeText(mContext, getResources().getString(R.string.stop_RD_report), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     // frequcnce >0 为连续定位
                     if (frequcnce > 0) {
                         startContinueCycleLoc();
@@ -510,6 +524,7 @@ public class LocActivity extends BaseActivity implements OnClickListener {
             case R.id.loc_now_btn:
                 if (mImmediateCount != null) {
                     mImmediateCount.start();
+
                 }
                 rdLocation(true);
                 loc_now_btn.setClickable(false);
@@ -527,17 +542,17 @@ public class LocActivity extends BaseActivity implements OnClickListener {
         String classNameLoc = CycleLocService.class.getName();
         boolean isStartLoc = SysUtils.isServiceRunning(mContext, classNameLoc);
         Intent intentLoc = new Intent(this, CycleLocService.class);
-        Log.w("LERRYTEST_RD定位" ,"========LocActivity523================startContinueCycleLoc()=========");
+        Log.w("LERRYTEST_RD定位", "========LocActivity523================startContinueCycleLoc()=========");
         if (!isStartLoc) {
             startService(intentLoc);
-            bindService(intentLoc,myConn,0);
-            Log.w("LERRYTEST_RD定位" ,"========LocActivity523================startContinueCycleLoc().startService=========");
+            bindService(intentLoc, myConn, 0);
+            Log.w("LERRYTEST_RD定位", "========LocActivity523================startContinueCycleLoc().startService=========");
             //修改 界面
             loc_btn.setText("停止连续定位");
         } else {
             stopService(intentLoc);
             unbindService(myConn);
-            Log.w("LERRYTEST_RD定位" ,"========LocActivity523================startContinueCycleLoc().stopService=========");
+            Log.w("LERRYTEST_RD定位", "========LocActivity523================startContinueCycleLoc().stopService=========");
             //修改 界面
             loc_btn.setText("开始连续定位");
         }
@@ -547,9 +562,29 @@ public class LocActivity extends BaseActivity implements OnClickListener {
      * rd定位
      */
     private void rdLocation(boolean isImmediateLocation) {
+
+
         BDCmdManager cmdManager = BDCmdManager.getInstance(this);
         try {
-            cmdManager.sendLocationInfoReqCmdBDV21(BDRDSSManager.ImmediateLocState.LOC_NORMAL_FLAG, Integer.valueOf("1"), "L", 0, 0, 0);
+
+            if(isImmediateLocation){
+                cmdManager.sendLocationInfoReqCmdBDV21(BDRDSSManager.ImmediateLocState.LOC_IMMEDIATE_FLAG, Integer.valueOf(mLocationSet.getHeightType()),
+                        "L", Integer.valueOf(mLocationSet.getHeightValue()), Integer.valueOf(mLocationSet.getTianxianValue()), 0);
+
+
+            }else {
+                cmdManager.sendLocationInfoReqCmdBDV21(BDRDSSManager.ImmediateLocState.LOC_NORMAL_FLAG, Integer.valueOf(mLocationSet.getHeightType()),
+                        "L", Integer.valueOf(mLocationSet.getHeightValue()), Integer.valueOf(mLocationSet.getTianxianValue()), 0);
+                //封装数据
+                BDCache mBdCache = new BDCache();
+                mBdCache.setMsgType(BDCache.RD_LOCATION_FLAG);
+                mBdCache.setSendAddress(SharedPreferencesHelper.getCardAddress());
+                mBdCache.setMsgContent("定位申请");
+                mBdCache.setPriority(BDCache.PRIORITY_1);
+                mBdCache.setCacheContent("单次定位，普通定位，测高方式："+mLocationSet.getHeightType()+",高程数据："+mLocationSet.getHeightValue()+",天线高："+mLocationSet.getTianxianValue());
+                //把数据保存到数据库中
+                SysUtils.dispatchData(LocActivity.this,mBdCache);
+            }
         } catch (BDUnknownException e) {
             e.printStackTrace();
         }
@@ -654,7 +689,6 @@ public class LocActivity extends BaseActivity implements OnClickListener {
         }
     };*/
 //    private SpHelper sphelper;
-
     protected void updateView(DBLocation location) {
 
         // 经度  纬度  高度 时间
@@ -682,7 +716,7 @@ public class LocActivity extends BaseActivity implements OnClickListener {
                 .getmHeight() : mContext.getResources().getString(
                 R.string.common_dadi_heigh_value));
 
-        if(location.getTime()!=0){
+        if (location.getTime() != 0) {
             //本地时间
             String locationTime = sdf.format(new Date(location.getTime()));
             String time = "00:00:00.00";
@@ -696,17 +730,22 @@ public class LocActivity extends BaseActivity implements OnClickListener {
             }
             mTime.setText(time);
 
-        }else if("".equals(location.getTimeStr())){
+        } else if ("".equals(location.getTimeStr())) {
             mTime.setText(location.getTimeStr());
         }
 
-        Log.e(TAG, "LERRYTEST_MAP: =========LocActivity694==========lon=="+ lon+"========lat=="+lat+"========time=="+mTime.getText().toString());
+        Log.e(TAG, "LERRYTEST_MAP: =========LocActivity694==========lon==" + lon + "========lat==" + lat + "========time==" + mTime.getText().toString());
 
-        SharedPreferencesHelper.put(Constant.SP_KEY_RD_LOCATION_LON,(float) location.getLongitude());
-        SharedPreferencesHelper.put(Constant.SP_KEY_RD_LOCATION_LAT,(float) location.getLatitude());
-        SharedPreferencesHelper.put(Constant.SP_KEY_RD_LOCATION_EARTHHEIGHT,(float) location.getAltitude());
-        SharedPreferencesHelper.put(Constant.SP_KEY_RD_LOCATION_TIME,location.getTime());
+        SharedPreferencesHelper.put(Constant.SP_KEY_RD_LOCATION_LON, (float) location.getLongitude());
+        SharedPreferencesHelper.put(Constant.SP_KEY_RD_LOCATION_LAT, (float) location.getLatitude());
+        SharedPreferencesHelper.put(Constant.SP_KEY_RD_LOCATION_EARTHHEIGHT, (float) location.getAltitude());
+        SharedPreferencesHelper.put(Constant.SP_KEY_RD_LOCATION_TIME, location.getTime());
 
+    }
+
+    @OnClick(R.id.return_home_layout)
+    public void onViewClicked() {
+        LocActivity.this.finish();
     }
 
 
@@ -774,7 +813,7 @@ public class LocActivity extends BaseActivity implements OnClickListener {
                 .getmLat() : mContext.getResources().getString(
                 R.string.common_lat_value));
 
-        mHeight.setText((param != null && param.getmHeight() != null) ? height+"" : mContext.getResources().getString(
+        mHeight.setText((param != null && param.getmHeight() != null) ? height + "" : mContext.getResources().getString(
                 R.string.common_dadi_heigh_value));
     }
 

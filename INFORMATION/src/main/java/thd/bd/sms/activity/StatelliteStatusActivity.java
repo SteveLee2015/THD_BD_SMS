@@ -1,7 +1,10 @@
 package thd.bd.sms.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
@@ -30,24 +33,20 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 import thd.bd.sms.R;
 import thd.bd.sms.base.BaseActivity;
-import thd.bd.sms.bean.DBLocation;
 import thd.bd.sms.bean.GpsLocationEvent;
 import thd.bd.sms.bean.MyLocationBean;
-import thd.bd.sms.bean.SatelliteInfo;
 import thd.bd.sms.utils.CollectionUtils;
 import thd.bd.sms.utils.Config;
 import thd.bd.sms.utils.WinUtils;
 import thd.bd.sms.view.CustomSatelliateMap;
 import thd.bd.sms.view.CustomSatelliateSnr;
-import thd.bd.sms.view.GspStatesManager;
 
-public class StatelliteStatusActivity extends BaseActivity {
+public class StatelliteStatusActivity extends BaseActivity implements View.OnClickListener {
     private final static int LOCATION_RESULT = 0x1000,
             GP_SATELLIATE_STATUS = 0x1001, BD_SATELLIATE_STATUS = 0x1002;
-    @BindView(R.id.tv_Statellite)
+    /*@BindView(R.id.tv_Statellite)
     TextView mStatellite;
     @BindView(R.id.tv_change)
     TextView mTvChange;
@@ -62,18 +61,42 @@ public class StatelliteStatusActivity extends BaseActivity {
     @BindView(R.id.gps_location_height_value)
     TextView mGPSLocationHeight;
     @BindView(R.id.gps_snr_view)
-    CustomSatelliateSnr mCustomBDSnr;
+    CustomSatelliateSnr mCustomBDSnr;*/
 
-    protected LocationManager locationManager = null;
+    private final String TAG = "StatelliteStatusActivity";
+    @BindView(R.id.return_home_layout)
+    LinearLayout returnHomeLayout;
+    @BindView(R.id.title_name)
+    TextView titleName;
+
+    private CustomSatelliateSnr mCustomBDSnr = null;
+
+    private TextView mGPSLocationResult, mGPSLocationStatus, mGPSLocationHeight;
+
+    private CustomSatelliateMap mCustomBDMap = null;
+
+    private SharedPreferences locationModelShare = null;
+
+
+    private Context mContext = this;
 
     private LinearLayout ll_gps_bd2;
 
     private int intFlag;
 
-//    SharedPreferences mSharePref;
+    private TextView mStatellite;
+
+    private RelativeLayout mRLchangeStatellite;
+
+    private TextView mTvChange;
+
+    SharedPreferences mSharePref;
     List<GpsSatellite> gplist = new ArrayList<>();
 
-    private Unbinder unbinder;
+    protected LocationManager locationManager = null;
+
+
+    //    private Unbinder unbinder;
     @Override
     protected int getContentView() {
         return R.layout.activity_statellite_status;
@@ -103,7 +126,7 @@ public class StatelliteStatusActivity extends BaseActivity {
 
                     gplist = (List<GpsSatellite>) msg.obj;
 
-                    Log.e("LERRYTEST_RN", "=========StatelliteStatusActivity102=========gplist=="+gplist.size());
+                    Log.e("LERRYTEST_RN", "=========StatelliteStatusActivity102=========gplist==" + gplist.size());
                     //排序
                     //Collections.sort(gplist);
                     showMap(gplist);
@@ -117,13 +140,15 @@ public class StatelliteStatusActivity extends BaseActivity {
         }
     };
 
+    @SuppressLint("LongLogTag")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         WinUtils.setWinTitleColor(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statellite_status);
-        unbinder = ButterKnife.bind(this);
+        ButterKnife.bind(this);
+//        unbinder = ButterKnife.bind(this);
 
         EventBus.getDefault().register(this);
 //        mSharePref = getSharedPreferences("BD_BLUETOOTH_PREF", 0);
@@ -135,9 +160,52 @@ public class StatelliteStatusActivity extends BaseActivity {
 //            intFlag = intent.getIntExtra(Config.FLAG_TAG, -1);
 //        }
 
+        titleName.setText("RN星图");
+
         intFlag = Config.FLAG_ALL;
 
         ll_gps_bd2 = (LinearLayout) findViewById(R.id.ll_gps_bd2);
+
+
+        Intent intent = getIntent();
+        if (intent != null) {
+            intFlag = intent.getIntExtra(Config.FLAG_TAG, -1);
+        }
+
+        ll_gps_bd2.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        mCustomBDSnr = (CustomSatelliateSnr) this.findViewById(R.id.gps_snr_view);
+        mCustomBDMap = (CustomSatelliateMap) this.findViewById(R.id.gps_map_view);
+        locationModelShare = this.getSharedPreferences("LOCATION_MODEL_ACTIVITY", 0);
+        mStatellite = (TextView) this.findViewById(R.id.tv_Statellite);
+        mRLchangeStatellite = (RelativeLayout) this.findViewById(R.id.rl_change_statellite);
+        mGPSLocationResult = (TextView) this.findViewById(R.id.gps_location_result);
+        mGPSLocationStatus = (TextView) this.findViewById(R.id.gps_location_status);
+        mGPSLocationHeight = (TextView) this.findViewById(R.id.gps_location_height_value);
+        mTvChange = (TextView) this.findViewById(R.id.tv_change);
+        mTvChange.setOnClickListener(this);
+        mRLchangeStatellite.setOnClickListener(this);
+        switch (intFlag) {
+            case Config.FLAG_GPS:
+                mStatellite.setText("GPS星图");
+                break;
+            case Config.FLAG_BD:
+                mStatellite.setText("北斗2星图");
+                break;
+            case Config.FLAG_ALL:
+                mStatellite.setText("RNSS星图");
+                break;
+
+            default:
+                break;
+        }
+
 
         ll_gps_bd2.setOnClickListener(new View.OnClickListener() {
 
@@ -171,20 +239,20 @@ public class StatelliteStatusActivity extends BaseActivity {
      */
     private void showMap(List<GpsSatellite> gplist) {
         List newList = CollectionUtils.removeDuplicate(gplist);
-        if (mCustomBDMap == null || mCustomBDMap == null) {
+        if (mCustomBDSnr == null || mCustomBDMap == null) {
             return;
         }
-        Log.e("LERRYTEST_RN", "=========StatelliteStatusActivity171=========newList=="+newList.size());
+//        Log.e("LERRYTEST_RN", "=========StatelliteStatusActivity171=========newList=="+newList.size());
         mCustomBDSnr.showMap(newList);//载噪比
         mCustomBDMap.showMap(newList);//星图
     }
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getGpsSatelliteList(List<GpsSatellite> list){
+    public void getGpsSatelliteList(List<GpsSatellite> list) {
         gplist = list;
 
-        Log.e("LERRYTEST_RN", "=========StatelliteStatusActivity180=========gplist=="+gplist.size());
+        Log.e("LERRYTEST_RN", "=========StatelliteStatusActivity180=========gplist==" + gplist.size());
         //排序
         //Collections.sort(gplist);
         showMap(gplist);
@@ -243,7 +311,7 @@ public class StatelliteStatusActivity extends BaseActivity {
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
-                Log.e("LERRYTEST_RN", "=========StatelliteStatusActivity228=========event=="+event);
+                Log.e("LERRYTEST_RN", "=========StatelliteStatusActivity228=========event==" + event);
                 mGpsStatus = locationManager.getGpsStatus(null);
                 switch (event) {
                     case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
@@ -266,7 +334,7 @@ public class StatelliteStatusActivity extends BaseActivity {
                         msg.obj = list;
                         mHandler.sendMessage(msg);
 
-                        Log.e("LERRYTEST_RN", "=========StatelliteStatusActivity264=========list=="+list.size());
+                        Log.e("LERRYTEST_RN", "=========StatelliteStatusActivity264=========list==" + list.size());
                         break;
                     default:
                         break;
@@ -398,7 +466,7 @@ public class StatelliteStatusActivity extends BaseActivity {
 //    };
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getLatlng(MyLocationBean myLocationBean){
+    public void getLatlng(MyLocationBean myLocationBean) {
         if (myLocationBean != null) {
 
             Location location = new Location("");
@@ -410,36 +478,36 @@ public class StatelliteStatusActivity extends BaseActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onLocationEvent(GpsLocationEvent event){
-        if(event != null && event.mLocation != null){
+    public void onLocationEvent(GpsLocationEvent event) {
+        if (event != null && event.mLocation != null) {
             updateView(event.mLocation);
             Log.e("LERRYTEST_MAP", "=========StatelliteStatusActivity407=======event.mLocation==" + event.mLocation.getLatitude() + "," + event.mLocation.getLongitude());
         }
 
     }
 
-    @OnClick({R.id.tv_change, R.id.rl_change_statellite})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.rl_change_statellite:
-            case R.id.tv_change:
-//                if (app.isBlueToothModel()) {
-//                    showGpsModelDialog();
-//                } else {
-                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivity(intent);
-//                }
-                break;
-
-            default:
-                break;
-        }
-    }
+//    @OnClick({R.id.tv_change, R.id.rl_change_statellite})
+//    public void onViewClicked(View view) {
+//        switch (view.getId()) {
+//            case R.id.rl_change_statellite:
+//            case R.id.tv_change:
+////                if (app.isBlueToothModel()) {
+////                    showGpsModelDialog();
+////                } else {
+//                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//                    startActivity(intent);
+////                }
+//                break;
+//
+//            default:
+//                break;
+//        }
+//    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbinder.unbind();
+//        unbinder.unbind();
         EventBus.getDefault().unregister(this);
 
     }
@@ -449,5 +517,28 @@ public class StatelliteStatusActivity extends BaseActivity {
         super.onComLocation(location);
 
         Log.e("LERRYTEST_MAP", "=========StatelliteStatusActivity440=======location==" + location.getLatitude() + "," + location.getLongitude());
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.rl_change_statellite:
+            case R.id.tv_change:
+//                if (app.isBlueToothModel()) {
+//                    showGpsModelDialog();
+//                } else {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+//                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    @OnClick(R.id.return_home_layout)
+    public void onViewClicked() {
+        StatelliteStatusActivity.this.finish();
     }
 }

@@ -7,6 +7,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -19,6 +20,7 @@ import android.location.BDLocation;
 import android.location.BDLocationReport;
 import android.location.BDMessageInfo;
 import android.location.BDUnknownException;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -40,11 +42,12 @@ import java.util.List;
 import java.util.Map;
 
 import thd.bd.sms.R;
-import thd.bd.sms.activity.MainActivity;
+import thd.bd.sms.bean.BDCache;
 import thd.bd.sms.bean.BDContactColumn;
 import thd.bd.sms.bean.FriendsLocation;
 import thd.bd.sms.database.BDMessageDatabaseOperation;
 import thd.bd.sms.database.FriendsLocationDatabaseOperation;
+import thd.bd.sms.database.RDCacheOperation;
 import thd.bd.sms.fragment.CommunicationFragment;
 import thd.bd.sms.sharedpreference.Constant;
 import thd.bd.sms.sharedpreference.SharedPreferencesHelper;
@@ -64,6 +67,7 @@ public class SMSApplication extends Application {
     public boolean openCrash = true; // 关闭或打开 crah重启
     public BDCmdManager bdCmdManager;
     public static LocationService locationService;
+    private RDCacheOperation cacheOperation;
 
     private static final String TAG = "SMSApplication";
 
@@ -73,10 +77,11 @@ public class SMSApplication extends Application {
         } else {
             smsApplication = new SMSApplication();
         }
+
         return null;
     }
 
-    //接收短报文广播接收器
+    /*//接收短报文广播接收器
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -100,9 +105,107 @@ public class SMSApplication extends Application {
         }
     };
 
-    /**
+    private BDEventListener.BDFKIListener mBDFKIListener = new BDEventListener.BDFKIListener() {
+
+        @Override
+        public void onCmd(String s, boolean b) {
+            Log.e("LERRY_FKI", "mBDFKIListener: ======================onCmd=======s==" + s + "===========b==" + b);
+
+            cacheOperation = new RDCacheOperation(appContext);
+
+            if (cacheOperation.getFirst() == null) {
+                return;
+            }
+
+            BDCache firstCache = cacheOperation.getFirst();
+
+            switch (s) {
+                case "WBA":
+                    if (b) {
+                        //删除最上面的一条信息
+                        String msgType = firstCache.getMsgType();
+                        if (BDCache.RD_REPORT_FLAG.equals(msgType)) {
+                            dispatchData(firstCache);
+                            notifyData();
+                            Toast.makeText(appContext, "位置报告2发送成功!",Toast.LENGTH_SHORT).show();
+                        }
+                    }else {
+                        Toast.makeText(appContext, "位置报告2发送失败!",Toast.LENGTH_SHORT).show();
+                    }
+
+                    break;
+
+                case "DWA":
+                    if (b) {
+                        //删除最上面的一条信息
+                        String msgType = firstCache.getMsgType();
+                        if (BDCache.RD_LOCATION_FLAG.equals(msgType)) {
+                            dispatchData(firstCache);
+                            notifyData();
+                            Toast.makeText(appContext, "定位命令发送成功!",Toast.LENGTH_SHORT).show();
+                        }
+                    }else {
+                        Toast.makeText(appContext, "定位命令发送成功!",Toast.LENGTH_SHORT).show();
+                    }
+
+                    break;
+
+                case "WAA":
+                    if (b) {
+                        //删除最上面的一条信息
+                        String msgType = firstCache.getMsgType();
+                        if (BDCache.RN_REPORT_FLAG.equals(msgType)) {
+                            dispatchData(firstCache);
+                            notifyData();
+                            Toast.makeText(appContext, "位置报告1发送成功!",Toast.LENGTH_SHORT).show();
+                        }
+                    }else {
+                        Toast.makeText(appContext, "位置报告1发送失败!",Toast.LENGTH_SHORT).show();
+                    }
+
+                    break;
+
+                case "TXA":
+                    if (b) {
+                        //删除最上面的一条信息
+                        String msgType = firstCache.getMsgType();
+                        if (BDCache.SMS_FLAG.equals(msgType)) {
+                            dispatchData(firstCache);
+                            notifyData();
+                            Toast.makeText(appContext, "北斗短报文发送成功!",Toast.LENGTH_SHORT).show();
+                        }
+                    }else {
+                        Toast.makeText(appContext, "北斗短报文发送失败!",Toast.LENGTH_SHORT).show();
+                    }
+
+                    break;
+            }
+        }
+
+        @Override
+        public void onTime(int i) {
+            Log.e("LERRY_FKI", "mBDFKIListener: ======================onTime=======i==" + i);
+        }
+
+        @Override
+        public void onSystemLauncher() {
+            Log.e("LERRY_FKI", "mBDFKIListener: ======================onSystemLauncher=======");
+        }
+
+        @Override
+        public void onPower() {
+            Log.e("LERRY_FKI", "mBDFKIListener: ======================onPower=======");
+        }
+
+        @Override
+        public void onSilence() {
+            Log.e("LERRY_FKI", "mBDFKIListener: ======================onSilence=======");
+        }
+    };
+
+    *//**
      * 读取北斗卡信息监听类
-     */
+     *//*
     private BDEventListener.LocalInfoListener localInfoListener = new BDEventListener.LocalInfoListener() {
 
         @Override
@@ -113,52 +216,52 @@ public class SMSApplication extends Application {
 //            EventBus.getDefault().post(cardInfo);
 
             //卡等级
-            if(cardInfo.getCommLevel()==0){
+            if (cardInfo.getCommLevel() == 0) {
                 SharedPreferencesHelper.put(Constant.SP_CARD_INFO_COMMLEVEL, 0);
-            }else {
+            } else {
                 SharedPreferencesHelper.put(Constant.SP_CARD_INFO_COMMLEVEL, cardInfo.getCommLevel());
             }
             //是否加密
-            if(cardInfo.getCheckEncryption()==null){
+            if (cardInfo.getCheckEncryption() == null) {
                 SharedPreferencesHelper.put(Constant.SP_CARD_INFO_CHECKENCRYPITION, "");
-            }else {
+            } else {
                 SharedPreferencesHelper.put(Constant.SP_CARD_INFO_CHECKENCRYPITION, cardInfo.getCheckEncryption());
             }
 
             //频度
-            if(cardInfo.getSericeFeq()==0){
+            if (cardInfo.getSericeFeq() == 0) {
                 SharedPreferencesHelper.put(Constant.SP_CARD_INFO_SERICEFEQ, 0);
-            }else {
+            } else {
                 SharedPreferencesHelper.put(Constant.SP_CARD_INFO_SERICEFEQ, cardInfo.getSericeFeq());
             }
             //是否有卡+卡号
-            if(cardInfo.getCardAddress()==null){
+            if (cardInfo.getCardAddress() == null) {
                 SharedPreferencesHelper.put(Constant.SP_CARD_INFO_ADDRESS, "");
-            }else {
+            } else {
                 SharedPreferencesHelper.put(Constant.SP_CARD_INFO_ADDRESS, cardInfo.getCardAddress());
             }
         }
     };
 
     private String beams = "";
-    /**
+    *//**
      * 读取波束信息监听类
-     */
+     *//*
     private BDEventListener.BDBeamStatusListener bdBeamStatusListener = new BDEventListener.BDBeamStatusListener() {
         @Override
         public void onBeamStatus(BDBeam bdBeam) {
             for (Integer beam : bdBeam.getBeamWaves()) {
                 beams += (beam + ",");
             }
-//            Log.e(TAG, "SMSApplication96: ==========波束=========="+beams );
+            Log.e(TAG, "LERRYTEST_bs: =======SMSApplication96============波束=========="+beams );
             beams = "";
             EventBus.getDefault().post(bdBeam);
         }
     };
 
-    /**
+    *//**
      * 监听队列中发送数据的位置和等待时间
-     */
+     *//*
     private BDCmdTimeOutListener bdCmdTimeOutListener = new BDCmdTimeOutListener() {
         @Override
         public void onTimeOut(Map<Integer, Long> map) {
@@ -168,9 +271,9 @@ public class SMSApplication extends Application {
         }
     };
 
-    /**
+    *//**
      * 读取RDSS位置信息监听类
-     */
+     *//*
     private BDEventListener.BDLocationListener bdLocationListener = new BDEventListener.BDLocationListener() {
         @Override
         public void onLocationChange(BDLocation bdLocation) {
@@ -181,9 +284,9 @@ public class SMSApplication extends Application {
         }
     };
 
-    /**
+    *//**
      * 读取位置报告信息监听类
-     */
+     *//*
     private BDEventListener.BDLocReportListener bdLocReportListener = new BDEventListener.BDLocReportListener() {
         @Override
         public void onLocReport(BDLocationReport bdLocationReport) {
@@ -191,27 +294,27 @@ public class SMSApplication extends Application {
             Log.e("TEST", "=================> bdLocReportListener lat =" + bdLocationReport.getLatitude() + ",lon =" + bdLocationReport.getLongitude());
             boolean isAdd = mAddLocationReportToDatabase(bdLocationReport, Config.RD_DWR);
             notifcation(ReceiverAction.APP_ACTION_FRIEND_LOCATION_21);
-            notificationSMS(bdLocationReport.mUserAddress,bdLocationReport.mLatitude+","+bdLocationReport.mLongitude);
+            notificationSMS(bdLocationReport.mUserAddress, bdLocationReport.mLatitude + "," + bdLocationReport.mLongitude);
         }
-    };
+    };*/
 
     /**
      * 通知数据有更新
-     */
+     *//*
     private void notifcation(String action) {
 
         Intent intent = new Intent();
         intent.setAction(action);
         appContext.sendBroadcast(intent);
 
-    }
+    }*/
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         appContext = this;
-        bdCmdManager = BDCmdManager.getInstance(appContext);
+//        bdCmdManager = BDCmdManager.getInstance(appContext);
 
         Log.e(TAG, "onCreate: ==========开启后台服务啦。。。。");
 
@@ -226,7 +329,7 @@ public class SMSApplication extends Application {
 
         initMap();
 
-        initBDService();
+//        initBDService();
 
 //        initGreenDao();
     }
@@ -247,28 +350,34 @@ public class SMSApplication extends Application {
     /**
      * 注册北斗接收监听器
      */
-    private void initBDService() {
+    /*private void initBDService() {
         registerReceiver();
         try {
-            bdCmdManager.addBDEventListener(localInfoListener, bdBeamStatusListener, bdCmdTimeOutListener, bdLocationListener, bdLocReportListener);
+            bdCmdManager.addBDEventListener(localInfoListener, bdBeamStatusListener, bdCmdTimeOutListener, bdLocationListener, bdLocReportListener, mBDFKIListener);
         } catch (BDUnknownException e) {
             e.printStackTrace();
         }
     }
 
 
-
     private void registerReceiver() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BDConstants.BD_MESSAGE_BROAD_ACTION);
         registerReceiver(receiver, filter);
+        Log.e(TAG, "registerReceiver: ===========已注册registerReceiver=========" );
     }
 
     private void unRegisterReceiver() {
-        if(receiver!=null){
-            unregisterReceiver(receiver);
+        if (receiver != null) {
+            try{
+                unregisterReceiver(receiver);
+            }catch (IllegalArgumentException e){
+                e.printStackTrace();
+                Log.e(TAG, "unRegisterReceiver: ==========IllegalArgumentException===========" );
+            }
+
         }
-    }
+    }*/
 
     @Override
     public void onTerminate() {
@@ -276,6 +385,12 @@ public class SMSApplication extends Application {
         //第三方日志反注册
         LogManager.getManager(getApplicationContext()).unregisterCrashHandler();
         BDCmdManager.getInstance(this).onDestroy();
+
+//        SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE, false);
+//        SharedPreferencesHelper.put(Constant.SP_RN_REPORT_STATE, false);
+        /*unRegisterReceiver();*/
+//        bdCmdManager.onDestroy();
+        Log.e(TAG, "onTrimMemory: ==========关闭后台服务啦。。。。");
     }
 
     @Override
@@ -286,10 +401,6 @@ public class SMSApplication extends Application {
     @Override
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
-
-        unRegisterReceiver();
-        bdCmdManager.onDestroy();
-        Log.e(TAG, "onTrimMemory: ==========关闭后台服务啦。。。。");
     }
 
     /**
@@ -299,7 +410,7 @@ public class SMSApplication extends Application {
      * @param bdAddress
      * @param msg
      */
-    private void storeMsg(Context context, String bdAddress, String msg) {
+   /* private void storeMsg(Context context, String bdAddress, String msg) {
 
         //此处要根据 bdAddress 收件号码 查询出收件人再保存到数据库
         String userAddres = bdAddress;
@@ -341,6 +452,11 @@ public class SMSApplication extends Application {
         Intent refreshIntent = new Intent();
         refreshIntent.putExtra(ReceiverAction.APP_KEY_SMS_RECEIVER, bdAddress);
         refreshIntent.setAction(ReceiverAction.APP_ACTION_SMS_REFRESH);
+        if(Build.VERSION.SDK_INT >= 26) {
+            ComponentName componentName=new ComponentName(getApplicationContext(),"");//参数1-包名 参数2-广播接收者所在的路径名
+            refreshIntent.setComponent(componentName);
+//            refreshIntent.addFlags(0x01000000);//加上这句话，可以解决在android8.0系统以上2个module之间发送广播接收不到的问题}
+        }
         context.sendOrderedBroadcast(refreshIntent, null);
 
 //        int flag = Integer.valueOf(BDMessageDatabaseOperation.MSG_TYPE_RECEIVER).intValue();
@@ -352,9 +468,9 @@ public class SMSApplication extends Application {
     }
 
 
-    /**
+    *//**
      * notification 短报文通知栏提醒
-     */
+     *//*
     private void notificationSMS(String address, String msg) {
         Log.e(TAG, "LERRY_TXA: =======SMSApplication短报文显示通知方法================");
 
@@ -406,13 +522,12 @@ public class SMSApplication extends Application {
     }
 
 
-
-    /**
+    *//**
      * 保存友邻位置到数据库
      *
      * @param report
      * @return
-     */
+     *//*
     private boolean mAddLocationReportToDatabase(BDLocationReport report, int flag) {
 
         FriendsLocationDatabaseOperation oper = new FriendsLocationDatabaseOperation(appContext);
@@ -434,7 +549,7 @@ public class SMSApplication extends Application {
 
         String reportTime = report.getReportTime();
 
-        Log.e(TAG, "mAddLocationReportToDatabase: =============reportTime=="+reportTime );
+        Log.e(TAG, "mAddLocationReportToDatabase: =============reportTime==" + reportTime);
 
         //本地时间
         String time = "00:00:00.00";
@@ -448,10 +563,10 @@ public class SMSApplication extends Application {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-dd");
             String ymd = simpleDateFormat.format(new Date());
 
-            time = ymd +"\t"+ beijingTime + ":" + mm + ":" + ss;
+            time = ymd + "\t" + beijingTime + ":" + mm + ":" + ss;
         }
 
-        /*String[] split = cbTime[0].split(":");
+        *//*String[] split = cbTime[0].split(":");
         if (split != null) {
             String hh = split[0];
             if (hh.length() > 2) {
@@ -481,7 +596,7 @@ public class SMSApplication extends Application {
             int i = reportTime.indexOf(":");
             String otherStr = reportTime.substring(i, reportTime.length());
             reportTime = reportTimeInt + otherStr;
-        }*/
+        }*//*
 
         FriendsLocation fl = new FriendsLocation();
         fl.setUserId(report.getUserAddress());
@@ -490,11 +605,42 @@ public class SMSApplication extends Application {
         fl.setHeight(String.valueOf(report.getHeight()));
         fl.setReportTime(time);
         boolean isTrue = oper.insert(fl);
-        Log.e(TAG, "mAddLocationReportToDatabase: =======是否保存到数据库========"+isTrue +",========time=="+time);
+        Log.e(TAG, "mAddLocationReportToDatabase: =======是否保存到数据库========" + isTrue + ",========time==" + time);
         oper.close();
         return isTrue;
     }
 
+
+    *//**
+     * 删除数据记录
+     *
+     * @param firstCache
+     *//*
+    private void dispatchData(BDCache firstCache) {
+        cacheOperation.delete(firstCache);
+        if (BDCache.PRIORITY_MAX == firstCache.getPriority()) {
+            //删除的紧急救援条数
+            //记录在app中
+            Config.SOS_COUNT++;
+            //  sos服务启动的时候清理一次
+            // 发送广播 更新数据
+            Intent sosCountIntent = new Intent();
+            sosCountIntent.setAction(ReceiverAction.BD_ACTION_SOS_UI_SOS_SIZE);
+            sosCountIntent.putExtra(ReceiverAction.BD_KEY_SOS_UI_SOS_SIZE, Config.SOS_COUNT);
+            appContext.sendBroadcast(sosCountIntent);
+        }
+        int count = cacheOperation.getCount();
+        SharedPreferencesHelper.put(Constant.SP_RECORDED_KEY_COUNT, count);
+    }
+
+    *//**
+     * 通知数据变化
+     *//*
+    private void notifyData() {
+        Intent intent = new Intent();
+        intent.setAction(ReceiverAction.DB_ACTION_ON_DATA_CHANGE_ADD);
+        appContext.sendBroadcast(intent );
+    }*/
 
 
     /**

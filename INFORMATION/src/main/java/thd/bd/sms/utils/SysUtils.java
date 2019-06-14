@@ -1,17 +1,27 @@
 package thd.bd.sms.utils;
 
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.List;
+
+import thd.bd.sms.bean.BDCache;
+import thd.bd.sms.database.RDCacheOperation;
+import thd.bd.sms.sharedpreference.Constant;
+import thd.bd.sms.sharedpreference.SharedPreferencesHelper;
 
 public class SysUtils {
 
@@ -26,7 +36,7 @@ public class SysUtils {
             if (mNetworkInfo != null) {
                 return mNetworkInfo.isAvailable();
             }
-            searchNetwork(context);//弹出提示对话框
+//            searchNetwork(context);//弹出提示对话框
         }
         return false;
     }
@@ -85,6 +95,76 @@ public class SysUtils {
             }
         }
         return isRunning;
+    }
+
+
+    /**
+     * 数据处理，缓存数据库
+     *
+     * @param mBdCache
+     */
+    public static void dispatchData(Context mContext,BDCache mBdCache) {
+
+        RDCacheOperation operation = new RDCacheOperation(mContext);
+
+        int conutBefore = operation.getCount();
+        if (conutBefore >= Config.CACHE_COUNT) {
+
+            Toast.makeText(mContext, "抱歉,缓存溢出!", Toast.LENGTH_SHORT).show();
+
+        } else {
+
+            operation.insert(mBdCache);//插入数据
+            int count = operation.getCount();//获取数据
+            SharedPreferencesHelper.put(Constant.SP_RECORDED_KEY_COUNT,count);
+            notifyData(mContext);
+            // 唤醒线程
+        }
+    }
+
+    /**
+     * 通知数据变化
+     */
+    public static void notifyData(Context mContext) {
+        Intent intent = new Intent();
+        intent.setAction(ReceiverAction.DB_ACTION_ON_DATA_CHANGE_ADD);
+        mContext.sendBroadcast(intent);
+    }
+
+    /**
+     * 跳转百度地图
+     */
+    public static void goToBaiduMap(Activity activity, double mLat, double mLng, String mAddressStr) {
+        if (!isInstalled(activity,"com.baidu.BaiduMap")) {
+            Toast.makeText(activity,"请先安装百度地图客户端",Toast.LENGTH_LONG).show();
+            return;
+        }
+        Intent intent = new Intent();
+        intent.setData(Uri.parse("baidumap://map/direction?destination=latlng:"
+                + mLat + ","
+                + mLng + "|name:" + mAddressStr + // 终点
+                "&mode=driving" + // 导航路线方式
+                "&src=andr.baidu.openAPIdemo"));
+        activity.startActivity(intent); // 启动调用
+    }
+
+    /**
+     * 检测程序是否安装
+     *
+     * @param packageName
+     * @return
+     */
+    private static boolean isInstalled(Activity activity,String packageName) {
+        PackageManager manager = activity.getPackageManager();
+        //获取所有已安装程序的包信息
+        List<PackageInfo> installedPackages = manager.getInstalledPackages(0);
+        if (installedPackages != null) {
+            for (PackageInfo info : installedPackages) {
+                if (info.packageName.equals(packageName))
+                    return true;
+            }
+        }
+        return false;
     }
 
 

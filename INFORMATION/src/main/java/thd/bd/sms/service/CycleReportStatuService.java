@@ -77,8 +77,6 @@ public class CycleReportStatuService extends CycleReportService {
 	public void onDestroy() {
 
 		timeTask.getInstance().destroyed();
-		//修改sp中状态
-//		SpTools.setFloatStatus(mContext, SpTools.SP_FLOAT_STATUS_KEY_STATUS, false);lerry_???
 		Logger.d(TAG, "onDestroy");
 		super.onDestroy();
 	}

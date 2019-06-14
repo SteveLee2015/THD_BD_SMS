@@ -6,6 +6,9 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
@@ -18,12 +21,14 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.utils.CoordinateConverter;
 import com.thd.cmd.manager.entity.EncodeMode;
 
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1558,24 +1563,38 @@ public class Utils {
         }
     }
 
+
     /**
-     * 将GPS设备采集的原始GPS坐标转换成百度坐标
      *
+     * fuck 坑
+     * @param num
      * @return
      */
-//    public static LatLng baiduMapJP(LatLng sourceLatLng) {
-//
-//        //初始化坐标转换工具类，指定源坐标类型和坐标数据
-//// sourceLatLng待转换坐标
-//        CoordinateConverter converter = new CoordinateConverter()
-//                .from(CoordinateConverter.CoordType.GPS)
-//                .coord(sourceLatLng);
-//
-//        //desLatLng 转换后的坐标
-//        LatLng desLatLng = converter.convert();
-//
-//        return desLatLng;
-//    }
+    public static double changeLonLatMinuteToDegreeReverse(double num) {
+//		if (num == 0.0 || num < 100) {
+//			return 0.0;
+//		}
+        double afterPonint = 0;
+        double beforePoint = 0;
+        try {
+            String value = String.valueOf(num);
+            int index = value.indexOf(".");
+
+            String[] split = value.split("\\.");
+
+            String substring = "0."+split[1];
+            double tempAfter = Double.valueOf(substring).doubleValue();
+            afterPonint = tempAfter * 60.0d;
+
+            String substring1 = split[0];
+            beforePoint = Double.valueOf(substring1).doubleValue();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            Log.e(TAG,"数据传入错误!");
+        }
+
+        return beforePoint+afterPonint/100f;
+    }
 
 
     /**
@@ -1583,7 +1602,7 @@ public class Utils {
      *
      * @return
      */
-    /*public static LatLng baiduMapJP(LatLng sourceLatLng) {
+    public static LatLng baiduMapJP(LatLng sourceLatLng) {
 
         //初始化坐标转换工具类，指定源坐标类型和坐标数据
 // sourceLatLng待转换坐标
@@ -1595,5 +1614,42 @@ public class Utils {
         LatLng desLatLng = converter.convert();
 
         return desLatLng;
-    }*/
+    }
+
+    /**
+     * 跳转百度地图
+     */
+    public static void goToBaiduMap(Context context,double mLat,double mLng,String mAddressStr) {
+        if (!isInstalled(context,"com.baidu.BaiduMap")) {
+            Toast.makeText(context,"请先安装百度地图客户端",Toast.LENGTH_LONG).show();
+            return;
+        }
+        Intent intent = new Intent();
+        intent.setData(Uri.parse("baidumap://map/direction?destination=latlng:"
+                + mLat + ","
+                + mLng + "|name:" + mAddressStr + // 终点
+                "&mode=driving" + // 导航路线方式
+                "&src=andr.baidu.openAPIdemo"));
+        context.startActivity(intent); // 启动调用
+    }
+
+
+    /**
+     * 检测程序是否安装
+     *
+     * @param packageName
+     * @return
+     */
+    public static boolean isInstalled(Context context,String packageName) {
+        PackageManager manager = context.getPackageManager();
+        //获取所有已安装程序的包信息
+        List<PackageInfo> installedPackages = manager.getInstalledPackages(0);
+        if (installedPackages != null) {
+            for (PackageInfo info : installedPackages) {
+                if (info.packageName.equals(packageName))
+                    return true;
+            }
+        }
+        return false;
+    }
 }

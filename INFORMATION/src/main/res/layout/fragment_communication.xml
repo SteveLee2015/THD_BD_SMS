@@ -72,7 +72,7 @@
             android:layout_weight="1"
             android:layout_marginRight="@dimen/dp_10"
             android:layout_width="0dp"
-            android:background="@mipmap/bottom_unclick"
+            android:background="@drawable/btn_bg_selector"
             android:layout_height="match_parent">
 
             <!--<ImageView-->
@@ -95,7 +95,7 @@
             android:id="@+id/communication_contant_layout"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:background="@mipmap/bottom_unclick"
+            android:background="@drawable/btn_bg_selector"
             android:gravity="center"
             android:layout_marginLeft="@dimen/dp_10"
             android:layout_width="0dp"

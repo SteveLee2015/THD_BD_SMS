@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.AssetFileDescriptor;
+import android.location.BDLocation;
+import android.location.BDLocationReport;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -19,6 +21,10 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -40,6 +46,7 @@ import thd.bd.sms.utils.Config;
 import thd.bd.sms.utils.DBhelper;
 import thd.bd.sms.utils.DateUtils;
 import thd.bd.sms.utils.ReceiverAction;
+import thd.bd.sms.utils.Utils;
 import thd.bd.sms.view.GspStatesManager;
 
 /**
@@ -53,7 +60,7 @@ public class CycleReportService extends Service {
     private final static int WARN_NO_LOCATION = 1000;
     protected static WakeLock wakeLock = null;
     protected int cardFreq = 60;//卡频
-    protected ReportSet mReportSet = null;
+//    protected ReportSet mReportSet = null;
     protected ReportSetDatabaseOperation oper = null;
     protected MediaPlayer mediaPlayer;
 
@@ -65,6 +72,7 @@ public class CycleReportService extends Service {
     private String reportType;//报告类型
     protected String reportStatus;//报告状态
     protected String sendNumStr;//收件人
+    private BDLocationReport report;
 
     Handler mHandler = new Handler() {
 
@@ -95,6 +103,7 @@ public class CycleReportService extends Service {
             wakeLock.acquire();
         }
 
+
         oper = new ReportSetDatabaseOperation(this);
         if (SharedPreferencesHelper.getSericeFeq()!=0) {
             cardFreq = SharedPreferencesHelper.getSericeFeq();
@@ -114,6 +123,7 @@ public class CycleReportService extends Service {
 //    }
 
 
+
     /**
      * 位置报告
      *
@@ -122,6 +132,7 @@ public class CycleReportService extends Service {
      * @param reportStatus 状态
      */
     protected void locReport(String sendNumStr, String reportType, String reportStatus) {
+
         rnLocation =  GspStatesManager.getInstance().mLocation;
         //重新赋值
         if (SharedPreferencesHelper.getSericeFeq()!=0) {
@@ -145,38 +156,49 @@ public class CycleReportService extends Service {
         }
 
         LocReportManager locReportManager = LocReportManager.getInstance(mContext);
+
         switch (reportType) {
             case ReportSet.REPORTSET_RN:
 
                 if (rnLocation != null) {
-//                    DecimalFormat df = new DecimalFormat("#.0000000");
-//                    BD_RD_WAA waa = new BD_RD_WAA();//RN 位置报告
-//                    waa.setMsgType(1);// 发为1 接收为0
-//                    waa.setUserAddress(reportSet.getReportNnm());
-//                    //waa.setReportTime(rnLocation.getTime()+"");//时间有问题
-////                    String dateTimeStr1 = DateUtils.getRNDateTimeStr(rnLocation.getTime());
-//                    String dateTimeStr = DateUtils.getRNDateTimeStr(rnLocation.getTime() - 1000 * 60 * 60 * 8);
-//
-//                    Log.e("LERRYTEST_RN" ,"=========CycleReportService165=========rnLocation.getTime()=="+rnLocation.getTime()+"=========dateTimeStr=="+dateTimeStr+"============");
-//
-//                    waa.setReportTime(dateTimeStr);//时间有问题
-//                    // 转换为 2.1协议
-//                    double latitudeNew = BDHelper.changeLonLatMinuteToDegreeReverse(rnLocation.getLatitude());
-//                    double longitudeNew = BDHelper.changeLonLatMinuteToDegreeReverse(rnLocation.getLongitude());
-//
-//                    //处理
-//                    String strLatitude = df.format(latitudeNew * 100);
-//                    String strLongitude = df.format(longitudeNew * 100);
-//
-//
-//                    waa.setLatitude(Double.parseDouble(strLatitude));
-//                    waa.setLatitudeDir("N");
-//                    waa.setLongitude(Double.parseDouble(strLongitude));
-//                    waa.setLongitudeDir("E");
-//                    waa.setHeight(rnLocation.getAltitude());
-//                    waa.setHeightUnit("M");
-//                    waa.setReportFeq(0);// 单次
-//                    mBdData = new BDData(ProtocolType.PROTOCOL_TYPE_BD21, BD21DataType.BD_21_RD_WAA, waa);
+                    report = new BDLocationReport();
+
+                    DecimalFormat df = new DecimalFormat("#.0000000");
+                    report.setMsgType(1);// 发为1 接收为0
+                    report.setUserAddress(reportSet.getReportNnm());
+                    //waa.setReportTime(rnLocation.getTime()+"");//时间有问题
+//                    String dateTimeStr1 = DateUtils.getRNDateTimeStr(rnLocation.getTime());
+                    String dateTimeStr = DateUtils.getRNDateTimeStr(rnLocation.getTime() - 1000 * 60 * 60 * 8);
+
+//                    report.setReportTime(dateTimeStr);//时间有问题
+                    // 转换为 2.1协议
+                    double latitudeNew = Utils.changeLonLatMinuteToDegreeReverse(rnLocation.getLatitude());
+                    double longitudeNew = Utils.changeLonLatMinuteToDegreeReverse(rnLocation.getLongitude());
+
+                    //2.1 转换为 °的问题
+//                    double latitudeNew = Utils.changeLonLatMinuteToDegree(Double.valueOf(rnLocation.getLatitude()));
+//                    double longitudeNew = Utils.changeLonLatMinuteToDegree(Double.valueOf(rnLocation.getLongitude()));
+
+                    //处理
+                    String strLatitude = df.format(latitudeNew * 100);
+                    String strLongitude = df.format(longitudeNew * 100);
+
+
+                    Log.e("LERRYTEST_RN" ,"=========CycleReportService165=========rnLocation.getTime()=="+rnLocation.getTime()
+                            +"=========dateTimeStr=="+dateTimeStr+"============"+"rnLocation.getLatitude()=="+rnLocation.getLatitude()+
+                            "=================rnLocation.getLongitude()=="+rnLocation.getLongitude()+"============latitudeNew=="+latitudeNew
+                            +"==================longitudeNew=="+longitudeNew+"================strLatitude=="+strLatitude+"====================strLongitude=="+strLongitude);
+
+
+                    report.setLatitude(Double.parseDouble(strLatitude));
+                    report.setLatitudeDir("N");
+                    report.setLongitude(Double.parseDouble(strLongitude));
+                    report.setLongitudeDir("E");
+                    report.setHeightUnit("M");
+                    report.setReportFeq(0);// 单次
+                    report.setHeight(rnLocation.getAltitude());
+                    report.setReportTime(dateTimeStr);
+
                 } else {
                     mHandler.sendEmptyMessage(WARN_NO_LOCATION);
                     return;
@@ -457,7 +479,7 @@ public class CycleReportService extends Service {
             //保存到发件箱
 
             //发送
-            locReportManager.locationReport(reportSet);
+            locReportManager.locationReport(reportSet,report);
         }
     }
 
@@ -514,6 +536,8 @@ public class CycleReportService extends Service {
             oper.close();
             oper = null;
         }
+
+
 //        if (wakeLock != null) {
 //            wakeLock.release();
 //            wakeLock = null;

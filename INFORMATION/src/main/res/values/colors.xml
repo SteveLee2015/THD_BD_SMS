@@ -9,6 +9,7 @@
     <!--<color name="colorMainTitle">#BCBBBB</color>-->
     <!--<color name="colorMainTitle">#585F6F</color>-->
     <color name="colorMainTitle">#99CCFF</color>
+    <color name="colorMainTitle1">#52C3FF</color>
     <!--<color name="colorMainTitle">#A3B7B5</color>-->
 
     <color name="colorWhite">#ffffff</color>
@@ -21,6 +22,8 @@
     <!-- 通用颜色 -->
     <color name="red">#FFFF0000</color>
     <color name="text_hint">#D4D4D4</color>
+    <color name="green">#33CC66</color>
+
 
     <color name="bd_rdss_no_signal">#DCDCDC</color>
     <color name="bd_rdss_have_signal">#5284EB</color>

@@ -11,20 +11,24 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,7 +70,7 @@ public class BDContactActivity extends BaseActivity {
     /**
      * 增加联系人图标
      */
-    private ImageView addContact=null;
+//    private ImageView addContact=null;
     private Context mContext=this;
     private BaseExpandableListAdapter adapter=null;
     private  long rowId=0;
@@ -82,6 +86,7 @@ public class BDContactActivity extends BaseActivity {
 	private boolean needBack;//是否需要返回
 
 	private TextView titleName;//标题
+	private Button bd_contact_btn;
 
 	@Override
 	protected int getContentView() {
@@ -158,6 +163,8 @@ public class BDContactActivity extends BaseActivity {
 				if (needBack==false) {
 					return true;
 				}
+
+
 				Intent intent=new Intent();
 				Map<String,Object> map=null;
 				long mid=0;
@@ -407,8 +414,8 @@ public class BDContactActivity extends BaseActivity {
 			public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3){}
 			
 		});
-		
-		addContact.setOnClickListener(new OnClickListener(){
+
+		bd_contact_btn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View arg0) {
 			   AlertDialog.Builder alertDialog=new AlertDialog.Builder(BDContactActivity.this);
@@ -473,7 +480,7 @@ public class BDContactActivity extends BaseActivity {
 		returnLayout.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View arg0) {
-		         BDContactActivity.this.finish();		
+		         BDContactActivity.this.finish();
 			}
 		});
 	}
@@ -589,9 +596,9 @@ public class BDContactActivity extends BaseActivity {
 		
 	
 	private void initUI(){
-		titleName=(TextView)this.findViewById(R.id.sub_title_name);
+		titleName=(TextView)this.findViewById(R.id.title_name);
 		titleName.setText("通讯录");
-		addContact=(ImageView)this.findViewById(R.id.addContact);
+		bd_contact_btn=(Button)this.findViewById(R.id.bd_contact_btn);
 		mSearchContact=(EditText)this.findViewById(R.id.search_contact);
 		contactListView=(ExpandableListView)this.findViewById(R.id.bd_contact_listview);
 		returnLayout=(LinearLayout)this.findViewById(R.id.return_home_layout);

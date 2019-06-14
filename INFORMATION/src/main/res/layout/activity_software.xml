@@ -1,0 +1,145 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_48"
+        android:background="@drawable/dialog_top_corner">
+
+        <LinearLayout
+            android:id="@+id/return_home_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal"
+            android:paddingRight="5dp"
+            android:weightSum="1">
+
+            <ImageView
+                android:id="@+id/sub_return_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/dp_18"
+                android:layout_weight="1"
+                android:src="@mipmap/page_back"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/title_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/sp_18"
+            android:text="版本信息"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/ll_update"
+        android:gravity="bottom">
+
+        <!-- icon -->
+
+        <ImageView
+            android:id="@+id/iv_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@+id/project_name_textview"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
+            android:src="@mipmap/notification_new_sms" />
+
+        <!-- app name -->
+
+        <TextView
+            android:id="@+id/project_name_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorSettingText"
+            android:layout_above="@+id/map_version_textview"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:text="北斗通信软件"
+            android:textSize="24dp" />
+
+        <!-- 地图版本 -->
+
+        <TextView
+            android:id="@+id/map_version_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/project_version_textview"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="地图版本：5.3.0"
+            android:textColor="@color/colorSettingText"
+            android:textSize="@dimen/sp_14"
+            android:visibility="visible" />
+
+        <!-- 软件版本 -->
+
+        <TextView
+            android:id="@+id/project_version_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/project_date_textview"
+            android:layout_gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:textColor="@color/colorSettingText"
+            android:text="软件版本：1.0.0"
+            android:textSize="@dimen/sp_14" />
+        <!-- 日期 -->
+
+        <TextView
+            android:id="@+id/project_date_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="30dp"
+            android:gravity="center"
+            android:textColor="@color/colorSettingText"
+            android:text="日期："
+            android:textSize="@dimen/sp_14" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible"
+        android:gravity="center" >
+
+        <Button
+            android:id="@+id/update_version_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/dp_40"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/btn_bg_selector"
+            android:padding="8dp"
+            android:text="软件升级"
+            android:textColor="@color/colorSettingText"
+            android:textSize="@dimen/sp_14"
+            />
+
+    </LinearLayout>
+
+</RelativeLayout>

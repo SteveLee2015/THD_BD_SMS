@@ -3,9 +3,11 @@ package thd.bd.sms.base;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.BDParameterException;
 import android.location.BDUnknownException;
@@ -18,6 +20,7 @@ import android.location.LocationProvider;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.Settings;
@@ -27,8 +30,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 
@@ -50,10 +55,12 @@ import thd.bd.sms.application.SMSApplication;
 import thd.bd.sms.bean.DBLocation;
 import thd.bd.sms.bean.GpsLocationEvent;
 import thd.bd.sms.bean.SatelliteInfo;
+import thd.bd.sms.service.CoreService;
 import thd.bd.sms.sharedpreference.Constant;
 import thd.bd.sms.sharedpreference.SharedPreferencesHelper;
 import thd.bd.sms.utils.Config;
 import thd.bd.sms.utils.SysUtils;
+import thd.bd.sms.utils.Utils;
 import thd.bd.sms.utils.WinUtils;
 import thd.bd.sms.service.LocationService;
 import thd.bd.sms.view.GspStatesManager;
@@ -88,6 +95,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     android.os.PowerManager.WakeLock wakeLock;
     private PowerManager pm = null;
 
+    private MyConn myConn = null;
+    private CoreService coreService;
+    private boolean isBind = false;
+
     @SuppressLint("InvalidWakeLockTag")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -96,6 +107,25 @@ public abstract class BaseActivity extends AppCompatActivity {
         setContentView(getContentView());
 
         WinUtils.hiddenKeyBoard(this);
+
+        WindowManager m = this.getWindowManager();
+        DisplayMetrics metrics = new DisplayMetrics();
+        m.getDefaultDisplay().getMetrics(metrics);
+        Utils.setmDisplayMetrics(metrics);
+
+        coreService = CoreService.getInstance();
+        myConn = new MyConn();
+
+        // 绑定服务 后台运行短报文等服务
+        boolean isCoreServiceStart = SysUtils.isServiceRunning(this,coreService.getClass().getName());
+
+        if(!isCoreServiceStart){
+            Intent intent2 = new Intent(this, coreService.getClass());
+            startService(intent2);
+            bindService(intent2, myConn, 0);
+            Log.e(TAG, "LERRY_SERVICE: =================BaseActivity123=======开启CoreService服务====");
+        }
+
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -132,6 +162,18 @@ public abstract class BaseActivity extends AppCompatActivity {
             SharedPreferencesHelper.put(Constant.SP_KEY_RN_LOCATION_LAT, mCurrentLat);
             SharedPreferencesHelper.put(Constant.SP_KEY_RN_LOCATION_LON, mCurrentLon);
         }
+
+        /*boolean isCoreServiceStart = SysUtils.isServiceRunning(this,coreService.getClass().getName());
+        if(isCoreServiceStart){
+            Intent mIntent = new Intent();
+            mIntent.setClass(this, coreService.getClass());
+            Log.e(TAG, "LERRY_SERVICE: =================BaseActivity162=======关闭CoreService服务====");
+
+            if(isBind){
+                this.unbindService(myConn);
+            }
+            this.stopService(mIntent);
+        }*/
 
         Log.e(TAG, "onDestroy: =============mCurrentLat========" + mCurrentLat + "============" + mCurrentLon);
     }
@@ -231,6 +273,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             location1.setTime(location.getTime());
             onComLocation(location1);
 //            Log.e(TAG, "LERRYTEST_MAP: ===============有权限了，去放肆吧=GspStatesManager.ILocationListener========");
+//            Log.e("LERRYTEST_MAP", "=========BaseActivity234=======location==" + location.getLatitude() + "," + location.getLongitude());
         }
     };
 
@@ -242,7 +285,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         // 位置改变时被调用
         @Override
         public void onLocationChanged(Location location) {
-
 
 
             if (location != null) {
@@ -435,10 +477,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         GspStatesManager.getInstance().addSatellitesListener(mSatellitesListener);
         GspStatesManager.getInstance().addLocationListener(mRnLocationlistener);
 
-        if(isFirstLocation){//如果是第一次登陆
-            if (isNetConn) {//如果有网络，就用网络定位，如果没有网络也没有GPS，就只有听天由命了
+        /*if(isFirstLocation){//如果是第一次登陆
+//            if (isNetConn) {//如果有网络，就用网络定位，如果没有网络也没有GPS，就只有听天由命了
                 locationService.start();
-            }
+//            }
         }else {//如果不是第一次登陆
 
             if(SharedPreferencesHelper.contain(Constant.SP_KEY_RN_LOCATION_LON)){//如果有最后一次登陆经纬度
@@ -460,7 +502,10 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
 
             checkGPSPermission();
-        }
+        }*/
+
+        checkGPSPermission();
+        locationService.start();
 
         Message message = new Message();
         message.what = BD_BSI_MESSAGE;
@@ -594,5 +639,26 @@ public abstract class BaseActivity extends AppCompatActivity {
         myLocation.setLongitude(lon);
 
         onComLocation(myLocation);
+    }
+
+    private class MyConn implements ServiceConnection {
+
+        /**
+         * 当服务被成功绑定时候调用
+         */
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+
+            Log.d(TAG, "onServiceConnected");
+            isBind = true;
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d(TAG, "onServiceDisconnected");
+            isBind = false;
+        }
+
     }
 }

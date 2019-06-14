@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:id="@+id/ll_content"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_400"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_marginRight="@dimen/dp_10"
+        android:layout_marginBottom="@dimen/dp_10"
+        android:background="@drawable/setting_background_corner"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/dp_72">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_36">
+
+            <View
+                android:layout_width="@dimen/dp_60"
+                android:layout_height="@dimen/dp_1"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/tv_message"
+                android:background="@color/colorLine" />
+
+            <TextView
+                android:id="@+id/tv_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="@dimen/dp_12"
+                android:layout_marginRight="@dimen/dp_12"
+                android:lineSpacingExtra="@dimen/dp_3"
+                android:text="是否要执行以下操作"
+                android:textColor="@color/colorSettingText"
+                android:textSize="12sp" />
+
+            <View
+                android:layout_width="@dimen/dp_60"
+                android:layout_height="@dimen/dp_1"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/tv_message"
+                android:background="@color/colorLine" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/tishi_latlng_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:orientation="horizontal">
+
+                <View style="@style/biaodanLineStyle" />
+
+                <TextView
+                    style="@style/locTxtStyle1"
+                    android:text="@string/bdloc_lon_str" />
+
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/tishi_lat"
+                style="@style/locTxtStyle2"
+                android:hint="请输入经度"
+                android:inputType="numberDecimal" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:orientation="horizontal">
+
+                <View style="@style/biaodanLineStyle" />
+
+                <TextView
+                    style="@style/locTxtStyle1"
+                    android:text="@string/bdloc_lat_str" />
+
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/tishi_lon"
+                style="@style/locTxtStyle2"
+                android:hint="请输入纬度"
+                android:inputType="numberDecimal" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tv_tishi_txt_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_tishi_txt"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/dp_40"
+                android:layout_marginTop="@dimen/dp_20"
+                android:layout_marginRight="@dimen/dp_40"
+                android:layout_marginBottom="@dimen/dp_20"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="1111111111111111"
+                android:textColor="@color/colorSettingText"
+                android:textSize="@dimen/sp_15" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_40"
+            android:layout_marginBottom="@dimen/dp_20"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <Button
+                android:id="@+id/dialog_commom_tishi_submit"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/dp_40"
+                android:layout_marginRight="@dimen/dp_40"
+                android:layout_weight="1.0"
+                android:background="@drawable/btn_bg_selector"
+                android:gravity="center"
+                android:text="取消"
+                android:textColor="@color/colorWhite"
+                android:textSize="@dimen/sp_14"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/dialog_commom_tishi_cancel"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/dp_40"
+                android:layout_marginRight="@dimen/dp_40"
+                android:layout_weight="1.0"
+                android:background="@drawable/btn_bg_selector"
+                android:gravity="center"
+                android:text="确定"
+                android:textColor="@color/colorWhite"
+                android:textSize="@dimen/sp_14" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_54"
+        android:layout_marginLeft="@dimen/dp_10"
+        android:layout_marginRight="@dimen/dp_10"
+        android:background="@drawable/dialog_top_corner">
+
+        <TextView
+            android:id="@+id/dialog_commom_tishi_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="@dimen/dp_20"
+            android:layout_marginRight="@dimen/dp_20"
+            android:gravity="center_vertical"
+            android:text="提示"
+            android:textColor="@color/colorWhite"
+            android:textSize="18sp" />
+
+    </RelativeLayout>
+
+
+    <ImageView
+        android:id="@+id/iv_close"
+        android:layout_width="@dimen/dp_24"
+        android:layout_height="@dimen/dp_24"
+        android:layout_below="@id/ll_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dp_24"
+        android:src="@mipmap/close"
+        android:visibility="visible" />
+</RelativeLayout>

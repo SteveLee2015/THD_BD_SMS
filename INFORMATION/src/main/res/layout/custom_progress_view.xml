@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal" >
 
-    <thd.bd.sms.view.BDRDSSSignalView
+    <!--<thd.bd.sms.view.BDRDSSSignalView
         android:id="@+id/progress_signal_1"
         android:padding="5dp"
         android:layout_width="0dp"
@@ -12,6 +12,7 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_weight="1"
+        android:background="@color/colorLine"
         android:gravity="center" />
 
     <thd.bd.sms.view.BDRDSSSignalView
@@ -21,7 +22,8 @@
         android:layout_height="fill_parent"
         android:layout_marginRight="5dp"
         android:layout_weight="1"
-        android:gravity="center" />
+        android:gravity="center"
+        android:background="@color/colorLine"/>
 
     <thd.bd.sms.view.BDRDSSSignalView
         android:id="@+id/progress_signal_3"
@@ -30,6 +32,7 @@
         android:layout_height="fill_parent"
         android:layout_marginRight="5dp"
         android:layout_weight="1"
+        android:background="@color/colorLine"
         android:gravity="center" />
 
     <thd.bd.sms.view.BDRDSSSignalView
@@ -39,6 +42,47 @@
         android:layout_height="fill_parent"
         android:layout_marginRight="5dp"
         android:layout_weight="1"
+        android:background="@color/colorLine"
+        android:gravity="center" />-->
+
+    <View
+        android:id="@+id/progress_signal_1"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_20"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:layout_weight="1"
+        android:background="@color/bd_rdss_no_signal"
+        android:gravity="center" />
+
+    <View
+        android:id="@+id/progress_signal_2"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_20"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:layout_weight="1"
+        android:background="@color/bd_rdss_no_signal"
+        android:gravity="center" />
+
+    <View
+        android:id="@+id/progress_signal_3"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_20"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:layout_weight="1"
+        android:background="@color/bd_rdss_no_signal"
+        android:gravity="center" />
+
+    <View
+        android:id="@+id/progress_signal_4"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_20"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:layout_weight="1"
+        android:background="@color/bd_rdss_no_signal"
         android:gravity="center" />
 
 </LinearLayout>

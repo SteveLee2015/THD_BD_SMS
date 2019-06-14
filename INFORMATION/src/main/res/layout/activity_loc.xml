@@ -1,7 +1,13 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground" >
+    android:background="@color/colorBackground"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/message_title"
+        layout="@layout/bd_title_layout"
+        android:focusable="true"/>
 
     <LinearLayout
         android:id="@+id/bd_location_layout"
@@ -14,117 +20,138 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:orientation="horizontal" >
+
+            <View
+                style="@style/biaodanLineStyle"/>
 
             <TextView
                 android:id="@+id/bdloc_lon_lable"
                 style="@style/locTxtStyle1"
                 android:text="@string/bdloc_lon_str"/>
 
-            <TextView
-                android:id="@+id/bdloc_lon"
-                style="@style/locTxtStyle2"
-                android:text="@string/common_lat_value" />
+
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/bdloc_lon"
+            style="@style/locTxtStyle2"
+            android:text="@string/common_lat_value" />
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:orientation="horizontal" >
+
+            <View
+                style="@style/biaodanLineStyle"/>
 
             <TextView
                 android:id="@+id/bdloc_lat_lable"
                 style="@style/locTxtStyle1"
                 android:text="@string/bdloc_lat_str"/>
 
-            <TextView
-                android:id="@+id/bdloc_lat"
-                style="@style/locTxtStyle2"
-                android:text="@string/common_lat_value"/>
+
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/bdloc_lat"
+            style="@style/locTxtStyle2"
+            android:text="@string/common_lat_value"/>
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:orientation="horizontal" >
+
+            <View
+                style="@style/biaodanLineStyle"/>
 
             <TextView
                 android:id="@+id/bdloc_height_lable"
                 style="@style/locTxtStyle1"
                 android:text="@string/bdloc_height_str"/>
 
-            <TextView
-                android:id="@+id/bdloc_height"
-                style="@style/locTxtStyle2"
-                android:text="@string/common_height_value"/>
+
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/bdloc_height"
+            style="@style/locTxtStyle2"
+            android:text="@string/common_height_value"/>
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:orientation="horizontal" >
+
+            <View
+                style="@style/biaodanLineStyle"/>
 
             <TextView
                 android:id="@+id/bdloc_time_lable"
                 style="@style/locTxtStyle1"
                 android:text="@string/bdloc_time_str"/>
 
-            <TextView
-                android:id="@+id/bdloc_time"
-                style="@style/locTxtStyle2"
-                android:text="@string/common_time_value"/>
+
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/bdloc_time"
+            style="@style/locTxtStyle2"
+            android:text="@string/common_time_value"/>
 
         <LinearLayout
             android:id="@+id/bdloc_coodr"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="30dp"
             android:gravity="center_vertical"
             android:orientation="horizontal" >
+
+            <View
+                style="@style/biaodanLineStyle"/>
 
             <TextView
                 style="@style/locTxtStyle1"
                 android:text="@string/bdloc_zuobiao_str"/>
 
-            <thd.bd.sms.view.CustomListView
-                android:id="@+id/bd_coodr_type"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/dp_40"
-                android:layout_weight="5" >
-            </thd.bd.sms.view.CustomListView>
+
         </LinearLayout>
+
+        <thd.bd.sms.view.CustomListView
+            android:id="@+id/bd_coodr_type"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_40"
+            android:layout_marginLeft="@dimen/dp_40"
+            android:layout_marginRight="@dimen/dp_40"
+            android:layout_marginBottom="@dimen/dp_30">
+        </thd.bd.sms.view.CustomListView>
+
     </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/ll_loc_submit"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_40"
         android:gravity="center"
         android:layout_below="@+id/bd_location_layout"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/loc_btn"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="30dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="20dp"
             android:background="@drawable/btn_bg_selector"
             android:gravity="center"
             android:text="开始定位"
@@ -133,10 +160,11 @@
 
         <Button
             android:id="@+id/loc_now_btn"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-           android:layout_toLeftOf="@+id/setting_rd"
+            android:layout_weight="1"
             android:layout_marginRight="20dp"
+            android:layout_marginLeft="@dimen/dp_20"
             android:background="@drawable/btn_bg_selector"
             android:gravity="center"
             android:text="紧急定位"
@@ -147,10 +175,10 @@
             android:id="@+id/setting_rd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_marginRight="20dp"
+            android:layout_marginLeft="@dimen/dp_20"
             android:layout_centerVertical="true"
             android:background="@mipmap/setting_unclick"/>
-    </RelativeLayout>
+    </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

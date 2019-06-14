@@ -119,6 +119,8 @@ public class CustomSatelliateSnr extends View {
 			canvas.drawText(mSatelliatePRN_No+"",prnPixelArr[i][0],prnPixelArr[i][1], mPaint);
 			canvas.drawText(String.valueOf((int)snrPixelArr[i][0]),snrPixelArr[i][1],snrPixelArr[i][2], mPaint);
 		}
+//		canvas.drawText(120+"",300,300, mPaint);
+
 	}
 
 	@Override
@@ -140,6 +142,7 @@ public class CustomSatelliateSnr extends View {
 			int ii = list.size();
 			if (i < list.size()) {
 				GpsSatellite mGPSatellite = list.get(i);
+				Log.i("LERRYTEST_RN" ,"=============================>mGPSatellite.getSnr() =" + mGPSatellite.getSnr());
 				if(mGPSatellite.getSnr()>0){
 					if(mGPSatellite.getPrn()>=160){
 						mSatelliatePRN[index] = (mGPSatellite.getPrn()-160+160)+ "";
@@ -147,11 +150,13 @@ public class CustomSatelliateSnr extends View {
 					}else{
 						mSatelliatePRN[index] =mGPSatellite.getPrn()+"";
 					}
+					Log.i("LERRYTEST_RN","============> prn["+index+"] ="+ mSatelliatePRN[index] +", snr="+mGPSatellite.getSnr());
 					int startValue=(2*index+1)*gapValue;
 					int stopValue=(2*index+2)*gapValue;
 					float mStartRectValue=left + Utils.dp2pixel(startValue);
 					float mStopRectValue=left + Utils.dp2pixel(stopValue);
 					float mShowValue=(bitMapHeight)*(1-mGPSatellite.getSnr()/100.0f);
+					Log.i("LERRYTEST_RN","================================>mStartRectValue =" +mStartRectValue +",mStopRectValue=" +mStopRectValue +",mShowValue="+mShowValue +",bitMapHeight ="+bitMapHeight);
 					snrRect[index][0]=mStartRectValue;
 					snrRect[index][1]=mShowValue;
 					snrRect[index][2]=mStopRectValue;
@@ -178,7 +183,8 @@ public class CustomSatelliateSnr extends View {
 				snrPixelArr[i][2]=-100;
 			}
 		}
-		postInvalidate();
+		//postInvalidate();
+		invalidate();
 	}
 	public void showMapBlue(List<SatelliteInfo> gsv) {
 

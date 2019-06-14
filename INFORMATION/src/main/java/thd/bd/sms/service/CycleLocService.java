@@ -15,9 +15,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import thd.bd.sms.application.SMSApplication;
+import thd.bd.sms.bean.BDCache;
 import thd.bd.sms.bean.LocationSet;
 import thd.bd.sms.database.LocSetDatabaseOperation;
 import thd.bd.sms.sharedpreference.SharedPreferencesHelper;
+import thd.bd.sms.utils.SysUtils;
 
 /**
  * 连续定位服务
@@ -128,11 +130,23 @@ public class CycleLocService extends CycleReportService {
 				// 循环 定位
 				BDCmdManager cmdManager = BDCmdManager.getInstance(app);
 				try {
-					cmdManager.sendLocationInfoReqCmdBDV21(BDRDSSManager.ImmediateLocState.LOC_NORMAL_FLAG, Integer.valueOf("1"), "L", 0, 0, 0);
+					cmdManager.sendLocationInfoReqCmdBDV21(BDRDSSManager.ImmediateLocState.LOC_NORMAL_FLAG, Integer.valueOf(mLocationSet.getHeightType()), "L",
+							Integer.valueOf(mLocationSet.getHeightValue()), Integer.valueOf(mLocationSet.getTianxianValue()), 0);
 					Log.w("LERRYTEST_RD定位" ,"========CycleLocService132============发送RD定位语句======");
 				} catch (BDUnknownException e) {
 					e.printStackTrace();
 				}
+
+				//封装数据
+				//BD_RD_DWA dwa = (BD_RD_DWA)data.m_Data;
+				BDCache mBdCache = new BDCache();
+				mBdCache.setMsgType(BDCache.RD_LOCATION_FLAG);
+				mBdCache.setSendAddress(SharedPreferencesHelper.getCardAddress());
+				mBdCache.setMsgContent("定位申请");
+				mBdCache.setPriority(BDCache.PRIORITY_1);
+				mBdCache.setCacheContent("连续定位，普通定位，测高方式："+mLocationSet.getHeightType()+",高程数据："+mLocationSet.getHeightValue()+",天线高："+mLocationSet.getTianxianValue());
+				//把数据保存到数据库中
+				SysUtils.dispatchData(CycleLocService.this,mBdCache);
 
 				playSoundAndVibrate();
 

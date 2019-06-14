@@ -1,7 +1,9 @@
 package thd.bd.sms.activity;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -26,8 +28,14 @@ import butterknife.OnClick;
 import thd.bd.sms.R;
 import thd.bd.sms.base.BaseActivity;
 import thd.bd.sms.bean.MyLocationBean;
+import thd.bd.sms.service.CycleLocService;
+import thd.bd.sms.service.CycleReportRDLocService;
+import thd.bd.sms.service.CycleReportRNLocService;
+import thd.bd.sms.service.CycleReportSOSService;
+import thd.bd.sms.service.CycleReportStatuService;
 import thd.bd.sms.utils.DateUtils;
 import thd.bd.sms.utils.ReceiverAction;
+import thd.bd.sms.utils.SysUtils;
 import thd.bd.sms.utils.Utils;
 import thd.bd.sms.utils.WinUtils;
 
@@ -95,6 +103,7 @@ public class BDTimeActivity extends BaseActivity {
         WinUtils.setWinTitleColor(this);
         super.onCreate(savedInstanceState);
 
+        titleName.setText("北斗校时");
         EventBus.getDefault().register(this);
 
     }
@@ -126,26 +135,27 @@ public class BDTimeActivity extends BaseActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.return_home_layout:
+                BDTimeActivity.this.finish();
                 break;
             case R.id.time_jiaoshi_btn:
 
-                /*// 判断 服务是否在运行
+                // 判断 服务是否在运行
                 // 连续 rd报告服务  rn报告服务 状态服务 定位服务
                 // 弹出对话框
                 String clssName1 = CycleReportRDLocService.class.getName();
-                boolean isStart1 = AppUtils.isServiceRunning(mContext, clssName1);
+                boolean isStart1 = SysUtils.isServiceRunning(this, clssName1);
 
                 String clssName2 = CycleReportRNLocService.class.getName();
-                boolean isStart2 = AppUtils.isServiceRunning(mContext, clssName2);
+                boolean isStart2 = SysUtils.isServiceRunning(this, clssName2);
 
                 String clssName3 = CycleReportStatuService.class.getName();
-                boolean isStart3 = AppUtils.isServiceRunning(mContext, clssName3);
+                boolean isStart3 = SysUtils.isServiceRunning(this, clssName3);
 
                 String clssName4 = CycleLocService.class.getName();
-                boolean isStart4 = AppUtils.isServiceRunning(mContext, clssName4);
+                boolean isStart4 = SysUtils.isServiceRunning(this, clssName4);
 
                 String clssName5 = CycleReportSOSService.class.getName();
-                boolean isStart5 = AppUtils.isServiceRunning(mContext, clssName5);
+                boolean isStart5 = SysUtils.isServiceRunning(this, clssName5);
 
 //                DBLocation location = GspStatesManager.getInstance().mLocation;
 //                if (location != null)
@@ -153,38 +163,33 @@ public class BDTimeActivity extends BaseActivity {
 
                 if (isStart1) {
                     //弹出提示对话框  请关闭连续rd报告
-                    String msg = "校时前,请关闭RD连续位置报告!";
-                    aletDialog(msg);
+                    Toast.makeText(this,"校时前,请关闭RD连续位置报告!",Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 if (isStart2) {
                     //弹出提示对话框  请关闭连续rd报告
-                    String msg = "校时前,请关闭RN连续位置报告!";
-                    aletDialog(msg);
+                    Toast.makeText(this,"校时前,请关闭RN连续位置报告!",Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 if (isStart3) {
                     //弹出提示对话框  请关闭连续rd报告
-                    String msg = "校时前,请关闭连续状态报告!";
-                    aletDialog(msg);
+                    Toast.makeText(this,"校时前,请关闭连续状态报告!",Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 if (isStart4) {
                     //弹出提示对话框  请关闭连续rd报告
-                    String msg = "校时前,请关闭RD连续定位!";
-                    aletDialog(msg);
+                    Toast.makeText(this,"校时前,请关闭RD连续定位!",Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 if (isStart5) {
                     //弹出提示对话框  请关闭连续rd报告
-                    String msg = "校时前,请关闭SOS救援服务!";
-                    aletDialog(msg);
+                    Toast.makeText(this,"校时前,请关闭SOS救援服务!",Toast.LENGTH_SHORT).show();
                     return;
-                }*/
+                }
 
                 if (locationTime != 0) {
 //                    if (app.isBlueToothModel()) {
@@ -226,6 +231,11 @@ public class BDTimeActivity extends BaseActivity {
             Intent intent = new Intent();
             intent.setAction(ReceiverAction.SPEEDATA_ACTION_SETDATETIME);
             intent.putExtra(ReceiverAction.SPEEDATA_KEY_DATETIME, dateTimeStr);
+            /*if(Build.VERSION.SDK_INT >= 26) {
+                ComponentName componentName=new ComponentName("thd.bd.sms","");//参数1-包名 参数2-广播接收者所在的路径名
+                intent.setComponent(componentName);
+//            intent.addFlags(0x01000000);//加上这句话，可以解决在android8.0系统以上2个module之间发送广播接收不到的问题}
+            }*/
             sendBroadcast(intent);
 
             mHandler.sendEmptyMessage(COMPLETE_CHECK_BD_TIME);

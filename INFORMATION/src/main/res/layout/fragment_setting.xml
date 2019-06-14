@@ -8,7 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_200"
-        android:background="@color/colorMainBlue"
+        android:background="@color/colorMainTitle"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -28,21 +28,21 @@
 
             <TextView
                 android:id="@+id/setting_bd_card"
+                style="@style/setting_card_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dp_20"
                 android:layout_marginTop="@dimen/dp_10"
-                android:text="北斗卡号："
-                style="@style/setting_card_style" />
+                android:text="北斗卡号：" />
 
             <TextView
                 android:id="@+id/setting_sim_card"
+                style="@style/setting_card_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dp_20"
                 android:layout_marginTop="@dimen/dp_10"
-                android:text="SIM卡号："
-                style="@style/setting_card_style" />
+                android:text="SIM卡号：" />
 
         </LinearLayout>
 
@@ -57,13 +57,13 @@
 
             <TextView
                 android:id="@+id/setting_company_name"
+                style="@style/setting_card_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dp_20"
                 android:layout_marginTop="@dimen/dp_20"
                 android:layout_marginBottom="@dimen/dp_10"
-                android:text="单位名称："
-                style="@style/setting_card_style" />
+                android:text="单位名称：" />
 
             <View
                 android:layout_width="match_parent"
@@ -73,21 +73,21 @@
 
             <TextView
                 android:id="@+id/setting_serial_number"
+                style="@style/setting_card_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dp_20"
                 android:layout_marginTop="@dimen/dp_10"
-                android:text="序列号"
-                style="@style/setting_card_style"/>
+                android:text="序列号" />
 
             <TextView
                 android:id="@+id/setting_pindu"
+                style="@style/setting_card_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dp_20"
                 android:layout_marginTop="@dimen/dp_10"
-                android:text="服务频度"
-                style="@style/setting_card_style" />
+                android:text="服务频度" />
 
         </LinearLayout>
 
@@ -106,8 +106,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_marginTop="@dimen/dp_20"
+            android:layout_weight="1"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -125,11 +125,11 @@
                     android:src="@mipmap/time" />
 
                 <TextView
+                    style="@style/setting_text_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
-                    android:text="校时"
-                    style="@style/setting_text_style" />
+                    android:text="北斗校时" />
 
             </LinearLayout>
 
@@ -144,14 +144,14 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/boshu" />
+                    android:src="@mipmap/report_form" />
 
                 <TextView
+                    style="@style/setting_text_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
-                    android:text="报告参数"
-                    style="@style/setting_text_style"/>
+                    android:text="报告参数" />
 
             </LinearLayout>
 
@@ -169,11 +169,11 @@
                     android:src="@mipmap/rd_par" />
 
                 <TextView
+                    style="@style/setting_text_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
-                    android:text="RD定位设置"
-                    style="@style/setting_text_style" />
+                    android:text="RD定位设置" />
 
             </LinearLayout>
 
@@ -182,13 +182,14 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_marginTop="@dimen/dp_20"
             android:layout_marginBottom="@dimen/dp_20"
+            android:layout_weight="1"
             android:gravity="center"
             android:orientation="horizontal">
 
             <LinearLayout
+                android:id="@+id/setting_SOS_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -198,18 +199,19 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/time" />
+                    android:src="@mipmap/sos_param" />
 
                 <TextView
+                    style="@style/setting_text_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
-                    android:text="校时"
-                    style="@style/setting_text_style" />
+                    android:text="SOS参数" />
 
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/setting_duanyu_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -219,18 +221,19 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/time" />
+                    android:src="@mipmap/duanyu" />
 
                 <TextView
+                    style="@style/setting_text_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
-                    android:text="校时"
-                    style="@style/setting_text_style"/>
+                    android:text="短语管理" />
 
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/setting_custom_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -240,46 +243,45 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/time" />
+                    android:src="@mipmap/status" />
 
                 <TextView
+                    style="@style/setting_text_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
-                    android:text="校时"
-                    style="@style/setting_text_style" />
+                    android:text="自定义状态" />
 
             </LinearLayout>
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/setting_about_layout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginBottom="@dimen/dp_20"
             android:layout_weight="1"
             android:gravity="center"
-            android:layout_marginBottom="@dimen/dp_20"
             android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="left"
-                android:layout_marginLeft="@dimen/dp_40"
+                android:gravity="center"
                 android:orientation="vertical">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/time" />
+                    android:src="@mipmap/about" />
 
                 <TextView
+                    style="@style/setting_text_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
-                    android:text="校时"
-                    style="@style/setting_text_style" />
+                    android:text="关于" />
 
             </LinearLayout>
 

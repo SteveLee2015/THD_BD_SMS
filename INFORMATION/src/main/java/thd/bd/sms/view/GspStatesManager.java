@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.LocationManager;
+import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -69,6 +70,8 @@ public class GspStatesManager {
             mLocation.mGroundDirection = event.mLocation.getBearing();
             onLocationListener(mLocation);
             updateRnss(mLocation);
+
+//            Log.e("LERRYTEST_MAP", "=========GspStatesManager74=======mLocation==" + mLocation.getLatitude() + "," + mLocation.getLongitude());
         }
 
     }

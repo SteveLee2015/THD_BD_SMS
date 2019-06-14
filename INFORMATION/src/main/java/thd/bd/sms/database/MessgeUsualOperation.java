@@ -73,6 +73,22 @@ public class MessgeUsualOperation {
 		mCursor.close();
 		return list;
 	}
+
+	public List<String> getAll1() throws SQLException {
+//		String orderBy = MsgWordColumns._ID + " desc";
+		// 查询
+		Cursor mCursor = sqliteDatabase
+				.query(true, MsgWordColumns.TABLE_NAME, new String[] {
+								MsgWordColumns._ID, MsgWordColumns.COLUMNS_WORD },
+						null, null, null, null, null, null);
+		List<String> list = new ArrayList<String>();
+		while (mCursor.moveToNext()) {
+			list.add(mCursor.getString(mCursor
+					.getColumnIndex(MsgWordColumns.COLUMNS_WORD)));
+		}
+		mCursor.close();
+		return list;
+	}
 	
 	public String[] getAllMessagesArray() throws SQLException {
 		String orderBy = MsgWordColumns._ID + " desc";

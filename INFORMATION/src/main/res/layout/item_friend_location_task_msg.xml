@@ -84,7 +84,7 @@
                 android:id="@+id/item_navi_line_btn"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:background="@mipmap/bottom_unclick"
+                android:background="@drawable/btn_bg_selector"
                 android:focusable="false"
                 android:text="导航"
                 android:textColor="@color/colorSettingText"

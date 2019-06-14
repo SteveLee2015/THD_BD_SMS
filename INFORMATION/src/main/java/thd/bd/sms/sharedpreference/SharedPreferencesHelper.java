@@ -112,11 +112,29 @@ public class SharedPreferencesHelper {
         return sharedPreferences.getString(Constant.SP_KEY_RD_LOCATION_TIME, "");
     }
 
+    //RD连续位置报告状态
+    public static boolean getRDReportState() {
+        return sharedPreferences.getBoolean(Constant.SP_RD_REPORT_STATE, false);
+    }
+
+    //RN连续位置报告状态
+    public static boolean getRNReportState() {
+        return sharedPreferences.getBoolean(Constant.SP_RN_REPORT_STATE, false);
+    }
+
     public static float getRDLat() {
         return sharedPreferences.getFloat(Constant.SP_KEY_RD_LOCATION_LAT, 0.0f);
     }
 
     public static float getRDLon() {
         return sharedPreferences.getFloat(Constant.SP_KEY_RD_LOCATION_LON, 0.0f);
+    }
+
+    public static String getSosNum() {
+        return sharedPreferences.getString(Constant.SP_KEY_SOS_NUM, "");
+    }
+
+    public static String getSosContent() {
+        return sharedPreferences.getString(Constant.SP_KEY_SOS_CONTENT, "");
     }
 }

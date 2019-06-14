@@ -100,8 +100,6 @@ public class CycleReportSOSService extends CycleReportService {
 	public void onDestroy() {
 
 		timeTask.getInstance().destroyed();
-		//修改sp中状态
-//		SpTools.setFloatStatus(mContext, SpTools.SP_FLOAT_STATUS_KEY_STATUS, false);lerry_???
 		Logger.d(TAG, "onDestroy");
 		super.onDestroy();
 	}
@@ -173,8 +171,9 @@ public class CycleReportSOSService extends CycleReportService {
 				try {
 					// 循环逻辑  rd rn Status?
 					reportType = ReportSet.REPORTSET_SOS;
-//					sendNumStr = spHelper.getString(SP_KEY_SOS_NUM);
-//					reportStatus = spHelper.getString(SP_KEY_SOS_CONTENT);lerry_???
+					sendNumStr = SharedPreferencesHelper.getSosNum();
+					reportStatus = SharedPreferencesHelper.getSosContent();
+
 					locReport(sendNumStr,reportType,reportStatus);
 					Logger.d(TAG, "Timer()-->locReport()");
 					playSoundAndVibrate();

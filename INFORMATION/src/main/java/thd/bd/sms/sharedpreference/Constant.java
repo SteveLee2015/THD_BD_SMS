@@ -22,4 +22,10 @@ public class Constant {
     public static final String SP_KEY_RD_LOCATION_EARTHHEIGHT="SP_RN_LOCATION_EARTHHEIGHT";//在SharedPreferences里记录的rd 定位数据 高程
     public static final String SP_KEY_RD_LOCATION_TIME="SP_RN_LOCATION_TIME";//在SharedPreferences里记录的rd 定位数据 时间
 
+
+    public static final String SP_RD_REPORT_STATE="RD_REPORT_STATE";//rd 连续位置报告的状态
+    public static final String SP_RN_REPORT_STATE="RN_REPORT_STATE";//rn 连续位置报告的状态
+
+    public static final String SP_KEY_SOS_NUM="SP_KEY_SOS_NUM";//在SharedPreferences里记录的sos 上报平台号码
+    public static final String SP_KEY_SOS_CONTENT="SP_KEY_SOS_CONTENT";//在SharedPreferences里记录的sos 上报平台内容
 }

@@ -9,6 +9,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import thd.bd.sms.bean.ReportSet;
+import thd.bd.sms.sharedpreference.Constant;
+import thd.bd.sms.sharedpreference.SharedPreferencesHelper;
 import thd.bd.sms.utils.Logger;
 
 /**
@@ -67,7 +69,7 @@ public class CycleReportRDLocService extends CycleReportService {
     public void onDestroy() {
         timeTask.getInstance().destroyed();
         Logger.d(TAG, "onDestroy");
-//        SpTools.setFloatStatus(mContext, SpTools.SP_FLOAT_STATUS_KEY_RD, false);lerry_???
+        SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE,false);
         super.onDestroy();
     }
 

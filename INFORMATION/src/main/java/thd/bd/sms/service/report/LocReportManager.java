@@ -1,6 +1,7 @@
 package thd.bd.sms.service.report;
 
 import android.content.Context;
+import android.location.BDLocationReport;
 import android.util.Log;
 
 import thd.bd.sms.bean.ReportSet;
@@ -36,7 +37,7 @@ public class LocReportManager {
      * 位置报告
      * 报告类型  0状态报告  1rn位置报告  2rd位置报告
      */
-    public void locationReport(ReportSet mReportSet) {
+    public void locationReport(ReportSet mReportSet,BDLocationReport report) {
         String reportType = mReportSet.getReportType();
         if (reportType == null) {
             Log.w("LERRYTEST_RD定位" ,"========LocReportManager42================位置报告类型不能为空!!==");
@@ -64,7 +65,7 @@ public class LocReportManager {
             Log.w("LERRYTEST_RD定位" ,"========LocReportManager65================位置报告类型不能为空!!==");
             return;
         }
-        reportor.reportLoc(mReportSet);
+        reportor.reportLoc(mReportSet,report);
     }
 
 

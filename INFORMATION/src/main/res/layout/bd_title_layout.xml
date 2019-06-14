@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/dp_48"
+    android:id="@+id/bd_title_layout_back"
     android:background="@color/colorMainTitle">
 
     <LinearLayout
@@ -12,23 +13,20 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:clickable="true"
-        android:onClick="back"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:orientation="horizontal"
         android:paddingRight="5dp"
         android:weightSum="1">
 
-        <ImageButton
+        <ImageView
             android:id="@+id/sub_return_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="0dp"
-            android:layout_marginLeft="18dip"
-            android:layout_marginTop="0dp"
+            android:layout_marginLeft="@dimen/dp_18"
             android:layout_weight="1"
-            android:background="@mipmap/page_back"
-            android:includeFontPadding="false"/>
+            android:src="@mipmap/page_back"/>
 
         <TextView
             android:id="@+id/sub_title_name"
@@ -38,6 +36,7 @@
             android:ellipsize="end"
             android:gravity="center"
             android:singleLine="true"
+            android:textColor="@color/colorWhite"
             android:text=""/>
     </LinearLayout>
 
@@ -47,6 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:textColor="@color/colorWhite"
+        android:textSize="@dimen/sp_18"
         android:text="北斗通信"/>
 
 </RelativeLayout>

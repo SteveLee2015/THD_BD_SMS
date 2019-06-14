@@ -1,17 +1,14 @@
 package thd.bd.sms.activity;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -31,21 +28,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.OnClick;
 import thd.bd.sms.R;
 import thd.bd.sms.base.BaseActivity;
 import thd.bd.sms.database.FriendsLocationDatabaseOperation;
-import thd.bd.sms.fragment.FriendLcationFragment;
 import thd.bd.sms.utils.Config;
 import thd.bd.sms.utils.ReceiverAction;
+import thd.bd.sms.utils.SysUtils;
 import thd.bd.sms.utils.WinUtils;
+import thd.bd.sms.view.CommomDialogList;
 
 public class FriendLocationDetailActivity extends BaseActivity {
 
     private final String TAG = "FriendLocationDetailActivity";
+    @BindView(R.id.return_home_layout)
+    LinearLayout returnHomeLayout;
+    @BindView(R.id.title_name)
+    TextView titleName;
 
     private ListView listView;
 
-    private List<Map<String,Object>> list= new ArrayList<Map<String,Object>>();
+    private List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
     private FriendsLocationDatabaseOperation oper;
     private FriendsAdapter adapter;
     private TextView tvInfo;
@@ -63,8 +67,8 @@ public class FriendLocationDetailActivity extends BaseActivity {
             String action = intent.getAction();
             if (ReceiverAction.APP_ACTION_FRIEND_LOCATION_21.equals(action)) {
                 //更新数据
-                if (oper!=null && adapter !=null) {
-                    list=oper.getAllByAddress(address);
+                if (oper != null && adapter != null) {
+                    list = oper.getAllByAddress(address);
                     adapter.notifyDataSetChanged();
                 }
 
@@ -93,18 +97,19 @@ public class FriendLocationDetailActivity extends BaseActivity {
         addReceiver();
         oper = new FriendsLocationDatabaseOperation(this);
         list = oper.getAllByAddress(address);
-        Log.e(TAG, "LERRY_YOULIN==================FriendLocationDetailActivity89=======address=="+address+"====list=="+list.size() );
+        Log.e(TAG, "LERRY_YOULIN==================FriendLocationDetailActivity89=======address==" + address + "====list==" + list.size());
 
-        message_title = (RelativeLayout)findViewById(R.id.message_title);
+        message_title = (RelativeLayout) findViewById(R.id.message_title);
         message_title.setVisibility(View.VISIBLE);
         listView = (ListView) findViewById(R.id.lv_friends);
         tvInfo = (TextView) findViewById(R.id.tv_info);
-        if (list.size()==0) {
+        if (list.size() == 0) {
             tvInfo.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             tvInfo.setVisibility(View.GONE);
         }
-        adapter=new FriendsAdapter();
+        titleName.setText("友邻位置详情");
+        adapter = new FriendsAdapter();
         listView.setAdapter(adapter);
         initListener();
 
@@ -115,7 +120,7 @@ public class FriendLocationDetailActivity extends BaseActivity {
     public void onResume() {
         super.onResume();
         //取消notification
-        if (FriendLocationDetailActivity.this!=null){
+        if (FriendLocationDetailActivity.this != null) {
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             notificationManager.cancel(Config.NOTIFICATION_LOC_REPORT);
         }
@@ -132,7 +137,7 @@ public class FriendLocationDetailActivity extends BaseActivity {
      */
     private void addReceiver() {
 
-        IntentFilter filter=new IntentFilter();
+        IntentFilter filter = new IntentFilter();
         filter.addAction(ReceiverAction.APP_ACTION_FRIEND_LOCATION_21);
         registerReceiver(newInfoReceiver, filter);
     }
@@ -144,166 +149,121 @@ public class FriendLocationDetailActivity extends BaseActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                                            final int position, long id) {
-                final int index=position;
-                final String[] arrayFruit = getResources().getStringArray(R.array.friend_loc_oper);
-                Dialog dialog = new AlertDialog.Builder(FriendLocationDetailActivity.this).setTitle("位置报告")
-                        .setItems(arrayFruit, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(FriendLocationDetailActivity.this, arrayFruit[which], Toast.LENGTH_SHORT).show();
-                                if(which==1){
+                final int index = position;
+                final String[] arrayFruit = getResources().getStringArray(R.array.friend_loc_oper_detail);
 
-                                    Log.e("LERRYTEST_MAP" ,"=========FriendLcationFragment115====点击了地图显示=====");
+                new CommomDialogList(FriendLocationDetailActivity.this, R.style.dialog_aa, arrayFruit, new CommomDialogList.OnCloseListener() {
+                    @SuppressLint("LongLogTag")
+                    @Override
+                    public void onClick(Dialog dialog, int position) {
+                        dialog.dismiss();
+                        switch (position) {
+                            case 0://导航
+                                String lonStr = String.valueOf(list.get(index).get("FRIEND_LON"));
+                                String latStr = String.valueOf(list.get(index).get("FRIEND_LAT"));
+                                SysUtils.goToBaiduMap(FriendLocationDetailActivity.this, Double.parseDouble(latStr), Double.parseDouble(lonStr), "友邻位置");
+                                break;
 
-                                    //显示地图
-                                    String endName = String.valueOf(list.get(index).get("FRIEND_ID"));
-                                    String lonStr = String.valueOf(list.get(index).get("FRIEND_LON"));
-                                    String latStr = String.valueOf(list.get(index).get("FRIEND_LAT"));
-                                    double lon = Double.parseDouble(lonStr);
-                                    double lat = Double.parseDouble(latStr);
+                            case 1://地图显示
+                                //显示地图
 
-                                    // 方案I 发送地图显示广播
-                			/*Intent intent = new Intent();
-                			intent.setAction(ReceiverAction.ACTION_BD_SHOW_IN_MAP);
-                			intent.putExtra(ReceiverAction.KEY_BD_FRIEND_POINT_LAT, lat);
-                			intent.putExtra(ReceiverAction.KEY_BD_FRIEND_POINT_LON, lon);
-                			intent.putExtra(ReceiverAction.KEY_BD_FRIEND_ID, endName);
-                			mActivity.sendBroadcast(intent);*/
+                                Intent intent = new Intent(FriendLocationDetailActivity.this, FriendLocationMapActivity.class);
+                                intent.putExtra("latitude", String.valueOf(list.get(position).get(
+                                        "FRIEND_LAT")));
+                                intent.putExtra("longitude", String.valueOf(list.get(position).get(
+                                        "FRIEND_LON")));
+                                startActivity(intent);
 
-                                    Intent intent = new Intent(FriendLocationDetailActivity.this,FriendLocationMapActivity.class);
-                                    intent.putExtra("latitude",String.valueOf(list.get(position).get(
-                                            "FRIEND_LAT")));
-                                    intent.putExtra("longitude",String.valueOf(list.get(position).get(
-                                            "FRIEND_LON")));
-                                    startActivity(intent);
+                                break;
 
-
-                                    Log.e("LERRYTEST_MAP", "=========FriendLcationFragment141================"+
-                                            list.get(position).get("FRIEND_LAT")+","+list.get(position).get("FRIEND_LON"));
-
-							/*//方案II 调用远程服务
-							SMSapp app = (SMSapp) mActivity.getApplication();
-
-							//IMapService mapService = app.mapService;
-							try {
-								app.showInMap_(lat,lon,endName);
-							} catch (RemoteException e) {
-								e.printStackTrace();
-							}*/
-
-
-                                }else if (which==0) {
-                                    //导航 路径规划
-                                    String endName = String.valueOf(list.get(index).get("FRIEND_ID"));
-                                    String lonStr = String.valueOf(list.get(index).get("FRIEND_LON"));
-                                    String latStr = String.valueOf(list.get(index).get("FRIEND_LAT"));
-                                    double lon = Double.parseDouble(lonStr);
-                                    double lat = Double.parseDouble(latStr);
-
-							/*//发送导航广播
-                			Intent intent = new Intent();
-                			intent.setAction(ReceiverAction.ACTION_BD_NAVIGATION);
-                			intent.putExtra(ReceiverAction.KEY_BD_NAVIGATION_END_POINT_LAT, lat);
-                			intent.putExtra(ReceiverAction.KEY_BD_NAVIGATION_END_POINT_LON, lon);
-                			intent.putExtra(ReceiverAction.KEY_BD_NAVIGATION_END_NAME, endName);
-                			mActivity.sendBroadcast(intent);*/
-
-//							goToBaiduMap(39.919625,116.403969,"");
-                                    goToBaiduMap(Double.parseDouble(latStr),Double.parseDouble(lonStr),"");
-
-                                }else if (which==4) {
-                                    //全部删除
-                                    boolean istrue=oper.delete();
-                                    oper.close();
-                                    if(istrue){
-                                        Toast.makeText(FriendLocationDetailActivity.this, getResources().getString(R.string.friend_loc_del_success), Toast.LENGTH_SHORT).show();
-                                        list.clear();
-                                        adapter.notifyDataSetChanged();
-                                    }else{
-                                        Toast.makeText(FriendLocationDetailActivity.this, getResources().getString(R.string.friend_loc_del_fail), Toast.LENGTH_SHORT).show();
-                                    }
-
-                                }else if (which ==2) {
-                                    //回复短报文
-                                    //Toast.makeText(mContext, "跳转到短报文界面", 0).show();
-//							String friendID = String.valueOf(list.get(index).get("FRIEND_ID"));
-//							while (friendID.startsWith("0")){
-//								friendID = friendID.substring(1);
-//							}
-//							Intent intent = new Intent(mActivity,ReplyMessageActivity.class);
-//							intent.putExtra(ReceiverAction.KEY_BD_FRIEND_ID, friendID);
-//							intent.putExtra("PHONE_NUMBER",friendID);
-//							intent.putExtra("MESSAGE_FLAG", "0");
-//							//intent.putExtra("MESSAGE_ID", id);
-//							intent.putExtra(Config.INTENT_TYPE, Config.REPLY_DIALOG);
-//							startActivity(intent);
-
-                                }else if (which ==3) {
-                                    //从数据库中删除数据
-                                    Map<String, Object> map=list.get(index);
-                                    String id=String.valueOf(map.get("F_ID"));
-                                    boolean istrue=oper.delete(Long.valueOf(id));
-                                    oper.close();
-                                    if(istrue){
-                                        Toast.makeText(FriendLocationDetailActivity.this, getResources().getString(R.string.friend_loc_del_success), Toast.LENGTH_SHORT).show();
-                                        list.remove(index);
-                                        adapter.notifyDataSetChanged();
-                                    }else{
-                                        Toast.makeText(FriendLocationDetailActivity.this, getResources().getString(R.string.friend_loc_del_fail), Toast.LENGTH_SHORT).show();
-                                    }
+                            case 2://回复短报文
+                                String friendID = String.valueOf(list.get(index).get("FRIEND_ID"));
+                                while (friendID.startsWith("0")) {
+                                    friendID = friendID.substring(1);
                                 }
-                            }
-                        })
-                        .setNegativeButton(getResources().getString(R.string.common_cancle_btn),
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {}
-                                }).create();  dialog.show();
+                                Intent intent1 = new Intent(FriendLocationDetailActivity.this, ReplyMessageActivity.class);
+                                intent1.putExtra(ReceiverAction.KEY_BD_FRIEND_ID, friendID);
+                                Log.e(TAG, "onClick: ============FriendLocationDetailActivity185===========" + friendID);
+                                intent1.putExtra("PHONE_NUMBER", friendID);
+                                intent1.putExtra("MESSAGE_FLAG", "0");
+                                //intent.putExtra("MESSAGE_ID", id);
+                                intent1.putExtra(Config.INTENT_TYPE, Config.REPLY_DIALOG);
+                                startActivity(intent1);
+                                break;
+
+                            case 3://删除
+                                //从数据库中删除数据
+                                //从数据库中删除数据
+                                Map<String, Object> map = list.get(index);
+                                String id = String.valueOf(map.get("F_ID"));
+                                boolean istrue = oper.delete(Long.valueOf(id));
+                                oper.close();
+                                if (istrue) {
+                                    Toast.makeText(FriendLocationDetailActivity.this, getResources().getString(R.string.friend_loc_del_success), Toast.LENGTH_SHORT).show();
+                                    list.remove(index);
+                                    adapter.notifyDataSetChanged();
+                                    notifcation(ReceiverAction.APP_ACTION_FRIEND_LOCATION_21);
+                                } else {
+                                    Toast.makeText(FriendLocationDetailActivity.this, getResources().getString(R.string.friend_loc_del_fail), Toast.LENGTH_SHORT).show();
+                                }
+                                dialog.dismiss();
+                                break;
+
+                            case 4://全部删除
+                                //全部删除
+                                boolean istrue1 = oper.delete();
+                                oper.close();
+                                if (istrue1) {
+                                    Toast.makeText(FriendLocationDetailActivity.this, getResources().getString(R.string.friend_loc_del_success), Toast.LENGTH_SHORT).show();
+                                    list.clear();
+                                    adapter.notifyDataSetChanged();
+                                    notifcation(ReceiverAction.APP_ACTION_FRIEND_LOCATION_21);
+
+                                } else {
+                                    Toast.makeText(FriendLocationDetailActivity.this, getResources().getString(R.string.friend_loc_del_fail), Toast.LENGTH_SHORT).show();
+                                }
+
+                                adapter.notifyDataSetChanged();
+                                FriendLocationDetailActivity.this.finish();
+                                dialog.dismiss();
+                                break;
+                        }
+                    }
+                }).show();
+
+
                 return false;
             }
         });
     }
 
     /**
-     * 跳转百度地图
+     * 通知数据有更新
      */
-    private void goToBaiduMap(double mLat,double mLng,String mAddressStr) {
-        if (!isInstalled("com.baidu.BaiduMap")) {
-            Toast.makeText(this,"请先安装百度地图客户端",Toast.LENGTH_LONG).show();
-            return;
-        }
+    private void notifcation(String action) {
+
         Intent intent = new Intent();
-        intent.setData(Uri.parse("baidumap://map/direction?destination=latlng:"
-                + mLat + ","
-                + mLng + "|name:" + mAddressStr + // 终点
-                "&mode=driving" + // 导航路线方式
-                "&src=andr.baidu.openAPIdemo"));
-        startActivity(intent); // 启动调用
+        intent.setAction(action);
+        intent.setAction(ReceiverAction.APP_ACTION_SMS_REFRESH);
+        if (Build.VERSION.SDK_INT >= 26) {
+            ComponentName componentName = new ComponentName(getApplicationContext(), "");//参数1-包名 参数2-广播接收者所在的路径名
+            intent.setComponent(componentName);
+//            intent.addFlags(0x01000000);//加上这句话，可以解决在android8.0系统以上2个module之间发送广播接收不到的问题}
+        }
+        sendBroadcast(intent);
+
     }
 
-
-    /**
-     * 检测程序是否安装
-     *
-     * @param packageName
-     * @return
-     */
-    private boolean isInstalled(String packageName) {
-        PackageManager manager = getPackageManager();
-        //获取所有已安装程序的包信息
-        List<PackageInfo> installedPackages = manager.getInstalledPackages(0);
-        if (installedPackages != null) {
-            for (PackageInfo info : installedPackages) {
-                if (info.packageName.equals(packageName))
-                    return true;
-            }
-        }
-        return false;
+    @OnClick(R.id.return_home_layout)
+    public void onViewClicked() {
+        FriendLocationDetailActivity.this.finish();
     }
 
 
     /**
      * 数据适配器
-     * @author llg052
      *
+     * @author llg052
      */
     public class FriendsAdapter extends BaseAdapter {
 
@@ -342,10 +302,6 @@ public class FriendLocationDetailActivity extends BaseActivity {
                         .findViewById(R.id.friends_loc_lat);
                 viewHolder.height = (TextView) contentView
                         .findViewById(R.id.friends_loc_height);
-
-
-
-
 
                 contentView.setTag(viewHolder);
             } else {

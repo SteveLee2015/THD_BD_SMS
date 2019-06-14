@@ -38,7 +38,7 @@
             android:id="@+id/custom_list_content"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
-            android:background="@mipmap/input_background"
+            android:background="@color/colorWhite"
             android:gravity="center"
             android:textColor="@color/colorSettingText"
             android:textSize="@dimen/sp_14" />

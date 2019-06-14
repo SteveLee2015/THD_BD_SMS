@@ -90,5 +90,10 @@ public class ReceiverAction {
 	 */
 	public static final String SPEEDATA_KEY_DATETIME = "datetime";
 
-	
+	/**
+	 * 缓存数据库数据变化广播
+	 */
+	public static final String DB_ACTION_ON_DATA_CHANGE_ADD = "com.ns.protocol_DB_ACTION_ON_DATA_CHANGE_ADD";
+
+	public static final  String KEY_BD_FRIEND_ID = "FRIEND_ID";//友邻id
 }

@@ -54,10 +54,10 @@
             android:id="@+id/time_jiaoshi_btn"
             android:layout_width="@dimen/dp_150"
             android:layout_height="@dimen/dp_40"
-            android:background="@color/colorMainBlue"
+            android:background="@drawable/btn_bg_selector"
             android:gravity="center"
             android:text="@string/jiaoshi"
-            android:textColor="@color/colorWhite"
+            android:textColor="@color/colorSettingText"
             android:textSize="@dimen/sp_14"/>
 
 

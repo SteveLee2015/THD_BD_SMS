@@ -10,6 +10,16 @@
         layout="@layout/bd_title_layout"
         android:focusable="true"/>-->
 
+    <TextView
+        android:id="@+id/tishi_total_txt"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_40"
+        android:text="还有0条等待发送"
+        android:textColor="@color/colorLine"
+        android:textSize="@dimen/dp_25"
+        android:gravity="center"
+        android:layout_above="@+id/main_center_btns_layout"/>
+
     <RelativeLayout
         android:id="@+id/main_center_btns_layout"
         android:layout_width="match_parent"
@@ -17,6 +27,7 @@
         android:layout_centerInParent="true"
         android:layout_marginLeft="@dimen/dp_25"
         android:layout_marginRight="@dimen/dp_25"
+        android:layout_marginTop="@dimen/dp_20"
         android:background="@drawable/setting_background_corner"
         android:orientation="vertical">
 
@@ -147,6 +158,7 @@
                     android:src="@mipmap/rn_report_blue" />
 
                 <TextView
+                    android:id="@+id/main_center_RN_report_txt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
@@ -169,10 +181,11 @@
                     android:src="@mipmap/rd_report_blue" />
 
                 <TextView
+                    android:id="@+id/main_center_RD_report_txt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dp_4"
-                    android:text="RD连续位置报告"
+                    android:text="连续位置报告"
                     style="@style/setting_text_style" />
 
             </LinearLayout>
@@ -221,7 +234,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/rn_report_blue" />
+                    android:src="@mipmap/rn_location" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -243,7 +256,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@mipmap/rd_report_blue" />
+                    android:src="@mipmap/rd_location" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -260,11 +273,11 @@
 
     <ImageView
         android:id="@+id/main_center_close_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/dp_40"
+        android:layout_height="@dimen/dp_40"
         android:layout_below="@+id/main_center_btns_layout"
         android:layout_centerInParent="true"
         android:layout_marginTop="@dimen/dp_40"
-        android:src="@mipmap/close1" />
+        android:src="@mipmap/close" />
 
 </RelativeLayout>

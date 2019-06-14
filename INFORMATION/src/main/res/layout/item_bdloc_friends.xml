@@ -15,8 +15,9 @@
         android:padding="@dimen/dp_5">
 
         <ImageView
-            android:layout_width="@dimen/dp_50"
-            android:layout_height="@dimen/dp_50"
+            android:layout_width="@dimen/dp_40"
+            android:layout_height="@dimen/dp_40"
+            android:layout_marginRight="@dimen/dp_10"
             android:src="@mipmap/friends_clicked"/>
 
     </LinearLayout>

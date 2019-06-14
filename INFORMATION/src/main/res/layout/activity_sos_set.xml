@@ -1,0 +1,156 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/colorBackground"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/message_title"
+        layout="@layout/bd_title_layout"
+        android:focusable="true"/>
+
+    <LinearLayout
+        android:layout_below="@+id/message_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="@dimen/dp_20"
+        android:layout_marginRight="10dp"
+        android:orientation="vertical">
+
+        <!--平台号码-->
+        <LinearLayout
+            android:id="@+id/sos_set_number_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <View
+                style="@style/biaodanLineStyle"/>
+
+            <TextView
+                style="@style/locTxtStyle1"
+                android:text="平台号码"/>
+
+        </LinearLayout>
+            <LinearLayout
+                style="@style/lineLayout_editor_text"
+                android:background="@color/colorWhite">
+
+                <EditText
+                    android:id="@+id/et_inputNum"
+                    android:maxLength="7"
+                    style="@style/locTxtStyle_other"
+                    android:layout_weight="1"
+                    android:hint="请输入报告号码"
+                    android:inputType="number"
+                    android:textColorHint="@color/text_hint"
+                    android:textSize="@dimen/sp_14"/>
+
+                <ImageView
+                    android:id="@+id/iv_contract"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="10dp"
+                    android:scaleType="center"
+                    android:src="@mipmap/add_phone_number" />
+
+            </LinearLayout>
+
+
+        <!--救援信息-->
+        <LinearLayout
+            android:id="@+id/ll_sos_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <View
+                style="@style/biaodanLineStyle"/>
+
+            <TextView
+                style="@style/locTxtStyle1"
+                android:text="救援信息" />
+
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/et_content"
+            android:hint="请输入救援信息"
+            android:inputType="number"
+            android:layout_marginLeft="@dimen/dp_45"
+            android:textColorHint="@color/text_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/setting_background_corner"
+            android:minLines="7"
+            android:minHeight="@dimen/dp_150"
+            android:textSize="@dimen/sp_14"
+            android:layout_marginRight="@dimen/dp_45"
+            android:paddingLeft="@dimen/dp_20"
+            android:gravity="top"
+            android:paddingTop="@dimen/dp_10"/>
+
+        <TextView
+            android:id="@+id/tv_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/dp_45"
+            android:layout_marginLeft="@dimen/dp_45"
+            android:layout_marginTop="8dp" />
+
+
+        <!--按钮-->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/submit"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="@dimen/dp_40"
+                android:background="@drawable/btn_bg_selector"
+                android:text="保存"
+                android:layout_marginLeft="@dimen/dp_20"
+                android:layout_marginRight="@dimen/dp_10"
+                android:textColor="@color/colorSettingText"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/immediately"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="@dimen/dp_40"
+                android:background="@drawable/btn_bg_selector"
+                android:text="立即求救"
+                android:layout_marginRight="@dimen/dp_10"
+                android:layout_marginLeft="@dimen/dp_10"
+                android:textColor="@color/colorSettingText"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/cancel"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="@dimen/dp_40"
+                android:layout_marginRight="@dimen/dp_20"
+                android:layout_marginLeft="@dimen/dp_10"
+                android:background="@drawable/btn_bg_selector"
+                android:text="取消"
+                android:textColor="@color/colorSettingText"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -67,7 +67,6 @@ public class CycleReportRNLocService extends CycleReportService {
 	@Override
 	public void onDestroy() {
 		timeTask.getInstance().destroyed();
-//		SpTools.setFloatStatus(mContext, SpTools.SP_FLOAT_STATUS_KEY_RN, false);lerry_???
 		Logger.d(TAG, "onDestroy");
 		super.onDestroy();
 	}

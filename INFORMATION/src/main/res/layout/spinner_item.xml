@@ -10,4 +10,4 @@
     android:textAlignment="inherit"
     android:textColor="@color/colorSettingText"
     android:text="10086"
-    android:textSize="18sp" />
+    android:textSize="@dimen/sp_14" />

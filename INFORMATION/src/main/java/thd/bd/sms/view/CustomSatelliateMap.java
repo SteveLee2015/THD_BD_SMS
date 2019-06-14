@@ -49,6 +49,7 @@ public class CustomSatelliateMap extends View {
 	public CustomSatelliateMap(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		this.mContext=context;
+
 	}
 
 	public CustomSatelliateMap(Context context, AttributeSet attrs) {
@@ -68,7 +69,7 @@ public class CustomSatelliateMap extends View {
 			mSatelliatePRN[i] = "";
 			mSatelliatePixArr[i]=false;
 		}
-		Log.e("LERRYTEST_RN", "=========CustomSatelliateMap71=======CustomSatelliateMap(Context context, AttributeSet attrs)==");
+
 	}
 
 	@Override
@@ -88,6 +89,8 @@ public class CustomSatelliateMap extends View {
 		//R = mCenterY-top-Utils.dp2pixel(15);
 		R = mCenterY-top-Utils.dp2pixel(50);//星图离散半径
 		canvas.drawBitmap(bitmap2,left, top, paint);
+
+
 		//Bitmap mBitmap=((BitmapDrawable)mContext.getResources().getDrawable(com.ns.sms.R.drawable.satellite_number_bg)).getBitmap();
 		//绘制可见星图的卫星
 		for (int i = 0; i < MAX_VISUAL_SATELLIATE_NUM; i++){
@@ -104,10 +107,8 @@ public class CustomSatelliateMap extends View {
 			if (prnInt>=160){
 				//paint.setColor(Color.GREEN);
 				paint.setColor(Color.BLUE);
-				Log.e("LERRYTEST_RN", "=========CustomSatelliateMap106=======paint.setColor(Color.BLUE);==");
 			}else {
 				paint.setColor(Color.RED);
-				Log.e("LERRYTEST_RN", "=========CustomSatelliateMap108=======paint.setColor(Color.RED);==");
 			}
 			//画圆
 			canvas.drawCircle(mCoordinateArr[i][0], mCoordinateArr[i][1],Utils.dp2pixel(8), paint);//小星半径
@@ -136,6 +137,7 @@ public class CustomSatelliateMap extends View {
 			int mSatelliatePRN_No = prnInt>=160?(prnInt-160):prnInt;
 			//canvas.drawText(mSatelliatePRN[i],x,mCoordinateArr[i][1] + Utils.dp2pixel(5), paint);
 			canvas.drawText(mSatelliatePRN_No+"",x,mCoordinateArr[i][1] + Utils.dp2pixel(5), paint);
+
 		}
 	}
 
@@ -148,7 +150,6 @@ public class CustomSatelliateMap extends View {
 		width = MeasureSpec.getSize(widthMeasureSpec);
 		height = MeasureSpec.getSize(heightMeasureSpec);
 
-		Log.w("CustomSatelliateMap", "height="+height+",width="+width+",mCenterX="+mCenterX+",mCenterY="+mCenterY+",R="+R);
 	}
 
 
@@ -179,49 +180,47 @@ public class CustomSatelliateMap extends View {
 				mCoordinateArr[i][1] = -100;
 				mSatelliatePRN[i] = "";
 			}
-			Logger.i("CustomSatelliateMap", mCoordinateArr[i][0] + ","
-					+ mCoordinateArr[i][1] + "," + mSatelliatePRN[i]);
 		}
 		invalidate();
 	}
 
-	public void showMapBlue(List<SatelliteInfo> gsv) {
-		int index = 0;
-		index = addSatelliteInfo(index, gsv);
+//	public void showMapBlue(List<SatelliteInfo> gsv) {
+//		int index = 0;
+//		index = addSatelliteInfo(index, gsv);
+//
+//		while (index < MAX_VISUAL_SATELLIATE_NUM) {
+//			mCoordinateArr[index][0] = -100;
+//			mCoordinateArr[index][1] = -100;
+//			mSatelliatePRN[index] = "";
+//			index++;
+//		}
+//		invalidate();
+//	}
 
-		while (index < MAX_VISUAL_SATELLIATE_NUM) {
-			mCoordinateArr[index][0] = -100;
-			mCoordinateArr[index][1] = -100;
-			mSatelliatePRN[index] = "";
-			index++;
-		}
-		invalidate();
-	}
-
-	private int addSatelliteInfo(int index, List<SatelliteInfo>  infoArray) {
-		if(infoArray != null)
-			for (SatelliteInfo gpsinfo : infoArray) {
-				if (gpsinfo != null) {
-					if (gpsinfo.getSNR() > 0) {
-						double r = R * (1.0 - (gpsinfo.getmElevation() / 90.0)); // 高度角
-						double x = mCenterX + (r * Math.sin(2.0 * Math.PI
-								* gpsinfo.getmAzimuth() / 360.0)); // 方位角
-						double y = mCenterY - (r * Math.cos(2.0 * Math.PI
-								* gpsinfo.getmAzimuth() / 360.0));
-						mCoordinateArr[index][0] = (float) x;
-						mCoordinateArr[index][1] = (float) y;
-						if (gpsinfo.getNumber() >= 160) {
-							mSatelliatePRN[index] = (gpsinfo.getNumber() - 160 + 160) + "";
-							//mSatelliatePRN[index] = (mGPSatellite.getPrn()-160)+ "";
-						} else {
-							mSatelliatePRN[index] = gpsinfo.getNumber() + "";
-						}
-						mSatelliatePixArr[index] = gpsinfo.mUsedInFix;
-						index++;
-					}
-				}
-			}
-
-		return index;
-	}
+//	private int addSatelliteInfo(int index, List<SatelliteInfo>  infoArray) {
+//		if(infoArray != null)
+//			for (SatelliteInfo gpsinfo : infoArray) {
+//				if (gpsinfo != null) {
+//					if (gpsinfo.getSNR() > 0) {
+//						double r = R * (1.0 - (gpsinfo.getmElevation() / 90.0)); // 高度角
+//						double x = mCenterX + (r * Math.sin(2.0 * Math.PI
+//								* gpsinfo.getmAzimuth() / 360.0)); // 方位角
+//						double y = mCenterY - (r * Math.cos(2.0 * Math.PI
+//								* gpsinfo.getmAzimuth() / 360.0));
+//						mCoordinateArr[index][0] = (float) x;
+//						mCoordinateArr[index][1] = (float) y;
+//						if (gpsinfo.getNumber() >= 160) {
+//							mSatelliatePRN[index] = (gpsinfo.getNumber() - 160 + 160) + "";
+//							//mSatelliatePRN[index] = (mGPSatellite.getPrn()-160)+ "";
+//						} else {
+//							mSatelliatePRN[index] = gpsinfo.getNumber() + "";
+//						}
+//						mSatelliatePixArr[index] = gpsinfo.mUsedInFix;
+//						index++;
+//					}
+//				}
+//			}
+//
+//		return index;
+//	}
 }

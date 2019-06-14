@@ -16,7 +16,7 @@ import java.util.List;
 
 import thd.bd.sms.R;
 import thd.bd.sms.bean.BDMsgBean;
-import thd.bd.sms.utils.LoadingDialog;
+import thd.bd.sms.view.LoadingDialog;
 
 
 public class MainRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {

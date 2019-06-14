@@ -1,7 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="thd.bd.sms">
+    package="thd.bd.sms"
+    android:versionCode="1"
+    android:versionName="1.0.0">
+
+    <!--读取系统信息，包含系统版本等信息，用作统计-->
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
+    <!--//使用步行AR导航，配置Camera权限-->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!--//程序在手机屏幕关闭后后台进程仍然运行-->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- 需要的一些权限 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.ACCESS_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.SET_TIME"
+        tools:ignore="ProtectedPermissions" />
+
+
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+
+    <permission android:name="android.permission.DEVICE_POWER"/>
+
 
     <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
 
@@ -17,10 +52,6 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"></uses-permission>
     <!-- 用于读取手机当前的状态-->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
-    <!-- 写入扩展存储，向扩展卡写入数据，用于写入离线定位数据-->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
-    <!-- 访问网络，网络定位需要上网-->
-    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-permission android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
@@ -38,12 +69,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/MAppTheme1"
-        android:name=".application.SMSApplication">
+        android:name=".application.SMSApplication"
+        android:hardwareAccelerated="false">
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="uk0WQ6V5uYiITHhgwqjZ4w6mhk4sfeUi" >
         </meta-data>
+
+        <!--适配全面屏-->
+        <meta-data android:name="android.max_aspect" android:value="2.1" />
+
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote" >
+        </service>
+
+
 
         <activity android:name=".activity.MainActivity"
             android:launchMode="singleInstance"
@@ -113,46 +156,98 @@
 
         </activity>
 
+        <activity android:name=".activity.MsgdbActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        </activity>
+
+        <activity android:name=".activity.SoSsetActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        </activity>
+
+        <activity android:name=".activity.SOSActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        </activity>
+
+        <activity android:name=".activity.MapOfflineActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        </activity>
+
+        <!-- 软件信息界面 -->
+        <activity
+            android:name=".activity.SoftwareActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/app_name"
+            android:theme="@style/mDialogStyleCustom">
+        </activity>
+
+        <!-- 短语操作界面 -->
+        <activity
+            android:name=".activity.MsgUsalWordActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="短语管理"
+            android:theme="@style/mDialogStyleCustom">
+        </activity>
+        <!-- 状态操作界面 -->
+        <activity
+            android:name=".activity.StateCodeActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="自定义状态"
+            android:theme="@style/mDialogStyleCustom">
+        </activity>
 
 
 
+
+
+        <service
+            android:name="thd.bd.sms.service.CoreService"
+            >
+            <!--android:process="system"-->
+            <intent-filter>
+                <action android:name="thd.bd.sms.service.CoreService"/>
+            </intent-filter>
+        </service>
 
         <!-- 连续定位服务 -->
-        <service android:name=".service.CycleLocService">
+        <service android:name="thd.bd.sms.service.CycleLocService">
             <intent-filter>
-                <action android:name="thd.bd.sms.CycleLocService"/>
+                <action android:name="thd.bd.sms.service.CycleLocService"/>
             </intent-filter>
         </service>
 
         <!-- 连续报告基类 -->
-        <service android:name=".service.CycleReportService">
+        <service android:name="thd.bd.sms.service.CycleReportService">
             <intent-filter>
-                <action android:name="thd.bd.sms.CycleReportService"/>
+                <action android:name="thd.bd.sms.service.CycleReportService"/>
             </intent-filter>
         </service>
         <!-- 连续rd位置报告 -->
-        <service android:name=".service.CycleReportRDLocService">
+        <service android:name="thd.bd.sms.service.CycleReportRDLocService">
             <intent-filter>
-                <action android:name="thd.bd.sms.CycleReportRDLocService"/>
+                <action android:name="thd.bd.sms.service.CycleReportRDLocService"/>
             </intent-filter>
         </service>
 
         <!-- 连续rn位置报告 -->
-        <service android:name=".service.CycleReportRNLocService">
+        <service android:name="thd.bd.sms.service.CycleReportRNLocService">
             <intent-filter>
-                <action android:name="thd.bd.sms.CycleReportRNLocService"/>
+                <action android:name="thd.bd.sms.service.CycleReportRNLocService"/>
             </intent-filter>
         </service>
         <!-- 连续短报文状态报告服务 -->
-        <service android:name=".service.CycleReportStatuService">
+        <service android:name="thd.bd.sms.service.CycleReportStatuService">
             <intent-filter>
-                <action android:name="thd.bd.sms.CycleReportStatuService"/>
+                <action android:name="thd.bd.sms.service.CycleReportStatuService"/>
             </intent-filter>
         </service>
         <!-- 连续短报文sos报告服务 -->
-        <service android:name=".service.CycleReportSOSService">
+        <service android:name="thd.bd.sms.service.CycleReportSOSService">
             <intent-filter>
-                <action android:name="thd.bd.sms.CycleReportSOSService"/>
+                <action android:name="thd.bd.sms.service.CycleReportSOSService"/>
             </intent-filter>
         </service>
 

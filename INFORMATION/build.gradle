@@ -61,7 +61,9 @@ dependencies {
     //北斗后台服务jar
     implementation files('libs/bd_cmd_manager.jar')
     //百度地图定位sdk
-    implementation files('libs/BaiduLBS_Android.jar')
+    /*检索功能：包括POI检索，室内POI检索，行政区边界数据检索，公交信息查询，路线规划，地理编码查询，在线建议检索，短串分享等；
+    计算工具：包括距离计算、坐标转换、调起百度地图导航等功能；
+    全量定位：包含离线定位、室内高精度定位能力，同时提供更人性化的位置描述服务；*/
     //utils中log.jar
     implementation files('libs/log.jar')
     //greendao配置

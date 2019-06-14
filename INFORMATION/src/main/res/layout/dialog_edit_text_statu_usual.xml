@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/et_usual_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入10位长度的常用短语!"
+        android:textColorHint="@color/text_hint"
+        android:layout_gravity="center_horizontal"
+        android:maxLength="10"/>
+
+</LinearLayout>

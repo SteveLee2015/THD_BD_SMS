@@ -23,9 +23,12 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import thd.bd.sms.R;
 import thd.bd.sms.activity.BDTimeActivity;
-import thd.bd.sms.activity.BSIActivity;
+import thd.bd.sms.activity.MsgUsalWordActivity;
 import thd.bd.sms.activity.RDLocationSetActivity;
 import thd.bd.sms.activity.ReportSetActivity;
+import thd.bd.sms.activity.SoSsetActivity;
+import thd.bd.sms.activity.SoftwareActivity;
+import thd.bd.sms.activity.StateCodeActivity;
 
 public class SettingFragment extends Fragment {
     private static final String TAG = "SettingFragment";
@@ -47,6 +50,14 @@ public class SettingFragment extends Fragment {
     LinearLayout settingReportLayout;
     @BindView(R.id.setting_RDLocation_layout)
     LinearLayout settingRDLocationLayout;
+    @BindView(R.id.setting_duanyu_layout)
+    LinearLayout settingDuanyuLayout;
+    @BindView(R.id.setting_custom_layout)
+    LinearLayout settingCustomLayout;
+    @BindView(R.id.setting_SOS_layout)
+    LinearLayout settingSOSLayout;
+    @BindView(R.id.setting_about_layout)
+    LinearLayout settingAboutLayout;
     private View view;
 
     private CardInfo cardInfo;
@@ -124,7 +135,11 @@ public class SettingFragment extends Fragment {
         unbinder.unbind();
     }
 
-    @OnClick({R.id.setting_time_layout, R.id.setting_report_layout,R.id.setting_RDLocation_layout})
+    @OnClick({R.id.setting_time_layout, R.id.setting_report_layout,
+            R.id.setting_RDLocation_layout,R.id.setting_duanyu_layout,
+            R.id.setting_custom_layout, R.id.setting_SOS_layout,
+            R.id.setting_about_layout})
+
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.setting_time_layout:
@@ -133,11 +148,27 @@ public class SettingFragment extends Fragment {
                 break;
 
             case R.id.setting_report_layout:
-                intent = new Intent(getActivity(), RDLocationSetActivity.class);
+                intent = new Intent(getActivity(), ReportSetActivity.class);
                 startActivity(intent);
                 break;
             case R.id.setting_RDLocation_layout:
-                intent = new Intent(getActivity(), ReportSetActivity.class);
+                intent = new Intent(getActivity(), RDLocationSetActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.setting_duanyu_layout:
+                intent = new Intent(getActivity(), MsgUsalWordActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.setting_custom_layout:
+                intent = new Intent(getActivity(), StateCodeActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.setting_SOS_layout:
+                intent = new Intent(getActivity(), SoSsetActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.setting_about_layout:
+                intent = new Intent(getActivity(),SoftwareActivity.class);
                 startActivity(intent);
                 break;
         }

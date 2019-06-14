@@ -44,6 +44,11 @@
                     android:text="友邻位置" />
             </LinearLayout>
 
+            <View
+                android:layout_width="@dimen/dp_2"
+                android:layout_height="match_parent"
+                android:background="@color/colorLine"/>
+
             <LinearLayout
                 android:id="@+id/instruct_tab_view"
                 android:layout_width="wrap_content"
@@ -58,6 +63,11 @@
                     style="@style/mTabTxtStyle"
                     android:text="指令导航" />
             </LinearLayout>
+
+            <View
+                android:layout_width="@dimen/dp_2"
+                android:layout_height="match_parent"
+                android:background="@color/colorLine"/>
 
             <LinearLayout
                 android:id="@+id/line_tab_view"

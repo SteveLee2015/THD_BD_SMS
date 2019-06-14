@@ -2,6 +2,7 @@ package thd.bd.sms.activity;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
@@ -51,7 +52,10 @@ import android.widget.Toast;
 import com.thd.cmd.manager.BDCmdManager;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,30 +66,35 @@ import java.util.Map;
 import thd.bd.sms.R;
 import thd.bd.sms.adapter.MsgUsalWordAdapter;
 import thd.bd.sms.base.BaseActivity;
+import thd.bd.sms.bean.BDCache;
 import thd.bd.sms.bean.BDContactColumn;
 import thd.bd.sms.bean.BDMessageInfo;
 import thd.bd.sms.bean.UsalMsg;
 import thd.bd.sms.database.BDMessageDatabaseOperation;
 import thd.bd.sms.database.DataBaseHelper.BDMessageColumns;
 import thd.bd.sms.database.MessgeUsualOperation;
+import thd.bd.sms.service.CycleLocService;
+import thd.bd.sms.service.CycleReportRDLocService;
+import thd.bd.sms.service.CycleReportRNLocService;
 import thd.bd.sms.sharedpreference.Constant;
 import thd.bd.sms.sharedpreference.SharedPreferencesHelper;
 import thd.bd.sms.utils.Config;
 import thd.bd.sms.utils.DBhelper;
 import thd.bd.sms.utils.ReceiverAction;
+import thd.bd.sms.utils.SysUtils;
 import thd.bd.sms.utils.Utils;
 import thd.bd.sms.utils.WinUtils;
+import thd.bd.sms.view.CommomDialogList;
 
 /**
  * 北斗短信详情页面
  *
  * @author llg
  */
-public class ReplyMessageActivity extends BaseActivity implements OnClickListener, OnLayoutChangeListener, View.OnTouchListener {
+public class ReplyMessageActivity extends BaseActivity implements OnClickListener, OnLayoutChangeListener{
 
 
     protected static final String TAG = "ReplyMessageActivity";
-    private ImageView sendButton = null;
     private EditText messageContent;//发送内容
     private ListView mBDDetailsMessageList = null;
     private LinearLayout returnLayout = null;
@@ -125,10 +134,9 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
 
     private LinearLayout receiver;
     private ImageView addMore;//更多
-//    private LinearLayout ll_addMore;//更多
     private LinearLayout ll_sendButton;//发送
 //    private ImageView queryContractImageview;
-    private EditText mEtSimNum;//卡号
+    private EditText mEtSimNumTXT;//卡号
     private String simNumStr;//收件人号
     private LinearLayout ll_more_info;//详细信息
     private TextView tvCacheInfo;//倒计时
@@ -233,6 +241,9 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         WinUtils.setWinTitleColor(this);
         super.onCreate(savedInstanceState);
+
+        EventBus.getDefault().register(this);
+
         addReceiver();
         //获取屏幕高度
         screenHeight = this.getWindowManager().getDefaultDisplay().getHeight();
@@ -299,8 +310,8 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
             //区分是新建对话 还是回复对话
             type = intent.getIntExtra(Config.INTENT_TYPE, -1);
 
-//			if (mEtSimNum !=null) {
-//				mEtSimNum.setText(friendId);
+//			if (mEtSimNumTXT !=null) {
+//				mEtSimNumTXT.setText(friendId);
 //				type = Config.REPLY_DIALOG;
 //			}
 
@@ -308,12 +319,12 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
                 // 新建对话
                 // title 先为 新建消息 选择联系人后 修改为联系人
 
-            } else if (Config.REPLY_DIALOG == type) {
+            } else if (Config.REPLY_DIALOG == type) {//回复对话
                 //隐藏
                 receiver.setVisibility(View.GONE);
                 // 回复对话
                 mUserName = intent.getStringExtra("PHONE_NUMBER");
-                if (mUserName.contains("(")) {
+                if (mUserName.contains("(")) {//如果是通讯录已有联系人，phoneNumber需要拆分，如果不是，不用拆分
                     phoneNumber = mUserName.substring(mUserName.lastIndexOf("(") + 1, mUserName.lastIndexOf(")"));
                     phoneName = mUserName.substring(0, mUserName.lastIndexOf("("));
                 } else {
@@ -321,7 +332,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
                     phoneName = "";//根据PhoneNumber查询名称
                 }
                 //设置号码
-                mEtSimNum.setText(phoneNumber);
+                mEtSimNumTXT.setText(phoneNumber);
                 messageFlag = intent.getStringExtra("MESSAGE_FLAG");
                 long id = intent.getLongExtra("MESSAGE_ID", 0);
                 if (!"".equals(messageFlag) && "3".equals(messageFlag)) {
@@ -333,7 +344,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
 
                 //其他界面跳转过来  比如:地图回复短报文  友邻位置跳转等
                 //从 intent 中获取 收件人号码
-                //String friendId = intent.getStringExtra(ReceiverAction.KEY_BD_FRIEND_ID);
+//                String friendId = intent.getStringExtra(ReceiverAction.KEY_BD_FRIEND_ID);
             }
 
             Cursor draftCursor = messageOperation.getDraftMessages(phoneNumber);
@@ -363,9 +374,9 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
 
                 SharedPreferencesHelper.put(simNumStr,isChecked);
                 if (isChecked) {
-                    mEtSimNum.setHint("请输入手机号");
+                    mEtSimNumTXT.setHint("请输入手机号");
                 } else {
-                    mEtSimNum.setHint("请输入北斗卡号");
+                    mEtSimNumTXT.setHint("请输入北斗卡号");
                 }
             }
         });
@@ -507,7 +518,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
                 String toSendContent = s.toString();
                 /*判断写入的汉字的个数和数字字母个数,汉字个数*14 数字字母个数×4*/
                 int num = Utils.checkStrBits(toSendContent);
-                int flag = Utils.checkMsg(toSendContent);
+//                int flag = Utils.checkMsg(toSendContent);
                 int temp = Utils.getMessageMaxLength();
                 //if(flag==2){
                 //	temp=(Utils.getMessageMaxLength()*2)/3;
@@ -522,24 +533,18 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
                         mToast = Toast.makeText(mContext, "输入超过最长字符，将不能发送短信!", Toast.LENGTH_SHORT);
                         mToast.show();
                         isOver = true;
-                        sendButton.setVisibility(View.INVISIBLE);
                         ll_sendButton.setVisibility(View.GONE);
                     }
                 } else {
                     if (isOver) {
                         mToast.cancel();
                         isOver = false;
-                        sendButton.setVisibility(View.VISIBLE);
                         ll_sendButton.setVisibility(View.VISIBLE);
-                    }
-                    if (!sendButton.isEnabled()) {
-                        //sendMsgBtn.setEnabled(true);
-                        //sendMsgBtn.setImageResource(R.drawable.msg_send_btn);
                     }
                 }
             }
         });
-        mEtSimNum.addTextChangedListener(new TextWatcher() {
+        mEtSimNumTXT.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -572,11 +577,11 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
 
         if (!TextUtils.isEmpty(toSendContent) && (contentLength >= maxLength)) {
             Toast.makeText(mContext, "发送内容太长将不能发送", Toast.LENGTH_SHORT).show();
-            sendButton.setVisibility(View.INVISIBLE);
+            ll_sendButton.setVisibility(View.INVISIBLE);
         }
 
         title.setVisibility(View.INVISIBLE);
-        simNumStr = mEtSimNum.getText().toString().trim();
+        simNumStr = mEtSimNumTXT.getText().toString().trim();
         if (simNumStr != null) {
             if (simNumStr.contains("(")) {
                 String name = simNumStr.substring(simNumStr.lastIndexOf("(") + 1, simNumStr.lastIndexOf(")"));
@@ -623,11 +628,9 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
         activityRootView = findViewById(R.id.root_layout);
         checkSendPhoneSMS = (CheckBox) this.findViewById(R.id.checkSendPhoneSMS);
         addMore = (ImageView) this.findViewById(R.id.addMore);
-//        ll_addMore = (LinearLayout) this.findViewById(R.id.ll_addMore);
-        sendButton = (ImageView) this.findViewById(R.id.sendButton);
         ll_sendButton = (LinearLayout) this.findViewById(R.id.ll_sendButton);
         messageContent = (EditText) this.findViewById(R.id.bd_message_content);
-        mEtSimNum = (EditText) this.findViewById(R.id.bd_sim_num);
+        mEtSimNumTXT = (EditText) this.findViewById(R.id.bd_sim_num);
         titleName = (TextView) this.findViewById(R.id.sub_title_name);
         title = (TextView) this.findViewById(R.id.title_name);
         tvCacheInfo = (TextView) this.findViewById(R.id.tv_chcheInfo);
@@ -638,10 +641,8 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
         ll_more_info = (LinearLayout) this.findViewById(R.id.ll_more_info);
         returnLayout.setOnClickListener(this);
         mBDDetailsMessageList = (ListView) this.findViewById(R.id.bd_message_details_list);
-        sendButton.setOnClickListener(this);
         addMore.setOnClickListener(this);
-        ll_sendButton.setOnTouchListener(this);
-        addMore.setOnTouchListener(this);
+        ll_sendButton.setOnClickListener(this);
 //        queryContractImageview.setOnClickListener(this);
     }
 
@@ -649,10 +650,6 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.sendButton:
-
-                sendFunctionSMS();
-                break;
             case R.id.return_home_layout:
                 onBackPressed();
                 break;
@@ -666,11 +663,56 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
 //                break;
             case R.id.addMore:
                 // 更多
-                openMsgModel();
+                openPopwindow();
+
                 break;
+
+            case R.id.ll_sendButton: {
+                if(SysUtils.isServiceRunning(this, CycleReportRDLocService.class.getName())){
+                    Toast.makeText(this,getResources().getString(R.string.stop_RD_report),Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if(SysUtils.isServiceRunning(this, CycleLocService.class.getName())){
+                    Toast.makeText(this,getResources().getString(R.string.stop_RD_Location),Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if(SysUtils.isServiceRunning(this, CycleReportRNLocService.class.getName())){
+                    Toast.makeText(this,getResources().getString(R.string.stop_RN_report),Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                sendFunctionSMS();
+                break;
+            }
+
             default:
                 break;
         }
+    }
+
+    private void openPopwindow() {
+        String[] strings = new String[]{"联系人","短语模板"};
+
+        new CommomDialogList(ReplyMessageActivity.this, R.style.dialog_aa, strings, new CommomDialogList.OnCloseListener() {
+            @Override
+            public void onClick(Dialog dialog, int position) {
+                dialog.dismiss();
+                switch (position){
+                    case 0:
+                        Intent intent = new Intent();
+                        intent.setClass(ReplyMessageActivity.this, BDContactActivity.class);
+                        intent.setData(BDContactColumn.CONTENT_URI);
+                        intent.putExtra(Config.NEED_BACK, true);
+                        startActivityForResult(intent, REQUEST_CONTACT);
+                        break;
+
+                    case 1:
+                        openMsgModel();
+                        break;
+                }
+            }
+        }).show();
     }
 
 
@@ -679,8 +721,8 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
      */
     private void registSendNO() {
 
-        if (mEtSimNum != null) {
-            String simNumStr2 = mEtSimNum.getText().toString().trim();
+        if (mEtSimNumTXT != null) {
+            String simNumStr2 = mEtSimNumTXT.getText().toString().trim();
             setSendNumStr(simNumStr2);
         }
     }
@@ -691,7 +733,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
      */
     private void sendFunctionSMS() {
 
-        simNumStr = mEtSimNum.getText().toString().trim();
+        simNumStr = mEtSimNumTXT.getText().toString().trim();
         String content = messageContent.getText().toString().trim();
         String phonecontent = "";
         if (simNumStr.isEmpty()) {
@@ -712,8 +754,13 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
             mHandler.sendEmptyMessage(WARN_NO_CONTENT);
             return;
         }
+
+        if (simNumStr.contains("(")) {
+            phonecontent = simNumStr.substring(0,simNumStr.lastIndexOf("("));
+        }
+
         //判断是否勾选 checkbox 发送到手机
-        if (checkSendPhoneSMS.isChecked()) {
+        /*if (checkSendPhoneSMS.isChecked()) {
             //被选中发送到手机
 
 
@@ -734,7 +781,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
         } else {
             //未选中 rd发送
             Log.e(TAG, "LERRY_TXA: =======ReplyMessageActivity764===========未选中 rd发送===");
-        }
+        }*/
 
         //判断长度 超出长度的时候  切割成  多条短语 循环发送
         //8bit ---字母 和 数字
@@ -743,22 +790,6 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
         int maxLength = Utils.getMessageMaxLength();
         int splitLength = maxLength / 14;
         if (content.length() >= splitLength) {
-            /**
-             *
-             //超长
-
-             ArrayList<String> subContents = getSubContent(content);
-
-             for (int i = 0; i < subContents.size(); i++) {
-
-             String sendContent = subContents.get(i);
-             BD_RD_TXA txa = sendSMS(sendContent);
-             //保存数据到数据库
-             save2db(txa);
-
-             }
-
-             */
             if (checkSendPhoneSMS.isChecked()) {
                 sendPhoneSMS(phonecontent, content);
 
@@ -810,8 +841,6 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
             String name = simNumStr.substring(simNumStr.lastIndexOf("(") + 1, simNumStr.lastIndexOf(")"));
             simNumStr = name;
             phoneNumber = name;
-
-
         }
         if (!simNumStr.contains("(")) {
             phoneNumber = simNumStr;
@@ -826,8 +855,29 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
             e.printStackTrace();
         }
 
-        //保存数据到数据库
-        save2db(phoneNumber,content, null);
+//        int priority = txa.getmPriority();
+        BDCache mBdCache = new BDCache();
+        /*if (priority < 0) {//短信内容优先级
+                *//*public static final int PRIORITY_MAX = 0;//紧急救援
+                public static final int PRIORITY_1 = 100;//最高优先级 定位申请
+                public static final int PRIORITY_3 = 300;//次之优先级 短报文 位置报告
+                public static final int PRIORITY_5 = 500;//最弱优先级*//*
+            //封装数据
+            mBdCache.setPriority(BDCache.PRIORITY_MAX);
+            Log.e(TAG, "LERRY_TXA: =======SMSapp320=========发送短报文啦！！！priority < 0========="+ ((BD_RD_TXA) data.m_Data).getmMessageContent());
+        } else {
+
+            mBdCache.setPriority(BDCache.PRIORITY_3);
+        }*/
+        //封装数据
+        mBdCache.setMsgType(BDCache.SMS_FLAG);
+        mBdCache.setPriority(BDCache.PRIORITY_3);
+        mBdCache.setSendAddress(phoneNumber);
+        mBdCache.setMsgContent(content);
+        mBdCache.setCacheContent(content);
+
+        //保存数据到缓存数据库
+        SysUtils.dispatchData(ReplyMessageActivity.this,mBdCache);
     }
 
     public void sendPhoneSMS(String phoneContent, String content) {
@@ -895,7 +945,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
     public void save2db(String cardNum,String messageContent, String otherMsg) {
 
 
-        String userInfo = titleName.getText().toString().trim();
+       /* String userInfo = titleName.getText().toString().trim();
         String phoneNum;
         String userName = "新建消息";
         if (userInfo.isEmpty()) {
@@ -928,12 +978,16 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
                 }
             }
 
-        }
+        }*/
         //Toast.makeText(mContext, userInfo, 0).show();
 
+//        if("".equals(phoneName)){
+//
+//        }
+
         BDMessageInfo info = new BDMessageInfo();
-        info.setUserName(userName);
-        info.setmUserAddress(cardNum);
+        info.setUserName(cardNum);
+        info.setmUserAddress(phoneNumber);
 
         if (!TextUtils.isEmpty(otherMsg)) {
             info.setMessage(otherMsg);
@@ -959,7 +1013,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
             String content = messageContent.getText().toString().trim();
             if (draftID == 0) {
 
-                String toWho = mEtSimNum.getText().toString().trim();
+                String toWho = mEtSimNumTXT.getText().toString().trim();
 
                 if (TextUtils.isEmpty(toWho)) {
                     return;
@@ -1037,7 +1091,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
                     mUserAddress = name + "(" + phoneNumber + ")";
                 }
                 cursor.close();
-                mEtSimNum.setText(mUserAddress);
+                mEtSimNumTXT.setText(mUserAddress);
                 titleName.setText(mUserAddress);
 
                 //同时设置数据到
@@ -1051,6 +1105,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        EventBus.getDefault().unregister(this);
         unregisterReceiver(smsDataChangReceiver);
         if (messageOperation != null) {
 // .close();
@@ -1073,31 +1128,9 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
     }
 
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-
-        int id = v.getId();
-        switch (id) {
-            case R.id.addMore: {
-
-                openMsgModel();
-
-                break;
-            }
-
-            case R.id.ll_sendButton: {
-
-                sendFunctionSMS();
-                break;
-            }
-        }
-
-        return false;
-    }
-
     private void openMsgModel(){
         MessgeUsualOperation oper = new MessgeUsualOperation(this);
-        List<Map<String, Object>> listMsg = oper.getAll();
+        List<String> listMsg = oper.getAll1();
         if (listMsg.size() == 0) {
             Toast.makeText(this, "请先添加短语!!", Toast.LENGTH_LONG).show();
         } else {
@@ -1105,35 +1138,25 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
         }
     }
 
-    private void addModel(final List<Map<String, Object>> listMsg) {
+    private void addModel(final List<String> listMsg) {
 
-        View dialogRootView = View.inflate(this, R.layout.dialog_modul_sms, null);
+        String[] strings = listMsg.toArray(new String[listMsg.size()]);
 
-        ViewGroup.LayoutParams lParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 400);
-        dialogRootView.setPadding(20, 20, 20, 20);
-        dialogRootView.setLayoutParams(lParams);
-        ListView lst_category = (ListView) dialogRootView.findViewById(R.id.lst_category);
-        MsgUsalWordAdapter adapterMsg = new MsgUsalWordAdapter(this, listMsg, Config.FLAG_USUAL_WORD);
-        lst_category.setAdapter(adapterMsg);
-
-        final AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setTitle("模板短语")
-                .setView(dialogRootView).create();
-        alertDialog.show();
-        // 常用短语条目点击事件
-        lst_category.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
+        new CommomDialogList(ReplyMessageActivity.this, R.style.dialog_aa, strings, new CommomDialogList.OnCloseListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                String usalMsg = String.valueOf(listMsg.get(position).get(
-                        "MESSAGE_WORD_TEXT"));
+            public void onClick(Dialog dialog, int position) {
+                dialog.dismiss();
+                String usalMsg = String.valueOf(listMsg.get(position));
                 UsalMsg usalMst = new UsalMsg(usalMsg);
                 EventBus.getDefault().post(usalMst);
-                alertDialog.dismiss();
             }
-        });
+        }).setMessage("请选择要使用的模板短语").setTitle("模板短语").show();
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN) //第2步:注册一个在后台线程执行的方法,用于接收事件
+    public void onUserEvent(UsalMsg usalMsg) {//参数必须是ClassEvent类型, 否则不会调用此方法
+        messageContent.setText(usalMsg.getUsalMsg());
     }
 
     /**
@@ -1281,9 +1304,8 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
     }
 
     public void updateCache() {
-//        int size = SpTools.getRecordCount(mContext, SpTools.SP_RECORDED_KEY_COUNT);
-        int size = (int)SharedPreferencesHelper.getRecordedCount();
-        String info = "还有" + size + "条等待发送!!";
+        int size = SharedPreferencesHelper.getRecordedCount();
+        String info = "还有" + size + "条等待发送";
         if (tvCacheInfo != null) {
             tvCacheInfo.setText(info);
         }

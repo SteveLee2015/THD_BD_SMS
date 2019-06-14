@@ -25,8 +25,8 @@
     <style name="bsi_relaylayout_style">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginLeft">10dp</item>
-        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:layout_marginLeft">3dp</item>
+        <item name="android:layout_marginRight">3dp</item>
         <item name="android:layout_marginBottom">8dp</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_gravity">center_horizontal</item>
@@ -53,7 +53,7 @@
 
     <style name="bsi_signal_style">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">@dimen/dp_25</item>
     </style>
 
     <style name="setting_text_style">
@@ -91,25 +91,53 @@
         <item name="android:windowIsTranslucent">true</item>
     </style>
 
+    <!-- 对话框风格 -->
+    <!-- <item name="android:windowBackground">@android:color/holo_orange_light</item> -->
+    <!--<style name="mDialogStyleCustom" parent="@android:style/Theme.Dialog">Theme.AppCompat.Light.Dialog-->
+    <style name="mDialogStyleCustom" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@mipmap/gray_bg</item>
+        <item name="android:backgroundDimAmount">0.3</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:textColor">@color/colorSettingText</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--背景透明-->
+        <item name="android:backgroundDimEnabled">true</item>
+        <!--模糊-->
+        <item name="android:windowFrame">@null</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
     <style name="locTxtStyle1">
-        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">@dimen/dp_40</item>
-        <item name="android:layout_weight">2</item>
+        <!--<item name="android:layout_weight">2</item>-->
+        <item name="android:layout_marginLeft">@dimen/dp_10</item>
         <item name="android:gravity">center</item>
-        <item name="android:textSize">@dimen/sp_14</item>
-        <item name="android:textColor">@color/colorWhite</item>
-        <item name="android:background">@color/colorMainBlue</item>
+        <item name="android:textSize">@dimen/sp_16</item>
+        <item name="android:textColor">@color/colorBlack</item>
+        <!--<item name="android:background">@color/colorMainBlue</item>-->
     </style>
 
     <style name="locTxtStyle2">
-        <item name="android:layout_marginLeft">@dimen/dp_4</item>
-        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_marginLeft">@dimen/dp_40</item>
+        <item name="android:layout_marginRight">@dimen/dp_40</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/dp_40</item>
-        <item name="android:layout_weight">5</item>
-        <item name="android:gravity">center</item>
+        <item name="android:gravity">center_vertical|left</item>
+        <item name="android:paddingLeft">@dimen/dp_20</item>
         <item name="android:textSize">@dimen/sp_14</item>
-        <item name="android:textColor">@color/colorBlack</item>
-        <item name="android:background">@color/colorMainBlue</item>
+        <item name="android:textColor">@color/colorSettingText</item>
+        <item name="android:background">@color/colorWhite</item>
+    </style>
+
+    <style name="biaodanLineStyle">
+        <item name="android:layout_width">@dimen/dp_2</item>
+        <item name="android:layout_height">@dimen/dp_40</item>
+        <item name="android:layout_marginLeft">@dimen/dp_45</item>
+        <item name="android:background">@color/colorLine</item>
     </style>
 
     <style name="lineLayout_parent">
@@ -120,21 +148,43 @@
     </style>
 
     <style name="lineLayout_editor_text">
-        <item name="android:background">@mipmap/input_background</item>
-        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/dp_40</item>
-        <item name="android:layout_weight">5</item>
+        <item name="android:layout_marginRight">@dimen/dp_45</item>
         <item name="android:gravity">center</item>
-        <item name="android:layout_marginLeft">@dimen/dp_4</item>
+        <item name="android:layout_marginLeft">@dimen/dp_45</item>
         <item name="android:orientation">horizontal</item>
     </style>
 
-    <style name="locTxtStyle_other" parent="locTxtStyle2">
-        <item name="android:background">@null</item>
+    <style name="locTxtStyle_other">
+        <item name="android:background">@color/colorWhite</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">@dimen/dp_40</item>
+        <item name="android:paddingLeft">@dimen/dp_20</item>
+        <item name="android:textColor">@color/colorSettingText</item>
+
     </style>
 
     <style name="lineLayout_editor_text2" parent="lineLayout_editor_text">
         <item name="android:background">@null</item>
         <item name="android:layout_marginLeft">0dp</item>
     </style>
+
+
+    <style name="dialog_aa" parent="@android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <!--边框-->
+        <item name="android:windowIsFloating">true</item>
+        <!--是否浮现在activity之上-->
+        <item name="android:windowIsTranslucent">false</item>
+        <!--半透明-->
+        <item name="android:windowNoTitle">true</item>
+        <!--无标题-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--背景透明-->
+        <item name="android:backgroundDimEnabled">true</item>
+        <!--模糊-->
+
+    </style>
+
 </resources>

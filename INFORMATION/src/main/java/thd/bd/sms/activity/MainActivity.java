@@ -14,15 +14,18 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.thd.cmd.manager.BDCmdManager;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +33,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import thd.bd.sms.R;
 import thd.bd.sms.base.BaseActivity;
+import thd.bd.sms.bean.GpsLocationEvent;
 import thd.bd.sms.bean.MyLocationBean;
 import thd.bd.sms.fragment.CommunicationFragment;
 import thd.bd.sms.fragment.FriendsFragment;
@@ -134,6 +138,8 @@ public class MainActivity extends BaseActivity {
 //        Log.e("LERRYTEST_MAP", "=========MainActivity115=======location==" + location.getLatitude() + "," + location.getLongitude());
 
         EventBus.getDefault().post(myLocationBean);
+
+//        EventBus.getDefault().post(new GpsLocationEvent(location));
     }
 
     @Override
@@ -142,9 +148,8 @@ public class MainActivity extends BaseActivity {
     }
 
 
-
     @OnClick({R.id.main_map_layout, R.id.main_communication_layout, R.id.main_friends_layout,
-            R.id.main_setting_layout,R.id.main_center_btn})
+            R.id.main_setting_layout, R.id.main_center_btn})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.main_map_layout:
@@ -231,14 +236,39 @@ public class MainActivity extends BaseActivity {
 
                 fragmentList.add(to);
 
-                Log.i(TAG, "MainActivity255: =======未添加过该fragment，添加并隐藏上一个========" );
+                Log.i(TAG, "MainActivity255: =======未添加过该fragment，添加并隐藏上一个========");
                 // 隐藏当前的fragment，add下一个fragment到Activity中
                 getSupportFragmentManager().beginTransaction().hide(from).add(R.id.main_bottom_fragmentLayout, to).commit();
             } else {
-                Log.i(TAG, "MainActivity258: =======添加过该fragment要隐藏了========" );
+                Log.i(TAG, "MainActivity258: =======添加过该fragment要隐藏了========");
                 // 隐藏当前的fragment，显示下一个fragment
                 getSupportFragmentManager().beginTransaction().hide(from).show(to).commit();
             }
         }
     }
+
+    // 用来计算返回键的点击间隔时间
+    private long exitTime = 0;
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && event.getAction() == KeyEvent.ACTION_DOWN) {
+
+            if ((System.currentTimeMillis() - exitTime) > 2000) {
+                //弹出提示，可以有多种方式
+                Toast.makeText(getApplicationContext(), "再按一次跳转到后台运行", Toast.LENGTH_SHORT).show();
+                exitTime = System.currentTimeMillis();
+            } else {
+                if (isTaskRoot()) {
+                    moveTaskToBack(false);
+                }
+            }
+            return true;
+
+        }
+
+
+        return super.onKeyDown(keyCode, event);
+    }
+
 }

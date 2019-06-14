@@ -3,8 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MapActivity">
+    android:layout_height="match_parent">
 
     <com.baidu.mapapi.map.MapView
         android:id="@+id/bmapView"
@@ -14,19 +13,36 @@
 
     </com.baidu.mapapi.map.MapView>
 
-    <ImageView
+    <ImageButton
         android:id="@+id/main_my_loction"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@mipmap/location_fill"
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="@dimen/dp_20"
-        android:layout_marginBottom="@dimen/dp_50"/>
+        android:layout_marginBottom="@dimen/dp_50"
+        android:background="@color/colorWhite"/>
 
-    <Button
-        android:id="@+id/main_bsi_btn"
+    <ImageButton
+        android:id="@+id/main_offline_img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="读波束"/>
+        android:layout_alignParentLeft="true"
+        android:layout_above="@+id/main_my_loction"
+        android:layout_marginLeft="@dimen/dp_20"
+        android:layout_marginBottom="@dimen/dp_10"
+        android:src="@mipmap/offline"
+        android:background="@color/colorWhite"/>
+
+    <ImageButton
+        android:id="@+id/main_input_latlng_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/main_offline_img"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="@dimen/dp_20"
+        android:layout_marginBottom="@dimen/dp_10"
+        android:background="@color/colorWhite"
+        android:src="@mipmap/input_latlng" />
 
 </RelativeLayout>

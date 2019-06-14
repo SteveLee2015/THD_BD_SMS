@@ -1,6 +1,7 @@
 package thd.bd.sms.service.report;
 
 import android.content.Context;
+import android.location.BDLocationReport;
 
 import thd.bd.sms.bean.ReportSet;
 import thd.bd.sms.utils.Logger;
@@ -20,12 +21,11 @@ public class SOSReport extends BaseReport implements Reportable{
 		super(mContext);
 		this.mContext = mContext;
 	}
-	@Override
-	public void reportLoc(ReportSet mReportSet) {
 
+	@Override
+	public void reportLoc(ReportSet mReportSet, BDLocationReport report) {
 		Logger.e(TAG, mReportSet.toString());
 
 //		sendData(mBDDat);
 	}
-
 }

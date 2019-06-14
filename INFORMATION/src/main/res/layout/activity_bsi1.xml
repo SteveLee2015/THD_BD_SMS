@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/message_title"
+        layout="@layout/bd_title_layout"
+        android:focusable="true"/>
+
+    <ImageView
+        android:id="@+id/bsi_earth_img"
+        android:layout_width="@dimen/dp_150"
+        android:layout_height="@dimen/dp_150"
+        android:src="@mipmap/earth"
+        android:layout_alignParentBottom="true"/>
+
+    <ImageView
+        android:layout_width="@dimen/dp_61"
+        android:layout_height="@dimen/dp_400"
+        android:background="@mipmap/earth_line"
+        android:layout_above="@+id/bsi_earth_img"
+        android:layout_marginBottom="-20dp"
+        android:layout_marginLeft="@dimen/dp_30"/>
+
+    <ImageView
+        android:id="@+id/bsi_weixing5"
+        android:layout_width="@dimen/dp_60"
+        android:layout_height="@dimen/dp_60"
+        android:src="@mipmap/weixing"
+        android:layout_above="@+id/bsi_earth_img"
+        android:layout_marginLeft="@dimen/dp_65"
+        android:layout_marginBottom="30dp"/>
+
+    <ImageView
+        android:id="@+id/bsi_weixing4"
+        android:layout_width="@dimen/dp_60"
+        android:layout_height="@dimen/dp_60"
+        android:src="@mipmap/weixing"
+        android:layout_marginBottom="@dimen/dp_10"
+        android:layout_above="@+id/bsi_weixing5"
+        android:layout_marginLeft="@dimen/dp_70"/>
+
+    <ImageView
+        android:id="@+id/bsi_weixing3"
+        android:layout_width="@dimen/dp_60"
+        android:layout_height="@dimen/dp_60"
+        android:src="@mipmap/weixing"
+        android:layout_marginBottom="@dimen/dp_10"
+        android:layout_above="@+id/bsi_weixing4"
+        android:layout_marginLeft="@dimen/dp_70"/>
+
+    <ImageView
+        android:id="@+id/bsi_weixing2"
+        android:layout_width="@dimen/dp_60"
+        android:layout_height="@dimen/dp_60"
+        android:src="@mipmap/weixing"
+        android:layout_above="@+id/bsi_weixing3"
+        android:layout_marginBottom="@dimen/dp_10"
+        android:layout_marginLeft="@dimen/dp_70"/>
+
+    <ImageView
+        android:id="@+id/bsi_weixing1"
+        android:layout_width="@dimen/dp_60"
+        android:layout_height="@dimen/dp_60"
+        android:src="@mipmap/weixing"
+        android:layout_above="@+id/bsi_weixing2"
+        android:layout_marginLeft="@dimen/dp_70"
+        android:layout_marginBottom="@dimen/dp_10"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/bsi_weixing1"
+        android:layout_toRightOf="@+id/bsi_weixing1"
+        android:layout_marginRight="@dimen/dp_20"
+        android:orientation="vertical">
+
+        <RelativeLayout style="@style/bsi_relaylayout_style">
+
+            <TextView
+                android:id="@+id/tv_bsi1"
+                android:text="波束1"
+                style="@style/bsi_title_style"/>
+
+            <thd.bd.sms.view.CustomProgressView
+                android:id="@+id/auto_progress_1"
+                style="@style/bsi_signal_style"
+                android:layout_toRightOf="@+id/tv_bsi1">
+            </thd.bd.sms.view.CustomProgressView>
+
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/bsi_relaylayout_style">
+
+            <TextView
+                android:id="@+id/tv_bsi2"
+                android:text="波束2"
+                style="@style/bsi_title_style"/>
+
+            <thd.bd.sms.view.CustomProgressView
+                android:id="@+id/auto_progress_2"
+                style="@style/bsi_signal_style"
+                android:layout_toRightOf="@+id/tv_bsi2">
+            </thd.bd.sms.view.CustomProgressView>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/bsi_weixing2"
+        android:layout_toRightOf="@+id/bsi_weixing2"
+        android:layout_marginRight="@dimen/dp_20"
+        android:orientation="vertical">
+
+        <RelativeLayout style="@style/bsi_relaylayout_style">
+
+            <TextView
+                android:id="@+id/tv_bsi3"
+                android:text="波束3"
+                style="@style/bsi_title_style"/>
+
+            <thd.bd.sms.view.CustomProgressView
+                android:id="@+id/auto_progress_3"
+                style="@style/bsi_signal_style"
+                android:layout_toRightOf="@+id/tv_bsi3">
+            </thd.bd.sms.view.CustomProgressView>
+
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/bsi_relaylayout_style">
+
+            <TextView
+                android:id="@+id/tv_bsi4"
+                android:text="波束4"
+                style="@style/bsi_title_style"/>
+
+            <thd.bd.sms.view.CustomProgressView
+                android:id="@+id/auto_progress_4"
+                style="@style/bsi_signal_style"
+                android:layout_toRightOf="@+id/tv_bsi4">
+            </thd.bd.sms.view.CustomProgressView>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/bsi_weixing3"
+        android:layout_toRightOf="@+id/bsi_weixing3"
+        android:layout_marginRight="@dimen/dp_20"
+        android:orientation="vertical">
+
+        <RelativeLayout style="@style/bsi_relaylayout_style">
+
+            <TextView
+                android:id="@+id/tv_bsi5"
+                android:text="波束5"
+                style="@style/bsi_title_style"/>
+
+            <thd.bd.sms.view.CustomProgressView
+                android:id="@+id/auto_progress_5"
+                style="@style/bsi_signal_style"
+                android:layout_toRightOf="@+id/tv_bsi5">
+            </thd.bd.sms.view.CustomProgressView>
+
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/bsi_relaylayout_style">
+
+            <TextView
+                android:id="@+id/tv_bsi6"
+                android:text="波束6"
+                style="@style/bsi_title_style"/>
+
+            <thd.bd.sms.view.CustomProgressView
+                android:id="@+id/auto_progress_6"
+                style="@style/bsi_signal_style"
+                android:layout_toRightOf="@+id/tv_bsi6">
+            </thd.bd.sms.view.CustomProgressView>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/bsi_weixing4"
+        android:layout_toRightOf="@+id/bsi_weixing4"
+        android:layout_marginRight="@dimen/dp_20"
+        android:orientation="vertical">
+
+        <RelativeLayout style="@style/bsi_relaylayout_style">
+
+            <TextView
+                android:id="@+id/tv_bsi7"
+                android:text="波束4"
+                style="@style/bsi_title_style"/>
+
+            <thd.bd.sms.view.CustomProgressView
+                android:id="@+id/auto_progress_7"
+                style="@style/bsi_signal_style"
+                android:layout_toRightOf="@+id/tv_bsi7">
+            </thd.bd.sms.view.CustomProgressView>
+
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/bsi_relaylayout_style">
+
+            <TextView
+                android:id="@+id/tv_bsi8"
+                android:text="波束8"
+                style="@style/bsi_title_style"/>
+
+            <thd.bd.sms.view.CustomProgressView
+                android:id="@+id/auto_progress_8"
+                style="@style/bsi_signal_style"
+                android:layout_toRightOf="@+id/tv_bsi8">
+            </thd.bd.sms.view.CustomProgressView>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/bsi_weixing5"
+        android:layout_toRightOf="@+id/bsi_weixing5"
+        android:layout_marginRight="@dimen/dp_20"
+        android:orientation="vertical">
+
+        <RelativeLayout style="@style/bsi_relaylayout_style">
+
+            <TextView
+                android:id="@+id/tv_bsi9"
+                android:text="波束9"
+                style="@style/bsi_title_style"/>
+
+            <thd.bd.sms.view.CustomProgressView
+                android:id="@+id/auto_progress_9"
+                style="@style/bsi_signal_style"
+                android:layout_toRightOf="@+id/tv_bsi9">
+            </thd.bd.sms.view.CustomProgressView>
+
+        </RelativeLayout>
+
+        <RelativeLayout style="@style/bsi_relaylayout_style">
+
+            <TextView
+                android:id="@+id/tv_bsi10"
+                android:text="波束10"
+                style="@style/bsi_title_style"/>
+
+            <thd.bd.sms.view.CustomProgressView
+                android:id="@+id/auto_progress_10"
+                style="@style/bsi_signal_style"
+                android:layout_toRightOf="@+id/tv_bsi10">
+            </thd.bd.sms.view.CustomProgressView>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

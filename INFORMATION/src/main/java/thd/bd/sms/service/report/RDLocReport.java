@@ -2,6 +2,7 @@ package thd.bd.sms.service.report;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.BDLocationReport;
 import android.location.BDParameterException;
 import android.location.BDRDSSManager;
 import android.location.BDUnknownException;
@@ -17,11 +18,13 @@ import thd.bd.sms.sharedpreference.SharedPreferencesHelper;
 import thd.bd.sms.utils.Config;
 import thd.bd.sms.utils.Logger;
 import thd.bd.sms.utils.ReceiverAction;
+import thd.bd.sms.utils.SysUtils;
+import thd.bd.sms.utils.Utils;
 
 
 /**
- * rn位置报告
- * @author llg052
+ * rd位置报告
+ * @author lerry
  *
  */
 public class RDLocReport extends BaseReport implements Reportable{
@@ -36,7 +39,7 @@ public class RDLocReport extends BaseReport implements Reportable{
 	}
 	private static final String TAG = "RDLocReport";
 	@Override
-	public void reportLoc(ReportSet mReportSet) {
+	public void reportLoc(ReportSet mReportSet,BDLocationReport report) {
 		Logger.e(TAG, mReportSet.toString());
 
 		//保存到数据库中
@@ -49,7 +52,7 @@ public class RDLocReport extends BaseReport implements Reportable{
 		mBdCache.setPriority(BDCache.PRIORITY_3);
 		mBdCache.setCacheContent(mReportSet.getReportNnm()+","+mReportSet.getReportType()+","+mReportSet.getTianxianValue()+","+mReportSet.getReportHz());
 		//把数据保存到数据库中
-		dispatchData(mBdCache);
+		SysUtils.dispatchData(mContext,mBdCache);
 
 		try {
 			cmdManager = BDCmdManager.getInstance(mContext);
@@ -60,40 +63,6 @@ public class RDLocReport extends BaseReport implements Reportable{
 			e.printStackTrace();
 		}
 
-	}
-
-	/**
-	 * 数据处理
-	 *
-	 * @param mBdCache
-	 */
-	private void dispatchData(BDCache mBdCache) {
-
-		RDCacheOperation operation = new RDCacheOperation(mContext);
-
-		int conutBefore = operation.getCount();
-		if (conutBefore >= Config.CACHE_COUNT) {
-
-			Toast.makeText(mContext, "抱歉,缓存溢出!", Toast.LENGTH_SHORT).show();
-
-		} else {
-
-			operation.insert(mBdCache);//插入数据
-			int count = operation.getCount();//获取数据
-			SharedPreferencesHelper.put(Constant.SP_RECORDED_KEY_COUNT,count);//记录数据
-			notifyData();
-			// 唤醒线程
-		}
-
-	}
-
-	/**
-	 * 通知数据变化
-	 */
-	private void notifyData() {
-//		Intent intent = new Intent();
-//		intent.setAction(ReceiverAction.DB_ACTION_ON_DATA_CHANGE_ADD);
-//		mContext.sendBroadcast(intent);
 	}
 
 }

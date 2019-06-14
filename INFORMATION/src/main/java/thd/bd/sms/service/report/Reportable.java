@@ -1,6 +1,8 @@
 package thd.bd.sms.service.report;
 
 
+import android.location.BDLocationReport;
+
 import thd.bd.sms.bean.ReportSet;
 
 /**
@@ -15,6 +17,6 @@ public interface Reportable {
 	 * 报告参数:报告策略  报告数据
 	 */
 //	public abstract void reportLoc(ReportSet mReportSet, BDData mBDDat);
-	public abstract void reportLoc(ReportSet mReportSet);
+	public abstract void reportLoc(ReportSet mReportSet,BDLocationReport report);
 
 }

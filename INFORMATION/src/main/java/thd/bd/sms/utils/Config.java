@@ -129,8 +129,8 @@ public class Config {
     
     
     /**RN连续报位**/
-    public static final String RN_RUNNING = "正在RN连续位置报告";
-    public static final String RN_WAITING = "等待RN连续位置报告";
+    public static final String RN_RUNNING = "正在连续报告";
+    public static final String RN_WAITING = "连续位置报告";
     
     /**RD连续报位**/
     public static final String RD_RUNNING = "正在连续报告";

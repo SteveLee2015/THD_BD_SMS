@@ -104,7 +104,7 @@ public class FriendsLocationDatabaseOperation {
 		return istrue;
 	}
 	/**
-	 * 删除
+	 * 删除所有友邻位置
 	 * @param
 	 * @return
 	 */
@@ -207,7 +207,7 @@ public class FriendsLocationDatabaseOperation {
 //						FriendsLocationColumns.FRIENDS_LON,FriendsLocationColumns.FRIENDS_LAT,
 //						FriendsLocationColumns.FRIENDS_HEIGHT},FriendsLocationColumns.FRIENDS_ID + "=" +address, null, null,null,FriendsLocationColumns._ID+" desc",null);
 
-		Cursor mCursor = sqliteDatabase.rawQuery("select * from BD_FRIEND_LOCATION where FRIENDS_ID = "+"'"+address+"'",null);
+		Cursor mCursor = sqliteDatabase.rawQuery("select * from BD_FRIEND_LOCATION where FRIENDS_ID = "+"'"+address+"' order by REPORT_TIME desc;" ,null);
 		int count = mCursor.getCount();
 		Log.e("FriendsOperation", "LERRY_YOULIN==================FriendsLocationDatabaseOperation213=======address=="+address+"====count=="+count);
 		List<Map<String ,Object>> list=new ArrayList<Map<String,Object>>();

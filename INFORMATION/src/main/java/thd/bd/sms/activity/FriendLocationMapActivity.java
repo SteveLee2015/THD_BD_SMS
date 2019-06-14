@@ -1,12 +1,12 @@
 package thd.bd.sms.activity;
 
-import android.graphics.Color;
+import android.app.Dialog;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.view.Window;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
@@ -27,13 +27,18 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import thd.bd.sms.R;
 import thd.bd.sms.base.BaseActivity;
+import thd.bd.sms.utils.SysUtils;
+import thd.bd.sms.utils.Utils;
 import thd.bd.sms.utils.WinUtils;
+import thd.bd.sms.view.CommomDialogCommon;
 
 public class FriendLocationMapActivity extends BaseActivity {
     private static final String TAG = "MapActivity";
 
     @BindView(R.id.return_home_layout)
     LinearLayout returnHomeLayout;
+    @BindView(R.id.title_name)
+    TextView titleName;
 
     private MapView mapView;
     private LatLng center = new LatLng(0, 0);
@@ -66,6 +71,7 @@ public class FriendLocationMapActivity extends BaseActivity {
         unbinder = (Unbinder) ButterKnife.bind(this);
 //        setContentView(getContentView());
 
+        titleName.setText("地图显示友邻位置");
 
         mapView = (MapView) findViewById(R.id.bmapView);
         mBaiduMap = mapView.getMap();
@@ -109,15 +115,15 @@ public class FriendLocationMapActivity extends BaseActivity {
         BitmapDescriptor bdA = BitmapDescriptorFactory.fromResource(R.mipmap.icon_gcoding);
         LatLng llA = new LatLng(lat, lng);
 
-//        MarkerOptions ooA = new MarkerOptions().position(Utils.baiduMapJP(llA)).icon(bdA).zIndex(9).draggable(true);
-        MarkerOptions ooA = new MarkerOptions().position(llA).icon(bdA).zIndex(9).draggable(true);
+        MarkerOptions ooA = new MarkerOptions().position(Utils.baiduMapJP(llA)).icon(bdA).zIndex(9).draggable(true);
+//        MarkerOptions ooA = new MarkerOptions().position(llA).icon(bdA).zIndex(9).draggable(true);
         // 掉下动画
         ooA.animateType(MarkerOptions.MarkerAnimateType.drop);
         mMarkerA = (Marker) (mBaiduMap.addOverlay(ooA));
 
         //以当前友邻位置为中心点
-//        builder.target(Utils.baiduMapJP(llA)).zoom(zoom);
-        builder.target(llA).zoom(zoom);
+        builder.target(Utils.baiduMapJP(llA)).zoom(zoom);
+//        builder.target(llA).zoom(zoom);
         mapView.getMap().setMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
         Log.e("LERRYTEST_MAP", "=========MapActivity158=======友邻location中心点==");
 
@@ -131,6 +137,22 @@ public class FriendLocationMapActivity extends BaseActivity {
 //            MapStatusUpdate u = MapStatusUpdateFactory.newLatLngBounds(builder.build());
 //            mBaiduMap.setMapStatus(u);
 //        }
+
+        mBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
+            //marker被点击时回调的方法
+            //若响应点击事件，返回true，否则返回false
+            //默认返回false
+            @Override
+            public boolean onMarkerClick(final Marker marker) {
+                new CommomDialogCommon(FriendLocationMapActivity.this, R.style.dialog_aa, "地图选点坐标为：\n经度：" + marker.getPosition().longitude + "\n纬度：" + marker.getPosition().latitude + "\n\n\n是否导航到此？", new CommomDialogCommon.OnCloseListener() {
+                    @Override
+                    public void onClick(Dialog dialog) {
+                        SysUtils.goToBaiduMap(FriendLocationMapActivity.this, marker.getPosition().latitude, marker.getPosition().longitude, "地图选点");
+                    }
+                }).show();
+                return false;
+            }
+        });
     }
 
     private void myLocation(LatLng myLocation) {
@@ -195,8 +217,8 @@ public class FriendLocationMapActivity extends BaseActivity {
 
         if (location != null && location.getLatitude() != 0.0 && location.getLongitude() != 0.0) {
             myLocation = new LatLng(location.getLatitude(), location.getLongitude());
-//            myLocation(Utils.baiduMapJP(myLocation));
-            myLocation(myLocation);
+            myLocation(Utils.baiduMapJP(myLocation));
+//            myLocation(myLocation);
 
         }
     }
