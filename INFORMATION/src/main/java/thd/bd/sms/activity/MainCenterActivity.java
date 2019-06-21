@@ -28,6 +28,7 @@ import thd.bd.sms.base.BaseActivity;
 import thd.bd.sms.bean.BDCache;
 import thd.bd.sms.bean.ReportSet;
 import thd.bd.sms.database.RDCacheOperation;
+import thd.bd.sms.service.CoreService;
 import thd.bd.sms.service.CycleLocService;
 import thd.bd.sms.service.CycleReportRDLocService;
 import thd.bd.sms.service.CycleReportRNLocService;
@@ -71,10 +72,12 @@ public class MainCenterActivity extends BaseActivity {
 
     private Intent intent;
     private final String TAG = "MainCenterActivity";
-    private MyConn myConn;
+//    private MyConn myConn;
     private RDCacheOperation cacheOperation;
     //    private List<BDCache> lists = new ArrayList<BDCache>();
-    private boolean isBind = false;
+//    private boolean isBind = false;
+
+    private CoreService coreService;
 
 
     /**
@@ -120,7 +123,9 @@ public class MainCenterActivity extends BaseActivity {
     }
 
     private void initView() {
-        myConn = new MyConn();
+//        myConn = new MyConn();
+
+        coreService = CoreService.getInstance();
 
         cacheOperation = new RDCacheOperation(this);
 
@@ -149,17 +154,25 @@ public class MainCenterActivity extends BaseActivity {
         Boolean floatRN = SharedPreferencesHelper.getRNReportState();
 //        Boolean floatStatus = SpTools.getFloatStatus(context, SpTools.SP_FLOAT_STATUS_KEY_STATUS);
 
-        if (floatRD) {
-            openRDcontinueService();
+        if (floatRD && SysUtils.isServiceRunning(this,CycleReportRDLocService.class.getName())) {
             mainCenterRDReportTxt.setText(Config.RD_RUNNING);
+            SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE,true);
+            SharedPreferencesHelper.put(Constant.SP_RN_REPORT_STATE,false);
+            mainCenterRNReportTxt.setText(Config.RN_WAITING);
         } else {
             mainCenterRDReportTxt.setText(Config.RD_WAITING);
+            SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE,false);
         }
-        if (floatRN) {
-            openRNcontinueService();
+        if (floatRN && SysUtils.isServiceRunning(this,CycleReportRNLocService.class.getName())) {
+
             mainCenterRNReportTxt.setText(Config.RN_RUNNING);
+            SharedPreferencesHelper.put(Constant.SP_RN_REPORT_STATE,true);
+            mainCenterRDReportTxt.setText(Config.RD_WAITING);
+            SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE,false);
+
         } else {
             mainCenterRNReportTxt.setText(Config.RN_WAITING);
+            SharedPreferencesHelper.put(Constant.SP_RN_REPORT_STATE,false);
         }
 //        if (floatStatus) {
 //            openStatucontinueService(context);
@@ -223,55 +236,49 @@ public class MainCenterActivity extends BaseActivity {
                 startActivity(intent);
                 break;
             case R.id.main_center_daohang_layout:
-                Utils.goToBaiduMap(this,0,0,"请设置导航终点");
+                Utils.goToBaiduMap(this, 0, 0, "请设置导航终点");
                 break;
             case R.id.main_center_state_layout:
-                Toast.makeText(this,"功能尚未开发完成，敬请期待！",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "功能尚未开发完成，敬请期待！", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.main_center_RNReport_layout:
-                if(SysUtils.isServiceRunning(this, CycleReportRDLocService.class.getName())){
-                    Toast.makeText(this,getResources().getString(R.string.stop_RD_report),Toast.LENGTH_SHORT).show();
+                if (SysUtils.isServiceRunning(this, CycleReportRDLocService.class.getName())) {
+                    Toast.makeText(this, getResources().getString(R.string.stop_RD_report), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(SysUtils.isServiceRunning(this, CycleReportSOSService.class.getName())){
-                    Toast.makeText(this,getResources().getString(R.string.stop_SOS_service),Toast.LENGTH_SHORT).show();
+                if (SysUtils.isServiceRunning(this, CycleReportSOSService.class.getName())) {
+                    Toast.makeText(this, getResources().getString(R.string.stop_SOS_service), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(SysUtils.isServiceRunning(this, CycleLocService.class.getName())){
-                    Toast.makeText(this,getResources().getString(R.string.stop_RD_Location),Toast.LENGTH_SHORT).show();
+                if (SysUtils.isServiceRunning(this, CycleLocService.class.getName())) {
+                    Toast.makeText(this, getResources().getString(R.string.stop_RD_Location), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                String rnStr = mainCenterRNReportTxt.getText().toString().trim();
-                if (Config.RN_RUNNING.equals(rnStr)) {
-                    mainCenterRNReportTxt.setText(Config.RN_WAITING);
-                    SharedPreferencesHelper.put(Constant.SP_RN_REPORT_STATE, false);
-                    closeLorReportService(CycleReportRNLocService.class);
-                } else {
-                    openRNcontinueService();
-                }
+                isServiceStart(ReportSet.REPORTSET_RN);
 
                 break;
             case R.id.main_center_RDReport_layout:
 //                String rnStr = tv_rd.getText().toString().trim();
-                if(SysUtils.isServiceRunning(this, CycleReportRNLocService.class.getName())){
-                    Toast.makeText(this,"请先关闭RN连续位置报告！",Toast.LENGTH_SHORT).show();
+                if (SysUtils.isServiceRunning(this, CycleReportRNLocService.class.getName())) {
+                    Toast.makeText(this, getResources().getString(R.string.stop_RN_report), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(SysUtils.isServiceRunning(this, CycleLocService.class.getName())){
-                    Toast.makeText(this,"请先关闭RD连续定位申请！",Toast.LENGTH_SHORT).show();
+                if (SysUtils.isServiceRunning(this, CycleLocService.class.getName())) {
+                    Toast.makeText(this, getResources().getString(R.string.stop_RD_Location), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if (SharedPreferencesHelper.getRDReportState()) {
-
-                    closeLorReportService(CycleReportRDLocService.class);
-                } else {
-                    openRDcontinueService();
+                if (SysUtils.isServiceRunning(this, CycleReportSOSService.class.getName())) {
+                    Toast.makeText(this, getResources().getString(R.string.stop_SOS_service), Toast.LENGTH_SHORT).show();
+                    return;
                 }
+
+                isServiceStart(ReportSet.REPORTSET_RD);
+
                 break;
             case R.id.main_center_SOS_layout:
                 Intent intent1 = new Intent(this, SoSsetActivity.class);
@@ -286,138 +293,74 @@ public class MainCenterActivity extends BaseActivity {
     }
 
     /**
-     * 关闭RD连续位置报告服务
+     * 判断服务是否开启
      */
-    private void closeLorReportService(Class clazz) {
 
-        String className = clazz.getName();
-        boolean isStart = SysUtils.isServiceRunning(this, className);
+    private void isServiceStart(String tag){
+        switch (tag){
+            case ReportSet.REPORTSET_RD:
+                String className = CycleReportRDLocService.class.getName();
+                boolean isStart = SysUtils.isServiceRunning(this, className);
 
-//		Intent mIntent=new Intent();
-//		mIntent.setClass(mContext,clazz);
-//		mContext.stopService(mIntent);
+                if(isStart){//如果开启就需要关闭
+                    mainCenterRDReportTxt.setText(Config.RD_WAITING);
+                    SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE, false);
 
-        /**
-         * 判断方法为什么失效
-         */
+                    coreService.isServiceStart(ReportSet.REPORTSET_RD);
+                    Log.e(TAG, "LERRY_RDREPORT: =================MainCenterActivity311=======关闭RD连续位置报告服务====");
 
-        if (!isStart) {//如果开着服务，就要关闭
-            mainCenterRDReportTxt.setText(Config.RD_RUNNING);
-            SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE, true);
-
-//            Intent mIntent = new Intent();
-//            mIntent.setClass(this, clazz);
-//            this.stopService(mIntent);
-        } else {
-            mainCenterRDReportTxt.setText(Config.RD_WAITING);
-            SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE, false);
-
-            Intent mIntent = new Intent();
-            mIntent.setClass(this, clazz);
-            Log.e(TAG, "LERRY_RDREPORT: =================MainCenterActivity183=======关闭RD/RN连续位置报告服务====");
-
-            if(isBind){
-                this.unbindService(myConn);
-            }
-            this.stopService(mIntent);
-        }
-    }
-
-
-    /**
-     * 开启RD连续位置报告服务
-     */
-    private void openRDcontinueService() {
-        boolean result = openLorReportService("", ReportSet.REPORTSET_RD, "", CycleReportRDLocService.class);
-
-        if (result) {
-            mainCenterRDReportTxt.setText(Config.RD_RUNNING);
-            SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE, true);
-        } else {
-            mainCenterRDReportTxt.setText(Config.RD_WAITING);
-            SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE, false);
-        }
-    }
-
-    /**
-     * 开启RD连续位置报告服务
-     */
-    private boolean openLorReportService(String sendNumStr, String reportType, String reportStatus, Class clazz) {
-        String clssName = clazz.getName();
-        boolean isStart = SysUtils.isServiceRunning(this, clssName);
-        boolean result = false;
-
-        try {
-            //开启 连续报位服务
-            if (!isStart) {
-                //不在运行 就开启
-                if (sendNumStr.isEmpty()) {
-                    sendNumStr = "";
+                }else {//开启
+                    coreService.isServiceStart(ReportSet.REPORTSET_RD);
+                    mainCenterRDReportTxt.setText(Config.RD_RUNNING);
+                    SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE, true);
+                    Log.e(TAG, "LERRY_RDREPORT: =================MainCenterActivity326=======开启RD连续位置报告服务====");
                 }
-                Intent service = new Intent(this, clazz);
-                //service.putExtra("reportType", reportType);
-                service.putExtra("sendNumStr", sendNumStr);
-                service.putExtra("reportStatus", reportStatus);
-                this.startService(service);
-                bindService(service, myConn, 0);
-                //closeViewPager();
-                Log.e(TAG, "LERRY_RDREPORT: =================MainCenterActivity224=======开启RD/RN连续位置报告服务====");
-                result = true;
-            } else {
-                // 在运行 什么都不做
-                Toast.makeText(this, "服务正在运行,再次开启失败!", Toast.LENGTH_SHORT).show();
 
-                result = true;
+                break;
 
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            result = false;
+            case ReportSet.REPORTSET_RN:
+
+                String className1 = CycleReportRNLocService.class.getName();
+                boolean isStart1 = SysUtils.isServiceRunning(this, className1);
+
+                if(isStart1){//如果开启就需要关闭
+                    mainCenterRNReportTxt.setText(Config.RN_WAITING);
+                    SharedPreferencesHelper.put(Constant.SP_RN_REPORT_STATE, false);
+
+                    coreService.isServiceStart(ReportSet.REPORTSET_RN);
+                    Log.e(TAG, "LERRY_RDREPORT: =================MainCenterActivity342=======关闭RN连续位置报告服务====");
+
+                }else {//开启
+                    coreService.isServiceStart(ReportSet.REPORTSET_RN);
+                    mainCenterRNReportTxt.setText(Config.RN_RUNNING);
+                    SharedPreferencesHelper.put(Constant.SP_RN_REPORT_STATE, true);
+                    Log.e(TAG, "LERRY_RDREPORT: =================MainCenterActivity357=======开启RN连续位置报告服务====");
+                }
+
+                break;
         }
-        return result;
     }
 
 
-    /**
-     * 开启RN连续位置报告服务
-     */
-    private void openRNcontinueService() {
-        boolean result = openLorReportService("", ReportSet.REPORTSET_RN, "", CycleReportRNLocService.class);
+    /*private class MyConn implements ServiceConnection {
 
-        if (result) {
-            mainCenterRNReportTxt.setText(Config.RN_RUNNING);
-            SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE, true);
-        } else {
-            mainCenterRNReportTxt.setText(Config.RN_WAITING);
-            SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE, false);
-        }
-
-    }
-
-    @OnClick(R.id.tishi_total_txt)
-    public void onViewClicked() {
-    }
-
-
-    private class MyConn implements ServiceConnection {
-
-        /**
+        *//**
          * 当服务被成功绑定时候调用
-         */
+         *//*
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
 
-            Log.d(TAG, "onServiceConnected");
+            Log.w(TAG, "LERRY_RDREPORT====================onServiceConnected");
             isBind = true;
 
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Log.d(TAG, "onServiceDisconnected");
+            Log.w(TAG, "LERRY_RDREPORT====================onServiceDisconnected");
             isBind = false;
         }
 
-    }
+    }*/
 
 }

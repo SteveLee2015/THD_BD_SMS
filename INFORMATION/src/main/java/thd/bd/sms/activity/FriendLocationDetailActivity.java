@@ -97,7 +97,6 @@ public class FriendLocationDetailActivity extends BaseActivity {
         addReceiver();
         oper = new FriendsLocationDatabaseOperation(this);
         list = oper.getAllByAddress(address);
-        Log.e(TAG, "LERRY_YOULIN==================FriendLocationDetailActivity89=======address==" + address + "====list==" + list.size());
 
         message_title = (RelativeLayout) findViewById(R.id.message_title);
         message_title.setVisibility(View.VISIBLE);
@@ -168,10 +167,11 @@ public class FriendLocationDetailActivity extends BaseActivity {
                                 //显示地图
 
                                 Intent intent = new Intent(FriendLocationDetailActivity.this, FriendLocationMapActivity.class);
-                                intent.putExtra("latitude", String.valueOf(list.get(position).get(
+                                intent.putExtra("latitude", String.valueOf(list.get(index).get(
                                         "FRIEND_LAT")));
-                                intent.putExtra("longitude", String.valueOf(list.get(position).get(
+                                intent.putExtra("longitude", String.valueOf(list.get(index).get(
                                         "FRIEND_LON")));
+
                                 startActivity(intent);
 
                                 break;

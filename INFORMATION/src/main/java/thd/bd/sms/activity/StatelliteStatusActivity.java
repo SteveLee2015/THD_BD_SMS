@@ -2,6 +2,7 @@ package thd.bd.sms.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,6 +35,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import thd.bd.sms.R;
+import thd.bd.sms.application.SMSApplication;
 import thd.bd.sms.base.BaseActivity;
 import thd.bd.sms.bean.GpsLocationEvent;
 import thd.bd.sms.bean.MyLocationBean;
@@ -103,6 +105,7 @@ public class StatelliteStatusActivity extends BaseActivity implements View.OnCli
     }
 
     private Handler mHandler = new Handler() {
+        @SuppressLint("LongLogTag")
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -112,10 +115,12 @@ public class StatelliteStatusActivity extends BaseActivity implements View.OnCli
                         mGPSLocationStatus.setText("状态:已定位");
                         int lon = (int) (mBDRNSSLocation.getLongitude() * 100000);
                         int lat = (int) (mBDRNSSLocation.getLatitude() * 100000);
-                        int height = (int) (mBDRNSSLocation.getAltitude() * 100);
+                        double height = mBDRNSSLocation.getAltitude();
                         //mGPSLocationResult.setText("("+lon/100000.0+","+lat/100000.0+","+height/100.0+")");
                         mGPSLocationResult.setText((lon / 100000.0) + " , " + (lat / 100000.0));
-                        mGPSLocationHeight.setText((height / 100.0) + "m");
+                        if(height!=0.0){
+                            mGPSLocationHeight.setText(height + "m");
+                        }
                     } else {
                         mGPSLocationStatus.setText("状态:未定位");
                         mGPSLocationResult.setText("0,0");
@@ -153,7 +158,7 @@ public class StatelliteStatusActivity extends BaseActivity implements View.OnCli
         EventBus.getDefault().register(this);
 //        mSharePref = getSharedPreferences("BD_BLUETOOTH_PREF", 0);
 
-        locationManager = BaseActivity.locationManager;
+        locationManager = SMSApplication.locationManager;//lerry_??
 
 //        Intent intent = getIntent();
 //        if (intent != null) {
@@ -172,13 +177,6 @@ public class StatelliteStatusActivity extends BaseActivity implements View.OnCli
             intFlag = intent.getIntExtra(Config.FLAG_TAG, -1);
         }
 
-        ll_gps_bd2.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
 
         mCustomBDSnr = (CustomSatelliateSnr) this.findViewById(R.id.gps_snr_view);
         mCustomBDMap = (CustomSatelliateMap) this.findViewById(R.id.gps_map_view);
@@ -206,14 +204,6 @@ public class StatelliteStatusActivity extends BaseActivity implements View.OnCli
                 break;
         }
 
-
-        ll_gps_bd2.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
 
         switch (intFlag) {
             case Config.FLAG_GPS:
@@ -344,6 +334,7 @@ public class StatelliteStatusActivity extends BaseActivity implements View.OnCli
     };
 
     //更新显示内容的方法
+    @SuppressLint("LongLogTag")
     public void updateView(Location location) {
         if (location == null) {
             if (mGPSLocationStatus != null) {
@@ -363,6 +354,7 @@ public class StatelliteStatusActivity extends BaseActivity implements View.OnCli
 
             return;
         }
+
         Message msg = Message.obtain();
         msg.what = LOCATION_RESULT;
         msg.obj = location;
@@ -512,12 +504,6 @@ public class StatelliteStatusActivity extends BaseActivity implements View.OnCli
 
     }
 
-    @Override
-    public void onComLocation(Location location) {
-        super.onComLocation(location);
-
-        Log.e("LERRYTEST_MAP", "=========StatelliteStatusActivity440=======location==" + location.getLatitude() + "," + location.getLongitude());
-    }
 
     @Override
     public void onClick(View view) {

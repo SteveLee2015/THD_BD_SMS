@@ -18,31 +18,40 @@
             android:orientation="vertical">
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/dp_20"
-                android:layout_marginTop="@dimen/dp_20"
-                android:text="关于我"
-                android:textColor="@color/colorWhite"
-                android:textSize="@dimen/sp_17" />
-
-            <TextView
                 android:id="@+id/setting_bd_card"
                 style="@style/setting_card_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dp_20"
                 android:layout_marginTop="@dimen/dp_10"
+                android:textSize="@dimen/sp_15"
+                android:textStyle="italic|bold"
                 android:text="北斗卡号：" />
 
             <TextView
-                android:id="@+id/setting_sim_card"
+                android:id="@+id/setting_sim_level"
                 style="@style/setting_card_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dp_20"
                 android:layout_marginTop="@dimen/dp_10"
-                android:text="SIM卡号：" />
+                android:textSize="@dimen/sp_15"
+                android:textStyle="italic|bold"
+                android:text="通信等级：" />
+
+            <TextView
+                android:id="@+id/setting_serice_feq"
+                style="@style/setting_card_style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_20"
+                android:layout_marginTop="@dimen/dp_10"
+                android:layout_marginBottom="@dimen/dp_10"
+                android:textSize="@dimen/sp_15"
+                android:layout_marginRight="@dimen/dp_20"
+                android:textStyle="italic|bold"
+                android:text="服务频度：" />
+
 
         </LinearLayout>
 
@@ -55,15 +64,17 @@
             android:gravity="bottom"
             android:orientation="vertical">
 
+
             <TextView
-                android:id="@+id/setting_company_name"
+                android:id="@+id/setting_sim_max_length"
                 style="@style/setting_card_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dp_20"
-                android:layout_marginTop="@dimen/dp_20"
-                android:layout_marginBottom="@dimen/dp_10"
-                android:text="单位名称：" />
+                android:layout_marginTop="@dimen/dp_10"
+                android:textSize="@dimen/sp_15"
+                android:textStyle="italic|bold"
+                android:text="最大通信长度：" />
 
             <View
                 android:layout_width="match_parent"
@@ -72,22 +83,28 @@
                 android:background="@color/colorLine" />
 
             <TextView
+                android:id="@+id/setting_jiami"
+                style="@style/setting_card_style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_20"
+                android:layout_marginTop="@dimen/dp_10"
+                android:textSize="@dimen/sp_15"
+                android:layout_marginRight="@dimen/dp_20"
+                android:textStyle="italic|bold"
+                android:text="是否密卡：" />
+
+            <TextView
                 android:id="@+id/setting_serial_number"
                 style="@style/setting_card_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dp_20"
                 android:layout_marginTop="@dimen/dp_10"
-                android:text="序列号" />
-
-            <TextView
-                android:id="@+id/setting_pindu"
-                style="@style/setting_card_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/dp_20"
-                android:layout_marginTop="@dimen/dp_10"
-                android:text="服务频度" />
+                android:layout_marginRight="@dimen/dp_20"
+                android:textSize="@dimen/sp_15"
+                android:textStyle="italic|bold"
+                android:text="序列号：" />
 
         </LinearLayout>
 

@@ -16,6 +16,8 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import thd.bd.sms.bean.BDCache;
@@ -113,6 +115,11 @@ public class SysUtils {
             Toast.makeText(mContext, "抱歉,缓存溢出!", Toast.LENGTH_SHORT).show();
 
         } else {
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String time = sdf.format(new Date());
+            Log.e("dispatchData", "dispatchData: =============time=="+time );
+            mBdCache.setCacheTime(time);
 
             operation.insert(mBdCache);//插入数据
             int count = operation.getCount();//获取数据

@@ -79,14 +79,14 @@ public class SoftwareActivity extends BaseActivity {
                 String[] versionInfos = appVersion.split(":");
                 String versionName = versionInfos[0];
                 String versionDate = versionInfos[1];
-                versionTextView.setText("软件版本:" + versionName);
-                dataTextView.setText("日期:" + versionDate);
+                versionTextView.setText("软件版本：" + versionName);
+                dataTextView.setText("日期：" + versionDate);
             } catch (Exception e) {
                 Toast.makeText(this, "获取软件版本信息错误!!", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         } else {
-            versionTextView.setText("软件版本:" + appVersion);
+            versionTextView.setText("软件版本：" + appVersion);
         }
 
         //图片 9连击

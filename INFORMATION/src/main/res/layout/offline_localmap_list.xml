@@ -37,6 +37,7 @@
         android:background="@drawable/btn_bg_selector"
         android:textColor="@color/colorSettingText"
         android:textSize="@dimen/sp_13"
+        android:visibility="gone"
         android:text="查看" />
 
     <Button

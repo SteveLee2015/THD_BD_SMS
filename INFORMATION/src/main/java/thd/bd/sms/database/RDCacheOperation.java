@@ -53,6 +53,7 @@ public class RDCacheOperation {
         //contentValues.put(RDCacheColumns.COLUMNS_TAG ,cache.getTag());
         contentValues.put(RDCacheColumns.COLUMNS_MSG_CONTENT, cache.getMsgContent());
         contentValues.put(RDCacheColumns.COLUMNS_WORD, cache.getCacheContent());
+        contentValues.put(RDCacheColumns.COLUMNS_TIME,cache.getCacheTime());
         long id = database.insert(RDCacheColumns.TABLE_NAME, null, contentValues);
         closeDB(database);
         return id;
@@ -67,7 +68,8 @@ public class RDCacheOperation {
      */
     public List<BDCache> getAll() throws SQLException {
         SQLiteDatabase database = databaseHelper.getReadableDatabase();
-        String orderBy = RDCacheColumns.COLUMNS_PRIORITY + " ASC";
+        String orderBy = RDCacheColumns.COLUMNS_TIME + " DESC";
+//        String orderBy = RDCacheColumns.COLUMNS_PRIORITY + " ASC";
         //String orderBy = RDCacheColumns.COLUMNS_PRIORITY + " DESC";
         // 查询
         Cursor mCursor = database.query(
@@ -80,7 +82,8 @@ public class RDCacheOperation {
                         RDCacheColumns.COLUMNS_PRIORITY,
                         //RDCacheColumns.COLUMNS_TAG,
                         RDCacheColumns.COLUMNS_MSG_CONTENT,
-                        RDCacheColumns.COLUMNS_WORD},
+                        RDCacheColumns.COLUMNS_WORD,
+                        RDCacheColumns.COLUMNS_TIME},
                 null,
                 null,
                 null,
@@ -97,6 +100,7 @@ public class RDCacheOperation {
             //cache.setTag(mCursor.getString(mCursor.getColumnIndex(RDCacheColumns.COLUMNS_TAG)));
             cache.setMsgContent(mCursor.getString(mCursor.getColumnIndex(RDCacheColumns.COLUMNS_MSG_CONTENT)));
             cache.setCacheContent(mCursor.getString(mCursor.getColumnIndex(RDCacheColumns.COLUMNS_WORD)));
+            cache.setCacheTime(mCursor.getString(mCursor.getColumnIndex(RDCacheColumns.COLUMNS_TIME)));
             list.add(cache);
         }
         mCursor.close();
@@ -120,7 +124,8 @@ public class RDCacheOperation {
                         RDCacheColumns.COLUMNS_PRIORITY,
                         //RDCacheColumns.COLUMNS_TAG,
                         RDCacheColumns.COLUMNS_MSG_CONTENT,
-                        RDCacheColumns.COLUMNS_WORD},
+                        RDCacheColumns.COLUMNS_WORD,
+                        RDCacheColumns.COLUMNS_TIME},
                 null, null, null, null, null, null);
         int count = mCursor.getCount();
         mCursor.close();
@@ -148,7 +153,8 @@ public class RDCacheOperation {
                         RDCacheColumns.COLUMNS_PRIORITY,
                         //RDCacheColumns.COLUMNS_TAG,
                         RDCacheColumns.COLUMNS_MSG_CONTENT,
-                        RDCacheColumns.COLUMNS_WORD},
+                        RDCacheColumns.COLUMNS_WORD,
+                RDCacheColumns.COLUMNS_TIME},
                 null, null, null, null, orderBy, null);
         if (mCursor == null) {
             closeDB(database);
@@ -171,6 +177,8 @@ public class RDCacheOperation {
                         .getColumnIndex(RDCacheColumns.COLUMNS_MSG_CONTENT)));
                 cache.setCacheContent(mCursor.getString(mCursor
                         .getColumnIndex(RDCacheColumns.COLUMNS_WORD)));
+                cache.setCacheTime(mCursor.getString(mCursor.getColumnIndex(RDCacheColumns.COLUMNS_TIME)));
+
                 mCursor.close();
                 closeDB(database);
                 return cache;

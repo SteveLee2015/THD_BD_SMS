@@ -11,6 +11,8 @@ public class ReportSet {
 	public static final String REPORTSET_RD = "2";
 	public static final String REPORTSET_SOS = "3";
 
+
+
 	//默认频率
 	public static final String REPORTSET_DEFAULT_REPORT_HZ = "0";
 	//默认天线高
@@ -27,7 +29,20 @@ public class ReportSet {
 	 * 报告平台号
 	 */
 	private String reportNnm;
-	
+
+	public String getReportSOSContent() {
+		return reportSOSContent;
+	}
+
+	public void setReportSOSContent(String reportSOSContent) {
+		this.reportSOSContent = reportSOSContent;
+	}
+
+	/**
+	 * 报告内容
+	 */
+	private String reportSOSContent;
+
 	/**
 	 * 报告频度
 	 */

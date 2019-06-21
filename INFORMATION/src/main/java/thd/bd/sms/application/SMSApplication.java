@@ -1,5 +1,6 @@
 package thd.bd.sms.application;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.Notification;
@@ -11,6 +12,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -20,7 +22,15 @@ import android.location.BDLocation;
 import android.location.BDLocationReport;
 import android.location.BDMessageInfo;
 import android.location.BDUnknownException;
+import android.location.GpsSatellite;
+import android.location.GpsStatus;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Build;
+import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -37,14 +47,21 @@ import org.greenrobot.eventbus.EventBus;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import thd.bd.sms.R;
+import thd.bd.sms.activity.MainActivity;
+import thd.bd.sms.base.BaseActivity;
 import thd.bd.sms.bean.BDCache;
 import thd.bd.sms.bean.BDContactColumn;
+import thd.bd.sms.bean.DBLocation;
 import thd.bd.sms.bean.FriendsLocation;
+import thd.bd.sms.bean.GpsLocationEvent;
+import thd.bd.sms.bean.SatelliteInfo;
 import thd.bd.sms.database.BDMessageDatabaseOperation;
 import thd.bd.sms.database.FriendsLocationDatabaseOperation;
 import thd.bd.sms.database.RDCacheOperation;
@@ -58,6 +75,7 @@ import thd.bd.sms.utils.DBhelper;
 import thd.bd.sms.utils.DateUtils;
 import thd.bd.sms.utils.ReceiverAction;
 import thd.bd.sms.utils.Utils;
+import thd.bd.sms.view.GspStatesManager;
 
 
 public class SMSApplication extends Application {
@@ -67,6 +85,9 @@ public class SMSApplication extends Application {
     public boolean openCrash = true; // 关闭或打开 crah重启
     public BDCmdManager bdCmdManager;
     public static LocationService locationService;
+    public static LocationManager locationManager;
+    private double mCurrentLat = 0.0;
+    private double mCurrentLon = 0.0;
     private RDCacheOperation cacheOperation;
 
     private static final String TAG = "SMSApplication";
@@ -81,233 +102,6 @@ public class SMSApplication extends Application {
         return null;
     }
 
-    /*//接收短报文广播接收器
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            switch (action) {
-                case BDConstants.BD_MESSAGE_BROAD_ACTION:
-                    BDMessageInfo mBDMessage = intent.getParcelableExtra(BDConstants.BDRDSS_MESSAGE);
-                    String message = "";
-                    try {
-                        message = new String(mBDMessage.getMessage(), "GBK");
-                        Log.i(TAG, "LERRY_TXR: =====================接收到短报文==" + message);
-
-                        storeMsg(appContext, mBDMessage.getmUserAddress(), message);
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
-
-    private BDEventListener.BDFKIListener mBDFKIListener = new BDEventListener.BDFKIListener() {
-
-        @Override
-        public void onCmd(String s, boolean b) {
-            Log.e("LERRY_FKI", "mBDFKIListener: ======================onCmd=======s==" + s + "===========b==" + b);
-
-            cacheOperation = new RDCacheOperation(appContext);
-
-            if (cacheOperation.getFirst() == null) {
-                return;
-            }
-
-            BDCache firstCache = cacheOperation.getFirst();
-
-            switch (s) {
-                case "WBA":
-                    if (b) {
-                        //删除最上面的一条信息
-                        String msgType = firstCache.getMsgType();
-                        if (BDCache.RD_REPORT_FLAG.equals(msgType)) {
-                            dispatchData(firstCache);
-                            notifyData();
-                            Toast.makeText(appContext, "位置报告2发送成功!",Toast.LENGTH_SHORT).show();
-                        }
-                    }else {
-                        Toast.makeText(appContext, "位置报告2发送失败!",Toast.LENGTH_SHORT).show();
-                    }
-
-                    break;
-
-                case "DWA":
-                    if (b) {
-                        //删除最上面的一条信息
-                        String msgType = firstCache.getMsgType();
-                        if (BDCache.RD_LOCATION_FLAG.equals(msgType)) {
-                            dispatchData(firstCache);
-                            notifyData();
-                            Toast.makeText(appContext, "定位命令发送成功!",Toast.LENGTH_SHORT).show();
-                        }
-                    }else {
-                        Toast.makeText(appContext, "定位命令发送成功!",Toast.LENGTH_SHORT).show();
-                    }
-
-                    break;
-
-                case "WAA":
-                    if (b) {
-                        //删除最上面的一条信息
-                        String msgType = firstCache.getMsgType();
-                        if (BDCache.RN_REPORT_FLAG.equals(msgType)) {
-                            dispatchData(firstCache);
-                            notifyData();
-                            Toast.makeText(appContext, "位置报告1发送成功!",Toast.LENGTH_SHORT).show();
-                        }
-                    }else {
-                        Toast.makeText(appContext, "位置报告1发送失败!",Toast.LENGTH_SHORT).show();
-                    }
-
-                    break;
-
-                case "TXA":
-                    if (b) {
-                        //删除最上面的一条信息
-                        String msgType = firstCache.getMsgType();
-                        if (BDCache.SMS_FLAG.equals(msgType)) {
-                            dispatchData(firstCache);
-                            notifyData();
-                            Toast.makeText(appContext, "北斗短报文发送成功!",Toast.LENGTH_SHORT).show();
-                        }
-                    }else {
-                        Toast.makeText(appContext, "北斗短报文发送失败!",Toast.LENGTH_SHORT).show();
-                    }
-
-                    break;
-            }
-        }
-
-        @Override
-        public void onTime(int i) {
-            Log.e("LERRY_FKI", "mBDFKIListener: ======================onTime=======i==" + i);
-        }
-
-        @Override
-        public void onSystemLauncher() {
-            Log.e("LERRY_FKI", "mBDFKIListener: ======================onSystemLauncher=======");
-        }
-
-        @Override
-        public void onPower() {
-            Log.e("LERRY_FKI", "mBDFKIListener: ======================onPower=======");
-        }
-
-        @Override
-        public void onSilence() {
-            Log.e("LERRY_FKI", "mBDFKIListener: ======================onSilence=======");
-        }
-    };
-
-    *//**
-     * 读取北斗卡信息监听类
-     *//*
-    private BDEventListener.LocalInfoListener localInfoListener = new BDEventListener.LocalInfoListener() {
-
-        @Override
-        public void onCardInfo(android.location.CardInfo cardInfo) {
-            Log.e("TEST", "======================>cardInfo " + cardInfo.getCardAddress());
-
-            EventBus.getDefault().postSticky(cardInfo);
-//            EventBus.getDefault().post(cardInfo);
-
-            //卡等级
-            if (cardInfo.getCommLevel() == 0) {
-                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_COMMLEVEL, 0);
-            } else {
-                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_COMMLEVEL, cardInfo.getCommLevel());
-            }
-            //是否加密
-            if (cardInfo.getCheckEncryption() == null) {
-                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_CHECKENCRYPITION, "");
-            } else {
-                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_CHECKENCRYPITION, cardInfo.getCheckEncryption());
-            }
-
-            //频度
-            if (cardInfo.getSericeFeq() == 0) {
-                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_SERICEFEQ, 0);
-            } else {
-                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_SERICEFEQ, cardInfo.getSericeFeq());
-            }
-            //是否有卡+卡号
-            if (cardInfo.getCardAddress() == null) {
-                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_ADDRESS, "");
-            } else {
-                SharedPreferencesHelper.put(Constant.SP_CARD_INFO_ADDRESS, cardInfo.getCardAddress());
-            }
-        }
-    };
-
-    private String beams = "";
-    *//**
-     * 读取波束信息监听类
-     *//*
-    private BDEventListener.BDBeamStatusListener bdBeamStatusListener = new BDEventListener.BDBeamStatusListener() {
-        @Override
-        public void onBeamStatus(BDBeam bdBeam) {
-            for (Integer beam : bdBeam.getBeamWaves()) {
-                beams += (beam + ",");
-            }
-            Log.e(TAG, "LERRYTEST_bs: =======SMSApplication96============波束=========="+beams );
-            beams = "";
-            EventBus.getDefault().post(bdBeam);
-        }
-    };
-
-    *//**
-     * 监听队列中发送数据的位置和等待时间
-     *//*
-    private BDCmdTimeOutListener bdCmdTimeOutListener = new BDCmdTimeOutListener() {
-        @Override
-        public void onTimeOut(Map<Integer, Long> map) {
-            for (Integer key : map.keySet()) {
-                Log.w("TEST1", "==========key =" + key + ", value =" + map.get(key));
-            }
-        }
-    };
-
-    *//**
-     * 读取RDSS位置信息监听类
-     *//*
-    private BDEventListener.BDLocationListener bdLocationListener = new BDEventListener.BDLocationListener() {
-        @Override
-        public void onLocationChange(BDLocation bdLocation) {
-            EventBus.getDefault().post(bdLocation);
-            bdLocation.dumpInfo();
-
-            Log.e("TEST", "=================> bdLocationListener lat =" + bdLocation.getLatitude() + ",lon =" + bdLocation.getLongitude());
-        }
-    };
-
-    *//**
-     * 读取位置报告信息监听类
-     *//*
-    private BDEventListener.BDLocReportListener bdLocReportListener = new BDEventListener.BDLocReportListener() {
-        @Override
-        public void onLocReport(BDLocationReport bdLocationReport) {
-            Toast.makeText(appContext, "bdLocReportListener lat =" + bdLocationReport.getLatitude() + ",lon =" + bdLocationReport.getLongitude(), Toast.LENGTH_SHORT).show();
-            Log.e("TEST", "=================> bdLocReportListener lat =" + bdLocationReport.getLatitude() + ",lon =" + bdLocationReport.getLongitude());
-            boolean isAdd = mAddLocationReportToDatabase(bdLocationReport, Config.RD_DWR);
-            notifcation(ReceiverAction.APP_ACTION_FRIEND_LOCATION_21);
-            notificationSMS(bdLocationReport.mUserAddress, bdLocationReport.mLatitude + "," + bdLocationReport.mLongitude);
-        }
-    };*/
-
-    /**
-     * 通知数据有更新
-     *//*
-    private void notifcation(String action) {
-
-        Intent intent = new Intent();
-        intent.setAction(action);
-        appContext.sendBroadcast(intent);
-
-    }*/
 
     @Override
     public void onCreate() {
@@ -329,9 +123,6 @@ public class SMSApplication extends Application {
 
         initMap();
 
-//        initBDService();
-
-//        initGreenDao();
     }
 
     private void initMap() {
@@ -345,39 +136,33 @@ public class SMSApplication extends Application {
          * 初始化定位sdk，建议在Application中创建
          */
         locationService = new LocationService(getApplicationContext());
-    }
 
-    /**
-     * 注册北斗接收监听器
-     */
-    /*private void initBDService() {
-        registerReceiver();
-        try {
-            bdCmdManager.addBDEventListener(localInfoListener, bdBeamStatusListener, bdCmdTimeOutListener, bdLocationListener, bdLocReportListener, mBDFKIListener);
-        } catch (BDUnknownException e) {
-            e.printStackTrace();
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
+//        locationService.registerListener(mListener);
+        //注册监听
+        locationService.setLocationOption(locationService.getDefaultLocationClientOption());
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
         }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
+        locationManager.addGpsStatusListener(mGpslistener);
+        GspStatesManager.getInstance().addSatellitesListener(mSatellitesListener);
+        GspStatesManager.getInstance().addLocationListener(mRnLocationlistener);
+
+
+        locationService.start();
     }
 
-
-    private void registerReceiver() {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(BDConstants.BD_MESSAGE_BROAD_ACTION);
-        registerReceiver(receiver, filter);
-        Log.e(TAG, "registerReceiver: ===========已注册registerReceiver=========" );
-    }
-
-    private void unRegisterReceiver() {
-        if (receiver != null) {
-            try{
-                unregisterReceiver(receiver);
-            }catch (IllegalArgumentException e){
-                e.printStackTrace();
-                Log.e(TAG, "unRegisterReceiver: ==========IllegalArgumentException===========" );
-            }
-
-        }
-    }*/
 
     @Override
     public void onTerminate() {
@@ -385,6 +170,16 @@ public class SMSApplication extends Application {
         //第三方日志反注册
         LogManager.getManager(getApplicationContext()).unregisterCrashHandler();
         BDCmdManager.getInstance(this).onDestroy();
+
+        locationManager.removeUpdates(locationListener);
+        locationManager.removeGpsStatusListener(mGpslistener);
+        GspStatesManager.getInstance().removeStatellitesListener(mSatellitesListener);
+        GspStatesManager.getInstance().removeLocationListener(mRnLocationlistener);
+
+        if (mCurrentLat != 0.0 && mCurrentLon != 0.0) {
+            SharedPreferencesHelper.put(Constant.SP_KEY_RN_LOCATION_LAT, mCurrentLat);
+            SharedPreferencesHelper.put(Constant.SP_KEY_RN_LOCATION_LON, mCurrentLon);
+        }
 
 //        SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE, false);
 //        SharedPreferencesHelper.put(Constant.SP_RN_REPORT_STATE, false);
@@ -404,258 +199,158 @@ public class SMSApplication extends Application {
     }
 
     /**
-     * 保存短报文
-     *
-     * @param context
-     * @param bdAddress
-     * @param msg
+     * 在7寸屏中 没有改功能
+     * 获得RNSS卫星数据的监听器 1.如果当前单北斗模式，则每次获得的数据都是北斗卫星的数据。
+     * 对北斗卫星数据进行遍历，获得当前北斗参与定位的卫星数目并显示出来。 2.如果当前单GPS模式，则每次获得的数据都是GPS卫星的数据。
+     * 对GPS卫星数据进行遍历，获得当前GPS参与定位的卫星数目并显示出来。 3.如果当前是混合模式，则一次获得GPS卫星数据，一次获得北斗卫星数据。
+     * 先解析GPS卫星数据，获得GPS参与定位的卫星数目，然后解析北斗卫星 数据获得北斗参与定位的卫星数目,把两次解析出来的卫星数目增加并显示出来。
      */
-   /* private void storeMsg(Context context, String bdAddress, String msg) {
+    protected GpsStatus.Listener mGpslistener = new GpsStatus.Listener() {
+        GpsStatus mGpsStatus;
 
-        //此处要根据 bdAddress 收件号码 查询出收件人再保存到数据库
-        String userAddres = bdAddress;
-        if (userAddres.startsWith("0")) {
-            userAddres = userAddres.substring(1, userAddres.length());
-        }
-        List<Map<String, Object>> contactList = DBhelper.queryContactDB(context, userAddres);
-        if (contactList != null && contactList.size() > 0) {
-            for (Map<String, Object> map : contactList) {
-                String userName = (String) map.get(BDContactColumn.USER_NAME);
-                BDMessageDatabaseOperation messageOperation = new BDMessageDatabaseOperation(context);
-                thd.bd.sms.bean.BDMessageInfo info = new thd.bd.sms.bean.BDMessageInfo();
-                info.setmUserAddress(bdAddress);
-                info.setUserName(userName);
-                info.setMessage(msg);
-                info.setMsgType(Integer.parseInt(BDMessageDatabaseOperation.MSG_TYPE_NOT_READ));
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String date = sdf.format(new Date());
-                info.setmSendTime(date);
-                long rawId = messageOperation.insert(info, BDMessageDatabaseOperation.MSG_TYPE_NOT_READ);
-                break;
-            }
-        } else {
-            BDMessageDatabaseOperation messageOperation = new BDMessageDatabaseOperation(context);
-            thd.bd.sms.bean.BDMessageInfo info = new thd.bd.sms.bean.BDMessageInfo();
-            info.setmUserAddress(bdAddress);
-            info.setMessage(msg);
-            info.setMsgType(Integer.parseInt(BDMessageDatabaseOperation.MSG_TYPE_NOT_READ));
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String date = sdf.format(new Date());
-            info.setmSendTime(date);
-            long rawId = messageOperation.insert(info, BDMessageDatabaseOperation.MSG_TYPE_NOT_READ);
-        }
-
-
-        notificationSMS(userAddres, msg);
-
-        //通知  聊天界面更新数据广播
-        Intent refreshIntent = new Intent();
-        refreshIntent.putExtra(ReceiverAction.APP_KEY_SMS_RECEIVER, bdAddress);
-        refreshIntent.setAction(ReceiverAction.APP_ACTION_SMS_REFRESH);
-        if(Build.VERSION.SDK_INT >= 26) {
-            ComponentName componentName=new ComponentName(getApplicationContext(),"");//参数1-包名 参数2-广播接收者所在的路径名
-            refreshIntent.setComponent(componentName);
-//            refreshIntent.addFlags(0x01000000);//加上这句话，可以解决在android8.0系统以上2个module之间发送广播接收不到的问题}
-        }
-        context.sendOrderedBroadcast(refreshIntent, null);
-
-//        int flag = Integer.valueOf(BDMessageDatabaseOperation.MSG_TYPE_RECEIVER).intValue();
-//        if (flag == 3) {
-//            Intent receiverIntent1 = new Intent();
-//            receiverIntent1.setAction("com.bd.action.BD_SMS_ICON_ACTION");
-//            context.sendBroadcast(receiverIntent1);
-//        }
-    }
-
-
-    *//**
-     * notification 短报文通知栏提醒
-     *//*
-    private void notificationSMS(String address, String msg) {
-        Log.e(TAG, "LERRY_TXA: =======SMSApplication短报文显示通知方法================");
-
-        Intent notificationIntent = new Intent(appContext, CommunicationFragment.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(appContext, 0,
-                notificationIntent, 0);
-
-        @SuppressLint("ResourceType") InputStream is = appContext.getResources().openRawResource(R.mipmap.notification_new_sms);
-        //InputStream is = mContext.getResources().openRawResource(R.drawable.qqqqqq);
-//		InputStream is = mContext.getResources().openRawResource(R.drawable.xxoo);
-        Bitmap mBitmap = BitmapFactory.decodeStream(is);
-
-
-        NotificationManager notificationManager = (NotificationManager) appContext.getSystemService(NOTIFICATION_SERVICE);
-
-        String channelId = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            channelId = "0516";
-            NotificationChannel channel = new NotificationChannel(channelId, "lerry", NotificationManager.IMPORTANCE_HIGH);
-            channel.enableLights(false); //是否在桌面icon右上角展示小红点   
-//            channel.setLightColor(Color.RED); //小红点颜色   
-            channel.setShowBadge(true); //是否在久按桌面图标时显示此渠道的通知   
-            notificationManager.createNotificationChannel(channel);
-
-        }
-
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(appContext, "0516");
-        builder.setContentTitle("来自" + address + "的消息")
-                .setContentText("消息内容:" + msg)
-                .setContentIntent(contentIntent)//点击意图
-                .setTicker("您有新消息!")
-                .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
-                .setPriority(Notification.PRIORITY_DEFAULT)
-                .setAutoCancel(true)//用户点击就自动消失
-                //.setOngoing(true)//ture，设置他为一个正在进行的通知。他们通常是用来表示一个后台任务,用户积极参与(如播放音乐)或以某种方式正在等待,因此占用设备(如一个文件下载,同步操作,主动网络连接)
-                .setDefaults(Notification.DEFAULT_VIBRATE)//向通知添加声音、闪灯和振动效果的最简单、最一致的方式是使用当前的用户默认设置，使用defaults属性，可以组合
-                .setDefaults(Notification.DEFAULT_SOUND)//向通知添加声音、闪灯和振动效果的最简单、最一致的方式是使用当前的用户默认设置，使用defaults属性，可以组合
-                //Notification.DEFAULT_ALL  Notification.DEFAULT_SOUND 添加声音 // requires VIBRATE permission
-                .setLargeIcon(mBitmap)
-                //.setColor(Color.parseColor("#EAA935"))
-                .setColor(Color.parseColor("#3191e8"))
-                //.setSmallIcon(R.drawable.notification_new_sms);//设置通知小ICON
-                .setSmallIcon(R.mipmap.notification_new_sms_small);//设置通知小ICON
-        Notification notification = builder.build();
-        notification.flags = Notification.FLAG_AUTO_CANCEL;
-        notificationManager.notify(Config.NOTIFICATION_SMS, notification);
-        //notificationManager.cancel(100);//通知以后自动消失了
-    }
-
-
-    *//**
-     * 保存友邻位置到数据库
-     *
-     * @param report
-     * @return
-     *//*
-    private boolean mAddLocationReportToDatabase(BDLocationReport report, int flag) {
-
-        FriendsLocationDatabaseOperation oper = new FriendsLocationDatabaseOperation(appContext);
-
-
-        double latitude = report.getLatitude();
-        double longitude = report.getLongitude();
-
-        //2.1 转换为 °的问题
-        double latitudeNew = Utils.changeLonLatMinuteToDegree(Double.valueOf(latitude));
-        double longitudeNew = Utils.changeLonLatMinuteToDegree(Double.valueOf(longitude));
-
-
-        //latitude = Double.parseDouble(latiFormat);
-        //longitude = Double.parseDouble(longiFormat);
-
-        report.setLatitude(latitudeNew);
-        report.setLongitude(longitudeNew);
-
-        String reportTime = report.getReportTime();
-
-        Log.e(TAG, "mAddLocationReportToDatabase: =============reportTime==" + reportTime);
-
-        //本地时间
-        String time = "00:00:00.00";
-        if (reportTime.length() >= 6) {
-            String hh = reportTime.substring(0, 2);
-            int anInt = Integer.parseInt(hh);
-            int beijingTime = (anInt + 8) % 24;
-            String mm = reportTime.substring(2, 4);
-            String ss = reportTime.substring(4, 6);
-
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-dd");
-            String ymd = simpleDateFormat.format(new Date());
-
-            time = ymd + "\t" + beijingTime + ":" + mm + ":" + ss;
-        }
-
-        *//*String[] split = cbTime[0].split(":");
-        if (split != null) {
-            String hh = split[0];
-            if (hh.length() > 2) {
-                //去除 年月日  2016-12-08 15:27:3 崩溃bug
-                String[] arr = hh.split("\\s+");
-                for (String ss : arr) {
-                    System.out.println(ss);
+        @Override
+        public void onGpsStatusChanged(int event) {
+            if (locationManager != null) {
+                if (ActivityCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
                 }
-                if (arr.length > 1) {
-                    hh = arr[arr.length - 1];
+//                Log.e("LERRYTEST_RN", "=========BaseActivity145=========event=="+event);
+                mGpsStatus = locationManager.getGpsStatus(null);
+                switch (event) {
+                    case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
+//                        if (app.isBlueToothModel()) return;
+                        Iterable<GpsSatellite> satellites = mGpsStatus.getSatellites();
+                        Iterator<GpsSatellite> it = satellites.iterator();
+                        List<GpsSatellite> list = new ArrayList<GpsSatellite>();
+                        while (it.hasNext()) {
+                            GpsSatellite satellite = it.next();
+                            // add by llg
+                            if (satellite.usedInFix()) {
+                                //已经定位 卫星
+
+                            }
+                            list.add(satellite);
+                        }
+
+                        EventBus.getDefault().post(list);
+//                        Log.e("LERRYTEST_RN", "=========BaseActivity164=========list=="+list.size());
+//                        Message msg = Message.obtain();
+//                        msg.what = GP_SATELLIATE_STATUS;
+//                        msg.obj = list;
+//                        mHandler.sendMessage(msg);
+
+                        break;
+                    default:
+                        break;
                 }
             }
-            int anInt = Integer.parseInt(hh);
-            int reportTimeInt = 0;
-            //怎么区分 rd 时间  和  rn时间
-            switch (flag) {
-                case Config.RN_RD_WAA:
-                    reportTimeInt = (anInt + 8) % 24;
-                    break;
-                case Config.RD_DWR:
-                    reportTimeInt = anInt;
-                    break;
-            }
-
-            //int reportTimeInt = (anInt+8)%24;
-
-            int i = reportTime.indexOf(":");
-            String otherStr = reportTime.substring(i, reportTime.length());
-            reportTime = reportTimeInt + otherStr;
-        }*//*
-
-        FriendsLocation fl = new FriendsLocation();
-        fl.setUserId(report.getUserAddress());
-        fl.setLat(String.valueOf(report.getLatitude()));
-        fl.setLon(String.valueOf(report.getLongitude()));
-        fl.setHeight(String.valueOf(report.getHeight()));
-        fl.setReportTime(time);
-        boolean isTrue = oper.insert(fl);
-        Log.e(TAG, "mAddLocationReportToDatabase: =======是否保存到数据库========" + isTrue + ",========time==" + time);
-        oper.close();
-        return isTrue;
-    }
-
-
-    *//**
-     * 删除数据记录
-     *
-     * @param firstCache
-     *//*
-    private void dispatchData(BDCache firstCache) {
-        cacheOperation.delete(firstCache);
-        if (BDCache.PRIORITY_MAX == firstCache.getPriority()) {
-            //删除的紧急救援条数
-            //记录在app中
-            Config.SOS_COUNT++;
-            //  sos服务启动的时候清理一次
-            // 发送广播 更新数据
-            Intent sosCountIntent = new Intent();
-            sosCountIntent.setAction(ReceiverAction.BD_ACTION_SOS_UI_SOS_SIZE);
-            sosCountIntent.putExtra(ReceiverAction.BD_KEY_SOS_UI_SOS_SIZE, Config.SOS_COUNT);
-            appContext.sendBroadcast(sosCountIntent);
         }
-        int count = cacheOperation.getCount();
-        SharedPreferencesHelper.put(Constant.SP_RECORDED_KEY_COUNT, count);
-    }
+    };
 
-    *//**
-     * 通知数据变化
-     *//*
-    private void notifyData() {
-        Intent intent = new Intent();
-        intent.setAction(ReceiverAction.DB_ACTION_ON_DATA_CHANGE_ADD);
-        appContext.sendBroadcast(intent );
-    }*/
 
+    GspStatesManager.ISatellitesListener mSatellitesListener = new GspStatesManager.ISatellitesListener() {
+        @Override
+        public void onSatelliteInfo(ArrayList<SatelliteInfo> list) {
+//            onSatlitesStatus(list);
+//            EventBus.getDefault().post(list);
+        }
+
+        @Override
+        public void onUpdateRnss(DBLocation gga) {
+            Location location = new Location("");
+            location.setLatitude(gga.getLatitude());
+            location.setLongitude(gga.getLongitude());
+            location.setAltitude(gga.getAltitude());
+            location.setTime(gga.getTime());
+//            onComLocation(location);
+
+//            Toast.makeText(appContext,"onUpdateRnss.....lat="+location.getLatitude()+"===lng="+location.getLongitude(),Toast.LENGTH_SHORT).show();
+
+//            Log.e(TAG, "LERRYTEST_MAP: ===============有权限了，去放肆吧=GspStatesManager.ISatellitesListener========");
+
+        }
+    };
+
+    GspStatesManager.ILocationListener mRnLocationlistener = new GspStatesManager.ILocationListener() {
+        @Override
+        public void onLocationChanged(DBLocation location) {
+
+            Location location1 = new Location("");
+            location1.setLatitude(location.getLatitude());
+            location1.setLongitude(location.getLongitude());
+            location1.setAltitude(location.getAltitude());
+            location1.setTime(location.getTime());
+//            onComLocation(location1);
+//            Log.e(TAG, "LERRYTEST_MAP: ===============有权限了，去放肆吧=GspStatesManager.ILocationListener========");
+//            Log.e("LERRYTEST_MAP", "=========SMSApplication292=======location==" + location.getLatitude() + "," + location.getLongitude());
+//            Toast.makeText(appContext,"ILocationListener.....lat="+location.getLatitude()+"===lng="+location.getLongitude(),Toast.LENGTH_SHORT).show();
+        }
+    };
 
     /**
-     * 初始化GreenDao,直接在Application中进行初始化操作
+     * 定位监听，定位都要用这个
      */
-//    private void initGreenDao() {
-//        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "BD_SMS.db");
-//        SQLiteDatabase db = helper.getWritableDatabase();
-//        DaoMaster daoMaster = new DaoMaster(db);
-//        daoSession = daoMaster.newSession();
-//    }
-//
-//    private DaoSession daoSession;
-//    public DaoSession getDaoSession() {
-//        return daoSession;
-//    }
+    LocationListener locationListener = new LocationListener() {
+
+        // 位置改变时被调用
+        @Override
+        public void onLocationChanged(Location location) {
+
+
+            if (location != null) {
+                if (location.getLatitude() != 0.0 && location.getLongitude() != 0.0) {
+                    locationService.stop();
+                }
+                mCurrentLat = location.getLatitude();
+                mCurrentLon = location.getLongitude();
+
+//                onComLocation(location);
+                EventBus.getDefault().post(new GpsLocationEvent(location));
+//                Log.e("LERRYTEST_MAP", "=========SMSApplication318=======location==" + location.getLatitude() + "," + location.getLongitude());
+//                Toast.makeText(appContext,"onLocationChanged.....lat="+location.getLatitude()+"===lng="+location.getLongitude(),Toast.LENGTH_SHORT).show();
+            }
+
+        }
+
+        // 用户禁用具有定位功能的硬件时被调用
+        @Override
+        public void onProviderDisabled(String provider) {
+            //updateView(null);
+
+        }
+
+        // 用户启用具有定位功能的硬件时被调用
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        // 定位功能硬件状态改变时被调用
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            switch (status) {
+                // GPS状态为可见时
+                case LocationProvider.AVAILABLE:
+//                    Toast.makeText(appContext, "当前GPS状态为可见状态", Toast.LENGTH_SHORT).show();
+                    break;
+                // GPS状态为服务区外时
+                case LocationProvider.OUT_OF_SERVICE:
+//                    Toast.makeText(appContext, "当前GPS状态为服务区外状态", Toast.LENGTH_SHORT).show();
+                    break;
+                // GPS状态为暂停服务时
+                case LocationProvider.TEMPORARILY_UNAVAILABLE:
+//                    Toast.makeText(appContext, "当前GPS状态为暂停服务状态", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
 
 }

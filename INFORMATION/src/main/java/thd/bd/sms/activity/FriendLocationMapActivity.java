@@ -3,6 +3,7 @@ package thd.bd.sms.activity;
 import android.app.Dialog;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.Window;
 import android.widget.LinearLayout;
@@ -21,12 +22,20 @@ import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.Calendar;
+import java.util.Date;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import thd.bd.sms.R;
 import thd.bd.sms.base.BaseActivity;
+import thd.bd.sms.bean.MyLocationBean;
 import thd.bd.sms.utils.SysUtils;
 import thd.bd.sms.utils.Utils;
 import thd.bd.sms.utils.WinUtils;
@@ -66,6 +75,7 @@ public class FriendLocationMapActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         WinUtils.setWinTitleColor(this);
 
+        EventBus.getDefault().register(this);
 
         //绑定初始化ButterKnife
         unbinder = (Unbinder) ButterKnife.bind(this);
@@ -207,16 +217,16 @@ public class FriendLocationMapActivity extends BaseActivity {
         mapView.onDestroy();
         mapView = null;
         unbinder.unbind();
+        EventBus.getDefault().unregister(this);
     }
 
 
-    @Override
-    public void onComLocation(Location location) {
-        Log.e("LERRYTEST_MAP", "=========MapActivity113=======location==" + location.getLatitude() + "," + location.getLongitude());
-        super.onComLocation(location);
 
-        if (location != null && location.getLatitude() != 0.0 && location.getLongitude() != 0.0) {
-            myLocation = new LatLng(location.getLatitude(), location.getLongitude());
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getLatlng(MyLocationBean myLocationBean) {
+
+        if (myLocationBean != null && myLocationBean.getLatitude() != 0.0 && myLocationBean.getLongitude() != 0.0) {
+            myLocation = new LatLng(myLocationBean.getLatitude(), myLocationBean.getLongitude());
             myLocation(Utils.baiduMapJP(myLocation));
 //            myLocation(myLocation);
 

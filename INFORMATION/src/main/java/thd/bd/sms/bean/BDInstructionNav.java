@@ -2,6 +2,7 @@ package thd.bd.sms.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
  * @author steve
  */
 public class BDInstructionNav implements Parcelable {
+    private final String TAG = "BDInstructionNav";
 
     private long rowId;
 
@@ -95,14 +97,20 @@ public class BDInstructionNav implements Parcelable {
 
     public String getEvadePointsString() {
         if (evadePoints != null) {
-            String str = "";
-            for (BDPoint mBDPoint : evadePoints) {
-                str += (mBDPoint.fomatString() + ",");
+            try{
+                String str = "";
+                for (BDPoint mBDPoint : evadePoints) {
+                    str += (mBDPoint.fomatString() + ",");
+                }
+                return str.substring(0, str.length() - 1);
+            }catch (StringIndexOutOfBoundsException e){
+                e.printStackTrace();
+                Log.e(TAG, "getEvadePointsString: ===================="+e.getMessage() );
             }
-            return str.substring(0, str.length() - 1);
         } else {
             return null;
         }
+        return null;
     }
 
     public long getRowId() {

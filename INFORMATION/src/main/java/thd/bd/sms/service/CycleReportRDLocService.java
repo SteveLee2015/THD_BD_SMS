@@ -69,7 +69,7 @@ public class CycleReportRDLocService extends CycleReportService {
     public void onDestroy() {
         timeTask.getInstance().destroyed();
         Logger.d(TAG, "onDestroy");
-        SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE,false);
+//        SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE,false);
         super.onDestroy();
     }
 

@@ -102,6 +102,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		//public static final String COLUMNS_TAG="TAG";//是否已经发送标示
 		public static final String COLUMNS_MSG_CONTENT="MSG_CONTENT";//消息内容 短报文-是为短报文 /位置报告-位置报告/定位申请-定位申请
 		public static final String COLUMNS_WORD = "RD_CACHE"; //缓存rd数据  经过build之后的byte[]
+		public static final String COLUMNS_TIME = "CACHE_TIME";
 	}
 	/**
 	 * 状态列表
@@ -318,7 +319,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			+ RDCacheColumns.COLUMNS_MSG_TYPE+TEXT_TYPE+COMMA_SEP
 			+ RDCacheColumns.COLUMNS_PRIORITY+TEXT_TYPE+COMMA_SEP
 			+ RDCacheColumns.COLUMNS_MSG_CONTENT+TEXT_TYPE+COMMA_SEP
-			+ RDCacheColumns.COLUMNS_WORD
+			+ RDCacheColumns.COLUMNS_WORD+COMMA_SEP
+            + RDCacheColumns.COLUMNS_TIME
 			+TEXT_TYPE+" )";
 	/**
 	 * 删除rd缓存表

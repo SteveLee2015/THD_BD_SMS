@@ -82,7 +82,7 @@
         <EditText
             android:id="@+id/et_content"
             android:hint="请输入救援信息"
-            android:inputType="number"
+            android:inputType="text"
             android:layout_marginLeft="@dimen/dp_45"
             android:textColorHint="@color/text_hint"
             android:layout_width="match_parent"

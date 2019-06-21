@@ -28,6 +28,7 @@ public class MyLocationBean {
     private double longitude;
     private double radius;
     private String address;
+    private double altitude;
 
     public long getTime() {
         return time;
@@ -83,5 +84,13 @@ public class MyLocationBean {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public double getAltitude() {
+        return altitude;
+    }
+
+    public void setAltitude(double altitude) {
+        this.altitude = altitude;
     }
 }

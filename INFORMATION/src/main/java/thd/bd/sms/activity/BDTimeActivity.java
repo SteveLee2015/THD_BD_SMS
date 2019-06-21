@@ -88,6 +88,7 @@ public class BDTimeActivity extends BaseActivity {
                 }
 
                 case COMPLETE_GO_BD_TIME: {
+//                    Log.e(TAG, "LERRY_TIME: ============handleMessage=========" );
                     updateTime((Calendar) msg.obj);
                     break;
                 }
@@ -118,6 +119,8 @@ public class BDTimeActivity extends BaseActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getLatlng(MyLocationBean myLocationBean) {
 
+//        Log.e(TAG, "LERRY_TIME: ============getLatlng=========" );
+
         if (myLocationBean != null && myLocationBean.getTime() != 0) {
             locationTime = myLocationBean.getTime();
         }
@@ -128,7 +131,8 @@ public class BDTimeActivity extends BaseActivity {
         message.what = COMPLETE_GO_BD_TIME;
         message.obj = calendar;
         mHandler.sendMessage(message);
-        Log.e("LERRYTEST_MAP", "=========BDTimeActivity81=======location==" + myLocationBean.getTime());
+//        Log.e("LERRYTEST_MAP", "=========BDTimeActivity81=======location==" + myLocationBean.getTime());
+
     }
 
     @OnClick({R.id.return_home_layout, R.id.time_jiaoshi_btn})
@@ -142,7 +146,7 @@ public class BDTimeActivity extends BaseActivity {
                 // 判断 服务是否在运行
                 // 连续 rd报告服务  rn报告服务 状态服务 定位服务
                 // 弹出对话框
-                String clssName1 = CycleReportRDLocService.class.getName();
+                /*String clssName1 = CycleReportRDLocService.class.getName();
                 boolean isStart1 = SysUtils.isServiceRunning(this, clssName1);
 
                 String clssName2 = CycleReportRNLocService.class.getName();
@@ -189,7 +193,7 @@ public class BDTimeActivity extends BaseActivity {
                     //弹出提示对话框  请关闭连续rd报告
                     Toast.makeText(this,"校时前,请关闭SOS救援服务!",Toast.LENGTH_SHORT).show();
                     return;
-                }
+                }*/
 
                 if (locationTime != 0) {
 //                    if (app.isBlueToothModel()) {
@@ -243,6 +247,7 @@ public class BDTimeActivity extends BaseActivity {
     }
 
     private void updateTime(Calendar calendar) {
+//        Log.e(TAG, "LERRY_TIME: ============updateTime=========" );
 
         String s,f,m,n,y,r,w;//时，分，秒，年，月，日，周
         s = Utils.showTwoBitNum(calendar.get(Calendar.HOUR_OF_DAY));
@@ -253,14 +258,12 @@ public class BDTimeActivity extends BaseActivity {
         y = Utils.showTwoBitNum(calendar.get(Calendar.MONTH) + 1);
         r = Utils.showTwoBitNum(calendar.get(Calendar.DAY_OF_MONTH));
         w = Utils.getCurrentWeekDay(calendar.get(calendar.DAY_OF_WEEK) - 1);
-        timeSfm.setText(s+":"+f+":"+m);
-        timeYmd.setText(n+"年"+y+"月"+r+"日，星期"+w);
+        if(timeSfm!=null){
+            timeSfm.setText(s+":"+f+":"+m);
+        }
+        if(timeYmd!=null){
+            timeYmd.setText(n+"年"+y+"月"+r+"日，星期"+w);
+        }
     }
 
-    @Override
-    public void onComLocation(Location location) {
-        super.onComLocation(location);
-
-        Log.e("LERRYTEST_MAP", "=========BDTimeActivity123=======location==" + location.getTime());
-    }
 }

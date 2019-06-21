@@ -29,20 +29,23 @@ import thd.bd.sms.activity.ReportSetActivity;
 import thd.bd.sms.activity.SoSsetActivity;
 import thd.bd.sms.activity.SoftwareActivity;
 import thd.bd.sms.activity.StateCodeActivity;
+import thd.bd.sms.sharedpreference.Constant;
+import thd.bd.sms.sharedpreference.SharedPreferencesHelper;
+import thd.bd.sms.utils.Utils;
 
 public class SettingFragment extends Fragment {
     private static final String TAG = "SettingFragment";
 
     @BindView(R.id.setting_bd_card)
     TextView settingBdCard;
-    @BindView(R.id.setting_sim_card)
-    TextView settingSimCard;
-    @BindView(R.id.setting_company_name)
-    TextView settingCompanyName;
+    @BindView(R.id.setting_sim_level)
+    TextView settingSimLevel;
+    @BindView(R.id.setting_serice_feq)
+    TextView settingSericeFeq;
     @BindView(R.id.setting_serial_number)
     TextView settingSerialNumber;
-    @BindView(R.id.setting_pindu)
-    TextView settingPindu;
+    @BindView(R.id.setting_jiami)
+    TextView settingJiami;
     Unbinder unbinder;
     @BindView(R.id.setting_time_layout)
     LinearLayout settingTimeLayout;
@@ -58,6 +61,8 @@ public class SettingFragment extends Fragment {
     LinearLayout settingSOSLayout;
     @BindView(R.id.setting_about_layout)
     LinearLayout settingAboutLayout;
+    @BindView(R.id.setting_sim_max_length)
+    TextView settingSimMaxLength;
     private View view;
 
     private CardInfo cardInfo;
@@ -72,10 +77,17 @@ public class SettingFragment extends Fragment {
 
         unbinder = ButterKnife.bind(this, view);
 
-        if (cardInfo != null) {
+        if (cardInfo != null && !"2031958".equals(cardInfo.getCardAddress())) {
             settingBdCard.setText("北斗卡号：" + cardInfo.getCardAddress());
             settingSerialNumber.setText("序列号：" + cardInfo.getSerialNum());
-            settingPindu.setText("服务频度：" + cardInfo.getSericeFeq());
+            if("N".equals(cardInfo.getCheckEncryption())){
+                settingJiami.setText("是否密卡：否");
+            }else if("E".equals(cardInfo.getCheckEncryption())){
+                settingJiami.setText("是否密卡：是");
+            }
+            settingSimLevel.setText("通信等级：" + cardInfo.getCommLevel() + "级");
+            settingSimMaxLength.setText("最大通信长度：" + Utils.getMessageMaxLength() + " bit");
+            settingSericeFeq.setText("服务频度："+cardInfo.getSericeFeq()+"秒");
         } else {
             BDCmdManager bdCmdManager = BDCmdManager.getInstance(getContext());
             bdCmdManager.sendAccessCardInfoCmdBDV21(0, 0);
@@ -122,8 +134,49 @@ public class SettingFragment extends Fragment {
 
         this.cardInfo = cardInfo;
 
-        //这里需要把卡数据存到本地
+        setCardInfoToView();
+    }
 
+    private void setCardInfoToView() {
+        //这里需要把卡数据存到本地
+        //卡等级
+        if (cardInfo.getCommLevel() == 0) {
+            SharedPreferencesHelper.put(Constant.SP_CARD_INFO_COMMLEVEL, 0);
+        } else {
+            SharedPreferencesHelper.put(Constant.SP_CARD_INFO_COMMLEVEL, cardInfo.getCommLevel());
+        }
+        //是否加密
+        if (cardInfo.getCheckEncryption() == null) {
+            SharedPreferencesHelper.put(Constant.SP_CARD_INFO_CHECKENCRYPITION, "");
+        } else {
+            SharedPreferencesHelper.put(Constant.SP_CARD_INFO_CHECKENCRYPITION, cardInfo.getCheckEncryption());
+        }
+
+        //频度
+        if (cardInfo.getSericeFeq() == 0) {
+            SharedPreferencesHelper.put(Constant.SP_CARD_INFO_SERICEFEQ, 0);
+        } else {
+            SharedPreferencesHelper.put(Constant.SP_CARD_INFO_SERICEFEQ, cardInfo.getSericeFeq());
+        }
+        //是否有卡+卡号
+        if (cardInfo.getCardAddress() == null) {
+            SharedPreferencesHelper.put(Constant.SP_CARD_INFO_ADDRESS, "");
+        } else {
+            SharedPreferencesHelper.put(Constant.SP_CARD_INFO_ADDRESS, cardInfo.getCardAddress());
+        }
+
+        if (cardInfo != null && !"2031958".equals(cardInfo.getCardAddress())) {
+            settingBdCard.setText("北斗卡号：" + cardInfo.getCardAddress());
+            settingSerialNumber.setText("序列号：" + cardInfo.getSerialNum());
+            if("N".equals(cardInfo.getCheckEncryption())){
+                settingJiami.setText("是否密卡：否");
+            }else if("E".equals(cardInfo.getCheckEncryption())){
+                settingJiami.setText("是否密卡：是");
+            }
+            settingSimLevel.setText("通信等级：" + cardInfo.getCommLevel() + "级");
+            settingSimMaxLength.setText("最大通信长度：" + Utils.getMessageMaxLength() + " bit");
+            settingSericeFeq.setText("服务频度："+cardInfo.getSericeFeq()+"秒");
+        }
     }
 
 
@@ -136,7 +189,7 @@ public class SettingFragment extends Fragment {
     }
 
     @OnClick({R.id.setting_time_layout, R.id.setting_report_layout,
-            R.id.setting_RDLocation_layout,R.id.setting_duanyu_layout,
+            R.id.setting_RDLocation_layout, R.id.setting_duanyu_layout,
             R.id.setting_custom_layout, R.id.setting_SOS_layout,
             R.id.setting_about_layout})
 
@@ -168,7 +221,7 @@ public class SettingFragment extends Fragment {
                 startActivity(intent);
                 break;
             case R.id.setting_about_layout:
-                intent = new Intent(getActivity(),SoftwareActivity.class);
+                intent = new Intent(getActivity(), SoftwareActivity.class);
                 startActivity(intent);
                 break;
         }

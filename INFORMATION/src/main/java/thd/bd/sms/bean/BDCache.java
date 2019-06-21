@@ -31,6 +31,7 @@ public class BDCache {
 	private String tag = TAG_NEED_SEND;//消息发送tag
 	private String msgContent;//消息内容
 	private String cacheContent;//缓存内容
+	private String cacheTime;//缓存时间
 	
 	
 	public int getId() {
@@ -75,7 +76,15 @@ public class BDCache {
 	public void setTag(String tag) {
 		this.tag = tag;
 	}
-	
+
+	public String getCacheTime() {
+		return cacheTime;
+	}
+
+	public void setCacheTime(String cacheTime) {
+		this.cacheTime = cacheTime;
+	}
+
 	@Override
 	public String toString() {
 		return "BDCache [id=" + id + ", sendAddress=" + sendAddress

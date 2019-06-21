@@ -32,10 +32,11 @@
             android:id="@+id/sub_title_name"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:layout_marginLeft="10dip"
+            android:layout_marginLeft="@dimen/dp_10"
             android:ellipsize="end"
             android:gravity="center"
             android:singleLine="true"
+            android:textSize="@dimen/sp_16"
             android:textColor="@color/colorWhite"
             android:text=""/>
     </LinearLayout>

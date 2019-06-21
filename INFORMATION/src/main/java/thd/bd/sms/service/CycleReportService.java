@@ -457,6 +457,8 @@ public class CycleReportService extends Service {
                     // 修改 发送内容 不需要 编码处理
                     sava2db(reportSet.getReportNnm(),-1,content,str);
 
+                    reportSet.setReportSOSContent(content);
+
                     //通知界面更新  发广播
                     Intent mIntent = new Intent();
                     mIntent.putExtra(ReceiverAction.APP_KEY_SMS_RECEIVER, reportSet.getReportNnm());

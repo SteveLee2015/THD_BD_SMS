@@ -72,7 +72,7 @@
             </LinearLayout>
 
             <EditText
-                android:id="@+id/tishi_lat"
+                android:id="@+id/tishi_lon"
                 style="@style/locTxtStyle2"
                 android:hint="请输入经度"
                 android:inputType="numberDecimal" />
@@ -93,7 +93,7 @@
             </LinearLayout>
 
             <EditText
-                android:id="@+id/tishi_lon"
+                android:id="@+id/tishi_lat"
                 style="@style/locTxtStyle2"
                 android:hint="请输入纬度"
                 android:inputType="numberDecimal" />

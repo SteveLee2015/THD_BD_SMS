@@ -73,6 +73,7 @@ import thd.bd.sms.bean.UsalMsg;
 import thd.bd.sms.database.BDMessageDatabaseOperation;
 import thd.bd.sms.database.DataBaseHelper.BDMessageColumns;
 import thd.bd.sms.database.MessgeUsualOperation;
+import thd.bd.sms.database.RDCacheOperation;
 import thd.bd.sms.service.CycleLocService;
 import thd.bd.sms.service.CycleReportRDLocService;
 import thd.bd.sms.service.CycleReportRNLocService;
@@ -91,10 +92,11 @@ import thd.bd.sms.view.CommomDialogList;
  *
  * @author llg
  */
-public class ReplyMessageActivity extends BaseActivity implements OnClickListener, OnLayoutChangeListener{
+public class ReplyMessageActivity extends BaseActivity implements OnClickListener, OnLayoutChangeListener {
 
 
     protected static final String TAG = "ReplyMessageActivity";
+    private RDCacheOperation cacheOperation;
     private EditText messageContent;//发送内容
     private ListView mBDDetailsMessageList = null;
     private LinearLayout returnLayout = null;
@@ -135,7 +137,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
     private LinearLayout receiver;
     private ImageView addMore;//更多
     private LinearLayout ll_sendButton;//发送
-//    private ImageView queryContractImageview;
+    //    private ImageView queryContractImageview;
     private EditText mEtSimNumTXT;//卡号
     private String simNumStr;//收件人号
     private LinearLayout ll_more_info;//详细信息
@@ -283,9 +285,11 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
         IntentFilter filter = new IntentFilter();
         filter.addAction(ReceiverAction.APP_ACTION_SMS_REFRESH);
         filter.addAction(ReceiverAction.APP_ACTION_SMS_NEW_DIALOG);
+        filter.addAction(ReceiverAction.DB_ACTION_ON_DATA_CHANGE_ADD);
         filter.setPriority(ReceiverAction.BD_PRIORITY_D);
         registerReceiver(smsDataChangReceiver, filter);
     }
+
 
     @Override
     protected void onResume() {
@@ -372,7 +376,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 // 保存数据到sp中
 
-                SharedPreferencesHelper.put(simNumStr,isChecked);
+                SharedPreferencesHelper.put(simNumStr, isChecked);
                 if (isChecked) {
                     mEtSimNumTXT.setHint("请输入手机号");
                 } else {
@@ -544,6 +548,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
                 }
             }
         });
+
         mEtSimNumTXT.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -599,9 +604,9 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
             checkSendPhoneSMS.setChecked(false);
         }
 
-        if("".equals(mUserName)){
+        if ("".equals(mUserName)) {
             titleName.setText("新建报文");
-        }else {
+        } else {
             titleName.setText(mUserName);
         }
         // 实现分页查询
@@ -624,6 +629,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
      * 初始化 UI
      */
     private void initUI() {
+        cacheOperation = new RDCacheOperation(this);
 
         activityRootView = findViewById(R.id.root_layout);
         checkSendPhoneSMS = (CheckBox) this.findViewById(R.id.checkSendPhoneSMS);
@@ -668,18 +674,18 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
                 break;
 
             case R.id.ll_sendButton: {
-                if(SysUtils.isServiceRunning(this, CycleReportRDLocService.class.getName())){
-                    Toast.makeText(this,getResources().getString(R.string.stop_RD_report),Toast.LENGTH_SHORT).show();
+                if (SysUtils.isServiceRunning(this, CycleReportRDLocService.class.getName())) {
+                    Toast.makeText(this, getResources().getString(R.string.stop_RD_report), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(SysUtils.isServiceRunning(this, CycleLocService.class.getName())){
-                    Toast.makeText(this,getResources().getString(R.string.stop_RD_Location),Toast.LENGTH_SHORT).show();
+                if (SysUtils.isServiceRunning(this, CycleLocService.class.getName())) {
+                    Toast.makeText(this, getResources().getString(R.string.stop_RD_Location), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(SysUtils.isServiceRunning(this, CycleReportRNLocService.class.getName())){
-                    Toast.makeText(this,getResources().getString(R.string.stop_RN_report),Toast.LENGTH_SHORT).show();
+                if (SysUtils.isServiceRunning(this, CycleReportRNLocService.class.getName())) {
+                    Toast.makeText(this, getResources().getString(R.string.stop_RN_report), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 sendFunctionSMS();
@@ -692,13 +698,13 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
     }
 
     private void openPopwindow() {
-        String[] strings = new String[]{"联系人","短语模板"};
+        String[] strings = new String[]{"联系人", "短语模板"};
 
         new CommomDialogList(ReplyMessageActivity.this, R.style.dialog_aa, strings, new CommomDialogList.OnCloseListener() {
             @Override
             public void onClick(Dialog dialog, int position) {
                 dialog.dismiss();
-                switch (position){
+                switch (position) {
                     case 0:
                         Intent intent = new Intent();
                         intent.setClass(ReplyMessageActivity.this, BDContactActivity.class);
@@ -756,7 +762,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
         }
 
         if (simNumStr.contains("(")) {
-            phonecontent = simNumStr.substring(0,simNumStr.lastIndexOf("("));
+            phonecontent = simNumStr.substring(0, simNumStr.lastIndexOf("("));
         }
 
         //判断是否勾选 checkbox 发送到手机
@@ -808,7 +814,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
                 sendPhoneSMS(phonecontent, content);
 
             } else {
-                Log.e(TAG, "LERRY_TXA: =======ReplyMessageActivity810=============正常短报文发送=="+content);
+                Log.e(TAG, "LERRY_TXA: =======ReplyMessageActivity810=============正常短报文发送==" + content);
                 sendSMS(content);
             }
             //保存数据到数据库
@@ -848,7 +854,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
 
         try {
 //            String msg ="你好呀为什么短报文不行呢";
-            cmdManager.sendSMSCmdBDV21( phoneNumber, 1 , Utils.checkMsgEncodeMode(content) , "N" , content);
+            cmdManager.sendSMSCmdBDV21(phoneNumber, 1, Utils.checkMsgEncodeMode(content), "N", content);
         } catch (BDUnknownException e) {
             e.printStackTrace();
         } catch (BDParameterException e) {
@@ -858,7 +864,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
 //        int priority = txa.getmPriority();
         BDCache mBdCache = new BDCache();
         /*if (priority < 0) {//短信内容优先级
-                *//*public static final int PRIORITY_MAX = 0;//紧急救援
+         *//*public static final int PRIORITY_MAX = 0;//紧急救援
                 public static final int PRIORITY_1 = 100;//最高优先级 定位申请
                 public static final int PRIORITY_3 = 300;//次之优先级 短报文 位置报告
                 public static final int PRIORITY_5 = 500;//最弱优先级*//*
@@ -877,7 +883,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
         mBdCache.setCacheContent(content);
 
         //保存数据到缓存数据库
-        SysUtils.dispatchData(ReplyMessageActivity.this,mBdCache);
+        SysUtils.dispatchData(ReplyMessageActivity.this, mBdCache);
     }
 
     public void sendPhoneSMS(String phoneContent, String content) {
@@ -940,50 +946,8 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
 
     /**
      * 保存到数据库
-     *
      */
-    public void save2db(String cardNum,String messageContent, String otherMsg) {
-
-
-       /* String userInfo = titleName.getText().toString().trim();
-        String phoneNum;
-        String userName = "新建消息";
-        if (userInfo.isEmpty()) {
-
-            if (simNumStr.contains("(")) {
-                phoneNum = simNumStr.substring(simNumStr.lastIndexOf("(") + 1, simNumStr.lastIndexOf(")"));
-                userName = simNumStr.substring(0, userInfo.lastIndexOf("("));
-            } else {
-                //phoneNum = simNumStr;
-                userName = simNumStr;
-                String dbUserName = DBhelper.getContactNameFromPhoneBook(mContext, userName);
-                if (dbUserName != null) {
-                    userName = dbUserName;
-                }
-            }
-        } else {
-
-            if (userInfo.contains("(")) {
-                //输入的是联系人
-                phoneNum = userInfo.substring(userInfo.lastIndexOf("(") + 1, userInfo.lastIndexOf(")"));
-                userName = userInfo.substring(0, userInfo.lastIndexOf("("));
-
-            } else {
-                userName = userInfo;
-                //输入的是 发送号码
-                //根据号码去查询联系人
-                String dbUserName = DBhelper.getContactNameFromPhoneBook(mContext, userName);
-                if (dbUserName != null) {
-                    userName = dbUserName;
-                }
-            }
-
-        }*/
-        //Toast.makeText(mContext, userInfo, 0).show();
-
-//        if("".equals(phoneName)){
-//
-//        }
+    public void save2db(String cardNum, String messageContent, String otherMsg) {
 
         BDMessageInfo info = new BDMessageInfo();
         info.setUserName(cardNum);
@@ -1128,7 +1092,7 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
     }
 
 
-    private void openMsgModel(){
+    private void openMsgModel() {
         MessgeUsualOperation oper = new MessgeUsualOperation(this);
         List<String> listMsg = oper.getAll1();
         if (listMsg.size() == 0) {
@@ -1347,11 +1311,18 @@ public class ReplyMessageActivity extends BaseActivity implements OnClickListene
 
                     break;
                 }
+                case ReceiverAction.DB_ACTION_ON_DATA_CHANGE_ADD:
+                    // 数据库变化了,重新查询数据库
+                    int count = cacheOperation.getAll().size();
+                    SharedPreferencesHelper.put(Constant.SP_RECORDED_KEY_COUNT, count);
+                    updateCache();
+                    break;
             }
 
 
         }
     };
     private String date;
+
 
 }

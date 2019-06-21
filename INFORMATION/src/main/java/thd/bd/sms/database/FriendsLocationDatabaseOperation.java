@@ -34,10 +34,20 @@ public class FriendsLocationDatabaseOperation {
 	private Context context;
 	private SQLiteDatabase sqliteDatabase;
 
+	private int count;
+
 	public FriendsLocationDatabaseOperation(Context mContext){
 		this.context=mContext;
 	}
-	
+
+	public int getCount() {
+		return count;
+	}
+
+	public void setCount(int count) {
+		this.count = count;
+	}
+
 	/**
 	 * 增加友邻位置
 	 * @param
@@ -173,6 +183,7 @@ public class FriendsLocationDatabaseOperation {
 
 		List<FriendBDPoint> list = new ArrayList<FriendBDPoint>();
 		int count = mCursor.getCount();
+		setCount(count);
 		for (int i = 0; i < count; i++) {
 
 			if (mCursor.moveToNext()) {
@@ -209,10 +220,11 @@ public class FriendsLocationDatabaseOperation {
 
 		Cursor mCursor = sqliteDatabase.rawQuery("select * from BD_FRIEND_LOCATION where FRIENDS_ID = "+"'"+address+"' order by REPORT_TIME desc;" ,null);
 		int count = mCursor.getCount();
-		Log.e("FriendsOperation", "LERRY_YOULIN==================FriendsLocationDatabaseOperation213=======address=="+address+"====count=="+count);
+
 		List<Map<String ,Object>> list=new ArrayList<Map<String,Object>>();
 
 		Map<String,String> userAddressMap=new HashMap<String,String>();
+
 		while(mCursor.moveToNext()){
 			String userAddress=mCursor.getString(mCursor.getColumnIndex(FriendsLocationColumns.FRIENDS_ID));
 
@@ -266,6 +278,27 @@ public class FriendsLocationDatabaseOperation {
 		mCursor.close();
 		return list;
 	}
+
+	/**
+	 * 根据address查询条数
+	 * @param
+	 * @return
+	 * @throws SQLException
+	 */
+	public int getCountByAddress(String address) throws SQLException {
+		databaseHelper=new DatabaseHelper(context);
+		sqliteDatabase=databaseHelper.getReadableDatabase();
+		//查询
+
+		Cursor mCursor = sqliteDatabase.rawQuery("select * from BD_FRIEND_LOCATION where FRIENDS_ID = "+"'"+address+"' ;" ,null);
+		int count = mCursor.getCount();
+
+		mCursor.close();
+		return count;
+	}
+
+
+
 //	/**
 //	 * 得到所有用户最新的一条数据
 //	 * @return
@@ -293,7 +326,7 @@ public class FriendsLocationDatabaseOperation {
 //		mCursor.close();
 //		return list;
 //	}
-	public int getSize() throws SQLException {
+	/*public int getSize() throws SQLException {
 		databaseHelper=new DatabaseHelper(context);
 		sqliteDatabase=databaseHelper.getReadableDatabase();
 		//查询
@@ -303,7 +336,9 @@ public class FriendsLocationDatabaseOperation {
 	             FriendsLocationColumns.FRIENDS_HEIGHT},null, null, null,null,null,null);
 		
 		return mCursor.getCount();
-	}
+	}*/
+
+
 	
 	public FriendLocation getById(long rowId) throws SQLException {
 		databaseHelper=new DatabaseHelper(context);

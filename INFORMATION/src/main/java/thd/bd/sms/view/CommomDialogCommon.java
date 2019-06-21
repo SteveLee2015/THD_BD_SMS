@@ -156,13 +156,15 @@ public class CommomDialogCommon extends Dialog implements View.OnClickListener {
             Log.e("isLatlon", "initView: ++++++++++++++++++++" );
         }
 
-        if(!TextUtils.isEmpty(tishi_lat.getText().toString())){
-            lat = Double.parseDouble(tishi_lat.getText().toString());
-        }
-
-        if(!TextUtils.isEmpty(tishi_lon.getText().toString())){
-            lon = Double.parseDouble(tishi_lon.getText().toString());
-        }
+//        if(!TextUtils.isEmpty(tishi_lat.getText().toString())){
+//            lat = Double.parseDouble(tishi_lat.getText().toString());
+//            Log.e("", "LERRY_DIALOG: =====================lat=="+lat );
+//        }
+//
+//        if(!TextUtils.isEmpty(tishi_lon.getText().toString())){
+//            lon = Double.parseDouble(tishi_lon.getText().toString());
+//            Log.e("", "LERRY_DIALOG: =====================lon=="+lon );
+//        }
 
     }
 
@@ -176,8 +178,15 @@ public class CommomDialogCommon extends Dialog implements View.OnClickListener {
 
             case R.id.dialog_commom_tishi_cancel:
 
-
                 if(isLatlon){
+
+                    if(!TextUtils.isEmpty(tishi_lat.getText().toString())){
+                        lat = Double.parseDouble(tishi_lat.getText().toString());
+                    }
+
+                    if(!TextUtils.isEmpty(tishi_lon.getText().toString())){
+                        lon = Double.parseDouble(tishi_lon.getText().toString());
+                    }
 
                     if (daoHangListener != null) {
                         daoHangListener.onClick(this,lat,lon);

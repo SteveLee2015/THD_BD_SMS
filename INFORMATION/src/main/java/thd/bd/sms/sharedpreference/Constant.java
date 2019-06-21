@@ -28,4 +28,6 @@ public class Constant {
 
     public static final String SP_KEY_SOS_NUM="SP_KEY_SOS_NUM";//在SharedPreferences里记录的sos 上报平台号码
     public static final String SP_KEY_SOS_CONTENT="SP_KEY_SOS_CONTENT";//在SharedPreferences里记录的sos 上报平台内容
+
+    public static final String SP_KEY_CITY="KEY_CITY";//在SharedPreferences里记录的当前城市名
 }

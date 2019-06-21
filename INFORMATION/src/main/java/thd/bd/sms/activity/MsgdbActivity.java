@@ -272,7 +272,7 @@ public class MsgdbActivity extends BaseActivity {
             }
             viewHolder.sendId.setText(lists.get(position).getSendAddress());
             viewHolder.content.setText(lists.get(position).getMsgContent());
-            viewHolder.date.setText("");
+            viewHolder.date.setText(lists.get(position).getCacheTime());
             viewHolder.llChecked.setTag(position);
 
             viewHolder.llChecked.setOnClickListener(this);

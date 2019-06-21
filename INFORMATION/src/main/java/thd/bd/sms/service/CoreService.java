@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.database.sqlite.SQLiteConstraintException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -33,6 +34,9 @@ import android.widget.Toast;
 
 
 import com.thd.cmd.manager.BDCmdManager;
+import com.thd.cmd.manager.entity.BDNACCmd;
+import com.thd.cmd.manager.entity.BDNALCmd;
+import com.thd.cmd.manager.entity.BDSendCommand;
 import com.thd.cmd.manager.helper.BDConstants;
 import com.thd.cmd.manager.listener.BDCmdTimeOutListener;
 
@@ -50,8 +54,12 @@ import thd.bd.sms.activity.MainCenterActivity;
 import thd.bd.sms.activity.MsgdbActivity;
 import thd.bd.sms.bean.BDCache;
 import thd.bd.sms.bean.BDContactColumn;
+import thd.bd.sms.bean.BDInstructionNav;
+import thd.bd.sms.bean.BDLineNav;
 import thd.bd.sms.bean.FriendsLocation;
 import thd.bd.sms.bean.ReportSet;
+import thd.bd.sms.database.BDInstructionNavOperation;
+import thd.bd.sms.database.BDLineNavOperation;
 import thd.bd.sms.database.BDMessageDatabaseOperation;
 import thd.bd.sms.database.FriendsLocationDatabaseOperation;
 import thd.bd.sms.database.RDCacheOperation;
@@ -68,7 +76,6 @@ import thd.bd.sms.view.GspStatesManager;
 
 
 /**
- *
  * @author lerry
  */
 public class CoreService extends Service {
@@ -125,7 +132,7 @@ public class CoreService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e(TAG, "LERRY_TXA: =======CoreService102短报文后台服务开启================" );
+        Log.e(TAG, "LERRY_TXA: =======CoreService102短报文后台服务开启================");
 
 
         mContext = this.getApplication().getApplicationContext();
@@ -138,15 +145,14 @@ public class CoreService extends Service {
 
 
         initBDService();
-        
-        myConn = new MyConn();
 
+        myConn = new MyConn();
 
         //通知
         notification();
-        showUI();
-        
-        
+//        showUI();
+
+
     }
 
     /**
@@ -165,110 +171,104 @@ public class CoreService extends Service {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BDConstants.BD_MESSAGE_BROAD_ACTION);
         registerReceiver(receiver, filter);
-        Log.e(TAG, "registerReceiver: ===========已注册registerReceiver=========" );
+        Log.e(TAG, "registerReceiver: ===========已注册registerReceiver=========");
     }
 
     private void unRegisterReceiver() {
         if (receiver != null) {
-            try{
+            try {
                 unregisterReceiver(receiver);
-            }catch (IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 e.printStackTrace();
-                Log.e(TAG, "unRegisterReceiver: ==========IllegalArgumentException===========" );
+                Log.e(TAG, "unRegisterReceiver: ==========IllegalArgumentException===========");
             }
 
         }
     }
-    
-    /**
-     * 数据回写
-     *
-     * @param
-     */
-    private void showUI() {
 
-        Boolean floatRD = SharedPreferencesHelper.getRDReportState();
-        Boolean floatRN = SharedPreferencesHelper.getRNReportState();
-//        Boolean floatStatus = SpTools.getFloatStatus(context, SpTools.SP_FLOAT_STATUS_KEY_STATUS);
 
-        if (floatRD) {
-            openRDcontinueService();
-        } else {
-        }
-        if (floatRN) {
-            openRNcontinueService();
-        } else {
-        }
-    }
+   /* *//**
+     * 开启或关闭RD/RN位置报告
+     *//*
 
-    /**
-     * 开启RN连续位置报告服务
-     */
-    private void openRNcontinueService() {
-        boolean result = openLorReportService("", ReportSet.REPORTSET_RN, "", CycleReportRNLocService.class);
-
-        if (result) {
-            SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE, true);
-        } else {
-            SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE, false);
-        }
-
-    }
-
-    /**
-     * 开启RD连续位置报告服务
-     */
-    private void openRDcontinueService() {
-        boolean result = openLorReportService("", ReportSet.REPORTSET_RD, "", CycleReportRDLocService.class);
-
-        if (result) {
-            SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE, true);
-        } else {
-            SharedPreferencesHelper.put(Constant.SP_RD_REPORT_STATE, false);
-        }
-    }
-
-    /**
-     * 开启RD连续位置报告服务
-     */
-    private boolean openLorReportService(String sendNumStr, String reportType, String reportStatus, Class clazz) {
-        String clssName = clazz.getName();
-        boolean isStart = SysUtils.isServiceRunning(this, clssName);
-        boolean result = false;
-
-        try {
-            //开启 连续报位服务
-            if (!isStart) {
-                //不在运行 就开启
-                if (sendNumStr.isEmpty()) {
-                    sendNumStr = "";
-                }
-                Intent service = new Intent(this, clazz);
+    public void openLocReportService(String tag){
+        switch (tag) {
+            case ReportSet.REPORTSET_RD:
+                Intent service = new Intent(this, CycleReportRDLocService.class);
                 //service.putExtra("reportType", reportType);
-                service.putExtra("sendNumStr", sendNumStr);
-                service.putExtra("reportStatus", reportStatus);
+//                    service.putExtra("sendNumStr", sendNumStr);
+//                    service.putExtra("reportStatus", reportStatus);
                 this.startService(service);
                 bindService(service, myConn, 0);
-                //closeViewPager();
-                Log.e(TAG, "LERRY_RDREPORT: =================CoreService253=======开启RD/RN连续位置报告服务====");
-                result = true;
-            } else {
-                // 在运行 什么都不做
-                Toast.makeText(this, "服务正在运行,再次开启失败!", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "LERRY_RDREPORT: =================CoreService217=======开启RD连续位置报告服务====");
+                break;
 
-                result = true;
+            case ReportSet.REPORTSET_RN:
 
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            result = false;
+                break;
         }
-        return result;
+    }*/
+
+    public void isServiceStart(String tag){
+        switch (tag){
+            case ReportSet.REPORTSET_RD:
+                String className = CycleReportRDLocService.class.getName();
+                boolean isStart = SysUtils.isServiceRunning(mContext, className);
+
+                if(isStart){//如果开启就需要关闭
+
+                    Intent mIntent = new Intent();
+                    mIntent.setClass(mContext, CycleReportRDLocService.class);
+                    Log.e(TAG, "LERRY_RDREPORT: =================CoreService204=======关闭RD连续位置报告服务====");
+
+//                    if (isBind) {
+//                        mContext.unbindService(myConn);
+//                    }
+                    mContext.stopService(mIntent);
+                }else {//开启
+                    Intent service = new Intent(mContext, CycleReportRDLocService.class);
+                    //service.putExtra("reportType", reportType);
+//                    service.putExtra("sendNumStr", sendNumStr);
+//                    service.putExtra("reportStatus", reportStatus);
+                    mContext.startService(service);
+//                    mContext.bindService(service, myConn, 0);
+                    Log.e(TAG, "LERRY_RDREPORT: =================CoreService217=======开启RD连续位置报告服务====");
+                }
+
+                break;
+
+            case ReportSet.REPORTSET_RN:
+
+                String className1 = CycleReportRNLocService.class.getName();
+                boolean isStart1 = SysUtils.isServiceRunning(mContext, className1);
+
+                if(isStart1){//如果开启就需要关闭
+
+                    Intent mIntent = new Intent();
+                    mIntent.setClass(mContext, CycleReportRNLocService.class);
+                    Log.e(TAG, "LERRY_RDREPORT: =================CoreService231=======关闭RN连续位置报告服务====");
+
+//                    if (isBind) {
+//                        mContext.unbindService(myConn);
+//                    }
+                    mContext.stopService(mIntent);
+                }else {//开启
+                    Intent service = new Intent(mContext, CycleReportRNLocService.class);
+                    //service.putExtra("reportType", reportType);
+//                    service.putExtra("sendNumStr", sendNumStr);
+//                    service.putExtra("reportStatus", reportStatus);
+                    mContext.startService(service);
+//                    mContext.bindService(service, myConn, 0);
+                    Log.e(TAG, "LERRY_RDREPORT: =================CoreService244=======开启RN连续位置报告服务====");
+                }
+
+                break;
+        }
     }
 
     @SuppressWarnings("ResourceType")
     public void notification() {
-        Toast.makeText(mContext, "北斗服务启动", 1).show();
+//        Toast.makeText(mContext, "北斗服务启动", 1).show();
 
 
         InputStream is = getResources().openRawResource(R.mipmap.notification_new_sms);
@@ -292,30 +292,30 @@ public class CoreService extends Service {
 
 
 //        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.notification_new_sms);
-        Notification.Builder builder = new Notification.Builder(getApplicationContext())
-                .setChannelId(CHANNEL_ONE_ID)
-                .setContentTitle("北斗服务")
-                .setContentText("北斗后台服务正在运行")
+            Notification.Builder builder = new Notification.Builder(getApplicationContext())
+                    .setChannelId(CHANNEL_ONE_ID)
+                    .setContentTitle("北斗服务")
+                    .setContentText("北斗后台服务正在运行")
 //                .setContentIntent(contentIntent)//点击意图
-                .setTicker("@core")
-                .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setAutoCancel(false)//用户点击就自动消失
-                .setOngoing(true)//ture，设置他为一个正在进行的通知。他们通常是用来表示一个后台任务,用户积极参与(如播放音乐)或以某种方式正在等待,因此占用设备(如一个文件下载,同步操作,主动网络连接)
-                .setDefaults(Notification.DEFAULT_VIBRATE)//向通知添加声音、闪灯和振动效果的最简单、最一致的方式是使用当前的用户默认设置，使用defaults属性，可以组合
-                .setDefaults(Notification.DEFAULT_SOUND)//向通知添加声音、闪灯和振动效果的最简单、最一致的方式是使用当前的用户默认设置，使用defaults属性，可以组合
-                //Notification.DEFAULT_ALL  Notification.DEFAULT_SOUND 添加声音 // requires VIBRATE permission
-                .setLargeIcon(mBitmap)//加载大图标
-                //.setColor(Color.parseColor("#3191e8"))
-                .setColor(getResources().getColor(R.color.colorMainBlue))
-                .setSmallIcon(R.mipmap.notification_new_sms);//设置通知小ICON
+                    .setTicker("@core")
+                    .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                    .setAutoCancel(false)//用户点击就自动消失
+                    .setOngoing(true)//ture，设置他为一个正在进行的通知。他们通常是用来表示一个后台任务,用户积极参与(如播放音乐)或以某种方式正在等待,因此占用设备(如一个文件下载,同步操作,主动网络连接)
+                    .setDefaults(Notification.DEFAULT_VIBRATE)//向通知添加声音、闪灯和振动效果的最简单、最一致的方式是使用当前的用户默认设置，使用defaults属性，可以组合
+                    .setDefaults(Notification.DEFAULT_SOUND)//向通知添加声音、闪灯和振动效果的最简单、最一致的方式是使用当前的用户默认设置，使用defaults属性，可以组合
+                    //Notification.DEFAULT_ALL  Notification.DEFAULT_SOUND 添加声音 // requires VIBRATE permission
+                    .setLargeIcon(mBitmap)//加载大图标
+                    //.setColor(Color.parseColor("#3191e8"))
+                    .setColor(getResources().getColor(R.color.colorMainBlue))
+                    .setSmallIcon(R.mipmap.notification_new_sms);//设置通知小ICON
             Notification notification = builder.build();
 
 //        Intent notificationIntent = new Intent(mContext, MsgdbActivity.class);
 //        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 //        notification.contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, 0);
 
-        startForeground(1, notification);
+            startForeground(1, notification);
         }
     }
 
@@ -341,8 +341,8 @@ public class CoreService extends Service {
 //        Log.e(TAG, "LERRY_RDREPORT: =================MainCenterActivity183=======关闭RD/RN连续位置报告服务====");
 
         unRegisterReceiver();
-        
-        if(isBind){
+
+        if (isBind) {
             this.unbindService(myConn);
         }
 //        this.stopService(mIntent);
@@ -528,17 +528,71 @@ public class CoreService extends Service {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             switch (action) {
-                case BDConstants.BD_MESSAGE_BROAD_ACTION:
+                case BDConstants.BD_MESSAGE_BROAD_ACTION://要区分开短报文和路线导航
                     BDMessageInfo mBDMessage = intent.getParcelableExtra(BDConstants.BDRDSS_MESSAGE);
                     String message = "";
+
                     try {
                         message = new String(mBDMessage.getMessage(), "GBK");
-                        Log.i(TAG, "LERRY_TXR: =====================接收到短报文==" + message);
-
-                        storeMsg(mContext, mBDMessage.getmUserAddress(), message);
+                        Log.e(TAG, "LERRY_SERVICE: ======================message=="+message );
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
+
+                    /*//接收处理BDNAC命令
+                    if (message.startsWith(BDSendCommand.BDNAC.get$Cmd())) {//指令导航
+                        BDNACCmd cmd = new BDNACCmd();
+                        cmd.setValueByCmd(message);
+                        //然后就可以获取cmd中的数据
+
+                        StringBuilder sb = new StringBuilder();
+                        if (cmd.getMustGoLonLatArr() != null && cmd.getMustGoLonLatArr().length > 0) {
+                            for(int i = 0; i < cmd.getMustGoLonLatArr().length; ++i) {
+                                sb.append(cmd.getMustGoLonLatArr()[i]).append(",");
+                            }
+                        }
+
+                        StringBuilder sb1 = new StringBuilder();
+                        if (cmd.getVoidGoLonLatArr() != null && cmd.getVoidGoLonLatArr().length > 0) {
+                            for(int i = 0; i < cmd.getVoidGoLonLatArr().length; ++i) {
+//                                sb1.append(cmd.getVoidGoLonLatArr()[i]).append(";");
+//                                sb1.append(cmd.getVoidGoLonLatArr()[i].replace("*4C", "")).append(";");//这里有待修改
+                                String voidLonLat = cmd.getVoidGoLonLatArr()[i];
+                                int index = voidLonLat.indexOf("*");
+                                if (index != -1) {
+                                    voidLonLat = voidLonLat.substring(0 , index);
+                                }
+                                sb1.append(voidLonLat).append(";");
+                            }
+                        }
+
+                        saveNACToDb(mBDMessage.getmUserAddress(),cmd.getLineId(),cmd.getTargeLonLatArr()[0],cmd.getTargeLonLatArr()[1],sb.toString(),sb1.toString());
+
+
+                    } else if (message.startsWith(BDSendCommand.BDNAL.get$Cmd())) {//线路导航
+                        BDNALCmd bdnalCmd = new BDNALCmd();
+                        bdnalCmd.setValueByCmd(message);
+                        //可以处理数据
+
+                        StringBuilder sb = new StringBuilder();
+                        if (bdnalCmd.getLonlatArr() != null && bdnalCmd.getLonlatArr().length > 0) {
+                            for(int i = 0; i < bdnalCmd.getLonlatArr().length; ++i) {
+                                sb.append(bdnalCmd.getLonlatArr()[i]).append(",");
+                            }
+                        }
+                        saveNALToDb(bdnalCmd.getNavId(),bdnalCmd.getCmdNum(),bdnalCmd.getCmdTotal(),sb.toString());
+
+                    } else {*/
+                        try {
+                            message = new String(mBDMessage.getMessage(), "GBK");
+                            Log.i(TAG, "LERRY_TXR: =====================接收到短报文==" + message);
+
+                            storeMsg(mContext, mBDMessage.getmUserAddress(), message);
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+//                    }
+//                    Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
                     break;
                 default:
                     break;
@@ -568,10 +622,10 @@ public class CoreService extends Service {
                         if (BDCache.RD_REPORT_FLAG.equals(msgType)) {
                             dispatchData(firstCache);
                             notifyData();
-                            Toast.makeText(mContext, "位置报告2发送成功!",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "位置报告2发送成功!", Toast.LENGTH_SHORT).show();
                         }
-                    }else {
-                        Toast.makeText(mContext, "位置报告2发送失败!",Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(mContext, "位置报告2发送失败!", Toast.LENGTH_SHORT).show();
                     }
 
                     break;
@@ -583,10 +637,10 @@ public class CoreService extends Service {
                         if (BDCache.RD_LOCATION_FLAG.equals(msgType)) {
                             dispatchData(firstCache);
                             notifyData();
-                            Toast.makeText(mContext, "定位命令发送成功!",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "定位命令发送成功!", Toast.LENGTH_SHORT).show();
                         }
-                    }else {
-                        Toast.makeText(mContext, "定位命令发送成功!",Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(mContext, "定位命令发送成功!", Toast.LENGTH_SHORT).show();
                     }
 
                     break;
@@ -598,10 +652,10 @@ public class CoreService extends Service {
                         if (BDCache.RN_REPORT_FLAG.equals(msgType)) {
                             dispatchData(firstCache);
                             notifyData();
-                            Toast.makeText(mContext, "位置报告1发送成功!",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "位置报告1发送成功!", Toast.LENGTH_SHORT).show();
                         }
-                    }else {
-                        Toast.makeText(mContext, "位置报告1发送失败!",Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(mContext, "位置报告1发送失败!", Toast.LENGTH_SHORT).show();
                     }
 
                     break;
@@ -613,10 +667,10 @@ public class CoreService extends Service {
                         if (BDCache.SMS_FLAG.equals(msgType)) {
                             dispatchData(firstCache);
                             notifyData();
-                            Toast.makeText(mContext, "北斗短报文发送成功!",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext, "北斗短报文发送成功!", Toast.LENGTH_SHORT).show();
                         }
-                    }else {
-                        Toast.makeText(mContext, "北斗短报文发送失败!",Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(mContext, "北斗短报文发送失败!", Toast.LENGTH_SHORT).show();
                     }
 
                     break;
@@ -721,7 +775,7 @@ public class CoreService extends Service {
             EventBus.getDefault().post(bdLocation);
             bdLocation.dumpInfo();
 
-            Log.e("TEST", "=================> bdLocationListener lat =" + bdLocation.getLatitude() + ",lon =" + bdLocation.getLongitude());
+            Log.e("TEST", "=================> bdLocationListener lat =" + bdLocation.getLatitude() + ",lon =" + bdLocation.getLongitude()+",time = "+bdLocation.mLocationTime);
         }
     };
 
@@ -731,7 +785,7 @@ public class CoreService extends Service {
     private BDEventListener.BDLocReportListener bdLocReportListener = new BDEventListener.BDLocReportListener() {
         @Override
         public void onLocReport(BDLocationReport bdLocationReport) {
-            Toast.makeText(mContext, "bdLocReportListener lat =" + bdLocationReport.getLatitude() + ",lon =" + bdLocationReport.getLongitude(), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(mContext, "bdLocReportListener lat =" + bdLocationReport.getLatitude() + ",lon =" + bdLocationReport.getLongitude(), Toast.LENGTH_SHORT).show();
             Log.e("TEST", "=================> bdLocReportListener lat =" + bdLocationReport.getLatitude() + ",lon =" + bdLocationReport.getLongitude());
             boolean isAdd = mAddLocationReportToDatabase(bdLocationReport, Config.RD_DWR);
             notifcation(ReceiverAction.APP_ACTION_FRIEND_LOCATION_21);
@@ -989,7 +1043,122 @@ public class CoreService extends Service {
     private void notifyData() {
         Intent intent = new Intent();
         intent.setAction(ReceiverAction.DB_ACTION_ON_DATA_CHANGE_ADD);
-        mContext.sendBroadcast(intent );
+        mContext.sendBroadcast(intent);
+    }
+
+    /**
+     * 保存指令导航到数据库
+     */
+    private void saveNALToDb(String lineId,int lineNum,int lineTotalNum,String passStr){
+        //保存到数据库,是否需要记录该条数据
+
+        BDLineNavOperation navOper = new BDLineNavOperation(mContext);
+        BDLineNav mBDLineNav = navOper.get(lineId);
+        if (mBDLineNav == null) {
+            //第一次 插入
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String date = sdf.format(new Date());
+            String createTime = date;
+
+            Log.e(TAG, "指令导航: =============lineId="+ lineId+"=========lineNum=="
+                    +lineNum+"=========lineTotalNum=="+lineTotalNum+"============passStr=="+passStr
+                    +"==========createTime=="+createTime);
+
+            final long id = navOper.insert(lineId, lineNum + "", lineTotalNum + "", passStr, createTime);
+
+            boolean isCompletion = navOper.checkLineNavComplete(lineId);
+            if (isCompletion) {
+                // 通知可以导航
+                //notificationNaviLine(info, navOper, lineId);
+                //notificationLineNav();
+                BDLineNav line = navOper.get(lineId);
+
+//                notificationLineNav(info, line);
+                Intent receiverIntent1 = new Intent();
+                receiverIntent1.putExtra("NAVILINEID", line.getLineId());
+                receiverIntent1.setAction("com.bd.action.NAVI_LINE_ACTION");
+                receiverIntent1.setAction(ReceiverAction.APP_ACTION_LINE_NAVI);
+                mContext.sendBroadcast(receiverIntent1);
+
+                // String content = "$BDNAR," + lineId + "," + lineNum + "," + lineTotalNum + "*41";//有问题??
+                // sendBDNAR(info, content);
+            } else {
+                //发送回执命令 补充数据 暂时关闭
+                //String content = "$BDNAR," + lineId + "," + lineNum + "," + lineTotalNum + "*41";//有问题??
+                //sendBDNAR(info, content);
+            }
+
+        } else {
+
+            //数据库中有数据  更新
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String date = sdf.format(new Date());
+            String createTime = date;
+            final long id = navOper.update(lineId, lineNum + "", lineTotalNum + "", passStr, createTime);
+
+            //第一次 插入
+            //final long id = navOper.insert(lineId, lineNum + "", lineTotalNum + "", passStr);
+            boolean isCompletion = navOper.checkLineNavComplete(lineId);
+            if (isCompletion) {
+                // 通知可以导航
+                //public static final String APP_ACTION_LINE_NAVI = "com.bd.action.LINE_NAVI_ACTION";
+                //notificationNaviLine(info, navOper, lineId);
+//                notificationLineNav(info, mBDLineNav);
+                Intent receiverIntent1 = new Intent();
+                receiverIntent1.putExtra("NAVILINEID", mBDLineNav.getLineId());
+                receiverIntent1.setAction("com.bd.action.NAVI_LINE_ACTION");
+                receiverIntent1.setAction(ReceiverAction.APP_ACTION_LINE_NAVI);
+                mContext.sendBroadcast(receiverIntent1);
+                //sendBDNAR(info, lineId, lineNum, lineTotalNum);
+            } else {
+                //发送回执命令 补充数据  暂时关闭
+                //sendBDNAR(info, lineId, lineNum, lineTotalNum);
+            }
+        }
+        navOper.close();
+    }
+
+    //保存路线导航到数据库
+    private void saveNACToDb(String address,String lineId,String targetLonStr,String targetLatStr,String passStr,String avaidStr){
+        //保存到数据库,是否需要记录该条数据
+        BDInstructionNavOperation navOper = new BDInstructionNavOperation(mContext);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = sdf.format(new Date());
+//                            info.setmSendTime(date);
+        String createTime = date;
+        long id = -1;
+        try {
+
+            Log.e(TAG, "路线导航: =============lineId="+ lineId+"=========targetLonStr=="
+                    +targetLonStr+"=========targetLatStr=="+targetLatStr+"============passStr=="+passStr
+                    +"============avaidStr=="+avaidStr+"==========createTime=="+createTime);
+            id = navOper.insert(address, lineId, targetLonStr + "," + targetLatStr, passStr, avaidStr, createTime);
+            if (id < 0) {
+                id = (long) navOper.update(address, lineId, targetLonStr + "," + targetLatStr, passStr, avaidStr, createTime);
+            }
+        }catch (SQLiteConstraintException ex){
+            id = (long) navOper.update(address, lineId, targetLonStr + "," + targetLatStr, passStr, avaidStr, createTime);
+        }
+        navOper.close();
+
+        //通知数据有更新
+        notifcation(ReceiverAction.APP_ACTION_INSTRUCT_NAVI);
+
+        if (id > 0) {
+            /* 发送Notification*/
+            BDInstructionNavOperation navOper1 = new BDInstructionNavOperation(mContext);
+            BDInstructionNav nav = navOper1.get(id);
+            navOper1.close();
+
+            Intent receiverIntent1 = new Intent();
+            receiverIntent1.putExtra("BDINSTRLINEID", nav.getRowId());
+            receiverIntent1.setAction("com.bd.action.BD_INSTR_LINE_ACTION");
+            mContext.sendBroadcast(receiverIntent1);
+
+//            notificationCommandNav(info);
+            return;
+        }
     }
 
 }

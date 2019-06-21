@@ -137,4 +137,8 @@ public class SharedPreferencesHelper {
     public static String getSosContent() {
         return sharedPreferences.getString(Constant.SP_KEY_SOS_CONTENT, "");
     }
+
+    public static String getCity() {
+        return sharedPreferences.getString(Constant.SP_KEY_CITY, "");
+    }
 }

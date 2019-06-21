@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -75,6 +76,12 @@ public class FriendLcationFragment extends BaseFragment {
                 if (oper != null && adapter != null) {
                     list = oper.getAllGroupById();
                     adapter.notifyDataSetChanged();
+
+                    if (list.size()==0) {
+                        tvInfo.setVisibility(View.VISIBLE);
+                    }else {
+                        tvInfo.setVisibility(View.GONE);
+                    }
                 }
 
             }
@@ -186,6 +193,11 @@ public class FriendLcationFragment extends BaseFragment {
                                     Toast.makeText(mContext, mContext.getResources().getString(R.string.friend_loc_del_success), Toast.LENGTH_SHORT).show();
                                     list.clear();
                                     adapter.notifyDataSetChanged();
+                                    if (list.size() == 0) {
+                                        tvInfo.setVisibility(View.VISIBLE);
+                                    } else {
+                                        tvInfo.setVisibility(View.GONE);
+                                    }
                                 } else {
                                     Toast.makeText(mContext, mContext.getResources().getString(R.string.friend_loc_del_fail), Toast.LENGTH_SHORT).show();
                                 }
@@ -255,16 +267,19 @@ public class FriendLcationFragment extends BaseFragment {
                 viewHolder.height = (TextView) contentView
                         .findViewById(R.id.friends_loc_height);
 
+                viewHolder.item_bdloc_friends_center_layout = (LinearLayout)contentView.findViewById(R.id.item_bdloc_friends_center_layout);
+                viewHolder.item_bdloc_friends_center_layout.setVisibility(View.GONE);
 
                 viewHolder.company = (TextView) contentView
                         .findViewById(R.id.item_friends_company_txt);
-                viewHolder.company.setText("单位");
+                viewHolder.company.setText("友邻ID  ");
                 viewHolder.idTxt = (TextView) contentView
                         .findViewById(R.id.item_friends_id_txt);
                 viewHolder.idTxt.setText("友邻ID");
                 viewHolder.count = (TextView) contentView
                         .findViewById(R.id.item_friends_count_txt);
                 viewHolder.count.setText("数量");
+
 
 
                 contentView.setTag(viewHolder);
@@ -275,6 +290,10 @@ public class FriendLcationFragment extends BaseFragment {
                 viewHolder.userId.setText(String.valueOf(list.get(position)
                         .getFriendID()));
                 viewHolder.time.setText(String.valueOf(list.get(position).getReceiveTime()));
+                int count = oper.getCountByAddress(list.get(position)
+                        .getFriendID());
+
+                viewHolder.height.setText(count+"");
 //				viewHolder.lon.setText(String.valueOf(list.get(position).get(
 //						"FRIEND_LON")));
 //				viewHolder.lat.setText(String.valueOf(list.get(position).get(
@@ -299,6 +318,7 @@ public class FriendLcationFragment extends BaseFragment {
         TextView lon;
         TextView lat;
         TextView height;
+        LinearLayout item_bdloc_friends_center_layout;
 
         TextView company, idTxt, count;
     }
