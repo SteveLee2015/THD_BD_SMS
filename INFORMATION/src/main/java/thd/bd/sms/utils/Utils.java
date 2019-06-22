@@ -1544,7 +1544,14 @@ public class Utils {
         if (num != 0.0D && num >= 100.0D) {
             String value = String.valueOf(num);
             int index = value.indexOf(".");
-            return Double.valueOf(value.substring(0, index - 2)) + Double.valueOf(value.substring(index - 2)) / 60.0D;
+            try{
+                return Double.valueOf(value.substring(0, index - 2)) + Double.valueOf(value.substring(index - 2)) / 60.0D;
+            }catch (Exception e){
+                e.printStackTrace();
+                Log.e(TAG, "changeLonLatMinuteToDegree: ============="+e.getMessage() );
+                return 0.0D;
+            }
+
         } else {
             return 0.0D;
         }

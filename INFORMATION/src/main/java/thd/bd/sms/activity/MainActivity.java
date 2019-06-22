@@ -127,6 +127,11 @@ public class MainActivity extends BaseActivity {
     private double mCurrentLat = 0.0;
     private double mCurrentLon = 0.0;
 
+    private static final String MAP_FRAGMENT_KEY = "mapFragment";
+    private static final String COMMUNICATION_FRAGMENT_KEY = "communicationFragment";
+    private static final String FRIENDS_FRAGMENT_KEY = "friendsFragment";
+    private static final String SETTING_FRAGMENT_KEY = "settingFragment";
+
     @Override
     protected int getContentView() {
         return R.layout.activity_main;
@@ -149,31 +154,131 @@ public class MainActivity extends BaseActivity {
             requestPermission();
         }
 
-        initContent();
+
+        initView();
+
+        if (savedInstanceState != null) {
+
+
+            /*获取保存的fragment  没有的话返回null*/
+            mapFragment = (MapFragment) getSupportFragmentManager().getFragment(savedInstanceState, MAP_FRAGMENT_KEY);
+            communicationFragment = (CommunicationFragment) getSupportFragmentManager().getFragment(savedInstanceState, COMMUNICATION_FRAGMENT_KEY);
+            friendsFragment = (FriendsFragment) getSupportFragmentManager().getFragment(savedInstanceState, FRIENDS_FRAGMENT_KEY);
+            settingFragment = (SettingFragment) getSupportFragmentManager().getFragment(savedInstanceState, SETTING_FRAGMENT_KEY);
+
+            addToList(mapFragment);
+            addToList(communicationFragment);
+            addToList(friendsFragment);
+            addToList(settingFragment);
+
+            switch (savedInstanceState.getString("saved_fragment")){
+                case "mapFragment":
+                    mainMapImg.setImageResource(R.mipmap.map_clicked);
+                    mainCommunicationImg.setImageResource(R.mipmap.communication_unclick);
+                    mainFriendsImg.setImageResource(R.mipmap.friends_unclick);
+                    mainSettingImg.setImageResource(R.mipmap.setting_unclick);
+
+                    break;
+
+                case "communicationFragment":
+                    mainMapImg.setImageResource(R.mipmap.map_unclick);
+                    mainCommunicationImg.setImageResource(R.mipmap.communication_clicked);
+                    mainFriendsImg.setImageResource(R.mipmap.friends_unclick);
+                    mainSettingImg.setImageResource(R.mipmap.setting_unclick);
+                    break;
+
+                case "friendsFragment":
+                    mainMapImg.setImageResource(R.mipmap.map_unclick);
+                    mainCommunicationImg.setImageResource(R.mipmap.communication_unclick);
+                    mainFriendsImg.setImageResource(R.mipmap.friends_clicked);
+                    mainSettingImg.setImageResource(R.mipmap.setting_unclick);
+                    break;
+
+                case "settingFragment":
+                    mainMapImg.setImageResource(R.mipmap.map_unclick);
+                    mainCommunicationImg.setImageResource(R.mipmap.communication_unclick);
+                    mainFriendsImg.setImageResource(R.mipmap.friends_unclick);
+                    mainSettingImg.setImageResource(R.mipmap.setting_clicked);
+                    break;
+            }
+
+        } else {
+            initFragment();
+        }
+
 
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        /*fragment不为空时 保存*/
+        if (mapFragment != null) {
+            getSupportFragmentManager().putFragment(outState, MAP_FRAGMENT_KEY, mapFragment);
 
-    private void initContent() {
+        }
+        if (communicationFragment != null) {
+            getSupportFragmentManager().putFragment(outState, COMMUNICATION_FRAGMENT_KEY, communicationFragment);
 
+        }
+        if (friendsFragment != null) {
+            getSupportFragmentManager().putFragment(outState, FRIENDS_FRAGMENT_KEY, friendsFragment);
+
+        }
+        if (settingFragment != null) {
+            getSupportFragmentManager().putFragment(outState, SETTING_FRAGMENT_KEY, settingFragment);
+
+        }
+
+
+        if(mContent!=null){
+            if(mContent == mapFragment){
+                outState.putString("saved_fragment","mapFragment");
+            }else if(mContent == communicationFragment){
+                outState.putString("saved_fragment","communicationFragment");
+            }else if(mContent == friendsFragment){
+                outState.putString("saved_fragment","friendsFragment");
+            }else if(mContent == settingFragment){
+                outState.putString("saved_fragment","settingFragment");
+            }
+        }
+
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    private void initView() {
         mainMapImg.setImageResource(R.mipmap.map_clicked);
         mainCommunicationImg.setImageResource(R.mipmap.communication_unclick);
         mainFriendsImg.setImageResource(R.mipmap.friends_unclick);
         mainSettingImg.setImageResource(R.mipmap.setting_unclick);
+    }
+
+    private void initFragment() {
 
         mapFragment = new MapFragment();
-        communicationFragment = new CommunicationFragment();
-        friendsFragment = new FriendsFragment();
-        settingFragment = new SettingFragment();
+//        communicationFragment = new CommunicationFragment();
+//        friendsFragment = new FriendsFragment();
+//        settingFragment = new SettingFragment();
 
-        //加载第一个fragment界面
+        mContent = mapFragment;
+
+
+        /*//加载第一个fragment界面
         mContent = mapFragment;
         getSupportFragmentManager().beginTransaction().add(R.id.main_bottom_fragmentLayout, mapFragment).commit();
 
         bundle = new Bundle();
 //        bundle.putDouble("lat",);
 //        bundle.putDouble("lng",);
-        mContent.setArguments(bundle);
+        mContent.setArguments(bundle);*/
+
+        /* 默认显示home  fragment*/
+        addFragment(mapFragment);
+        showFragment(mapFragment);
 
     }
 
@@ -237,7 +342,7 @@ public class MainActivity extends BaseActivity {
     protected void onStop() {
         super.onStop();
         locationService.unregisterListener(mListener); //注销掉监听
-        if(locationService.isStart()){
+        if (locationService.isStart()) {
             locationService.stop(); //停止定位服务
         }
 
@@ -292,7 +397,13 @@ public class MainActivity extends BaseActivity {
                 mainFriendsImg.setImageResource(R.mipmap.friends_unclick);
                 mainSettingImg.setImageResource(R.mipmap.setting_unclick);
 
-                switchContent_keep(mContent, mapFragment, 0);
+//                switchContent_keep(mContent, mapFragment, 0);
+                if (mapFragment == null) {
+                    mapFragment = new MapFragment();
+                }
+
+                addFragment(mapFragment);
+                showFragment(mapFragment);
                 break;
 
             case R.id.main_communication_layout:
@@ -301,7 +412,12 @@ public class MainActivity extends BaseActivity {
                 mainFriendsImg.setImageResource(R.mipmap.friends_unclick);
                 mainSettingImg.setImageResource(R.mipmap.setting_unclick);
 
-                switchContent_keep(mContent, communicationFragment, 1);
+//                switchContent_keep(mContent, communicationFragment, 1);
+                if (communicationFragment == null) {
+                    communicationFragment = new CommunicationFragment();
+                }
+                addFragment(communicationFragment);
+                showFragment(communicationFragment);
                 break;
 
             case R.id.main_friends_layout:
@@ -310,7 +426,12 @@ public class MainActivity extends BaseActivity {
                 mainFriendsImg.setImageResource(R.mipmap.friends_clicked);
                 mainSettingImg.setImageResource(R.mipmap.setting_unclick);
 
-                switchContent_keep(mContent, friendsFragment, 2);
+//                switchContent_keep(mContent, friendsFragment, 2);
+                if (friendsFragment == null) {
+                    friendsFragment = new FriendsFragment();
+                }
+                addFragment(friendsFragment);
+                showFragment(friendsFragment);
                 break;
 
             case R.id.main_setting_layout:
@@ -319,7 +440,12 @@ public class MainActivity extends BaseActivity {
                 mainFriendsImg.setImageResource(R.mipmap.friends_unclick);
                 mainSettingImg.setImageResource(R.mipmap.setting_clicked);
 
-                switchContent_keep(mContent, settingFragment, 3);
+//                switchContent_keep(mContent, settingFragment, 3);
+                if (settingFragment == null) {
+                    settingFragment = new SettingFragment();
+                }
+                addFragment(settingFragment);
+                showFragment(settingFragment);
                 break;
 
             case R.id.main_center_btn:
@@ -343,9 +469,54 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    private void addToList(Fragment fragment) {
+        if (fragment != null) {
+            fragmentList.add(fragment);
+        }
+
+//        for(Fragment fragment1 : fragmentList){
+//            fragment1.is
+//        }
+
+        Log.e(TAG, "addToList: "+"fragmentList数量" + fragmentList.size() );
+    }
+
+    /*添加fragment*/
+    private void addFragment(Fragment fragment) {
+
+        /*判断该fragment是否已经被添加过  如果没有被添加  则添加*/
+        if (!fragment.isAdded()) {
+            getSupportFragmentManager().beginTransaction().add(R.id.main_bottom_fragmentLayout, fragment).commit();
+            /*添加到 fragmentList*/
+            fragmentList.add(fragment);
+
+            Log.e(TAG, "addFragment: "+"fragmentList数量" + fragmentList.size() );
+        }
+
+    }
+
+
+    /*显示fragment*/
+    private void showFragment(Fragment fragment) {
+
+        Log.e(TAG, "showFragment: "+"fragmentList數量：" + fragmentList.size() );
+        for (Fragment frag : fragmentList) {
+
+            if (frag != fragment) {
+                /*先隐藏其他fragment*/
+                Log.e(TAG, "showFragment: "+"隱藏" + frag +"====showFragment===="+fragment);
+                mContent = fragment;
+                getSupportFragmentManager().beginTransaction().hide(frag).commit();
+            }
+        }
+        getSupportFragmentManager().beginTransaction().show(fragment).commit();
+
+    }
+
+
     /**
      * fragment切换，不保留之前的状态，每次打开都重新加载
-     */
+     *//*
     private void switchContent(Fragment to, int i) {
         getSupportFragmentManager().beginTransaction().replace(R.id.main_bottom_fragmentLayout, to);
 //        bundle.putString("page",pages[i]);
@@ -353,9 +524,9 @@ public class MainActivity extends BaseActivity {
         to.setArguments(bundle);
     }
 
-    /**
+    *//**
      * fragment切换，保留之前的状态，每次打开都不会重新加载
-     */
+     *//*
     private void switchContent_keep(Fragment from, Fragment to, int i) {
 
         if (from != to) {
@@ -379,7 +550,7 @@ public class MainActivity extends BaseActivity {
                 getSupportFragmentManager().beginTransaction().hide(from).show(to).commit();
             }
         }
-    }
+    }*/
 
     // 用来计算返回键的点击间隔时间
     private long exitTime = 0;
@@ -675,10 +846,10 @@ public class MainActivity extends BaseActivity {
                 sb.append("\ncity : ");// 城市
                 sb.append(location.getCity());
 
-                if(location.getCity()!=null && !"".equals(location.getCity())){
-                    SharedPreferencesHelper.put(Constant.SP_KEY_CITY,location.getCity());
-                }else {
-                    SharedPreferencesHelper.put(Constant.SP_KEY_CITY,"");
+                if (location.getCity() != null && !"".equals(location.getCity())) {
+                    SharedPreferencesHelper.put(Constant.SP_KEY_CITY, location.getCity());
+                } else {
+                    SharedPreferencesHelper.put(Constant.SP_KEY_CITY, "");
                 }
 
                 sb.append("\nDistrict : ");// 区
@@ -712,7 +883,7 @@ public class MainActivity extends BaseActivity {
                     sb.append("\ndescribe : ");
                     sb.append("gps定位成功");
 
-                    sendFirstLocation(location.getLatitude(),location.getLongitude());
+                    sendFirstLocation(location.getLatitude(), location.getLongitude());
 
                 } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// 网络定位结果
                     // 运营商信息
@@ -725,13 +896,13 @@ public class MainActivity extends BaseActivity {
                     sb.append("\ndescribe : ");
                     sb.append("网络定位成功");
 
-                    sendFirstLocation(location.getLatitude(),location.getLongitude());
+                    sendFirstLocation(location.getLatitude(), location.getLongitude());
 
                 } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// 离线定位结果
                     sb.append("\ndescribe : ");
                     sb.append("离线定位成功，离线定位结果也是有效的");
 
-                    sendFirstLocation(location.getLatitude(),location.getLongitude());
+                    sendFirstLocation(location.getLatitude(), location.getLongitude());
 
                 } else if (location.getLocType() == BDLocation.TypeServerError) {
                     sb.append("\ndescribe : ");
@@ -746,7 +917,7 @@ public class MainActivity extends BaseActivity {
             }
 
 //            Toast.makeText(BaseActivity.this,sb.toString(),Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "onReceiveLocation: ======388================"+sb.toString() );
+//            Log.e(TAG, "onReceiveLocation: ======388================" + sb.toString());
         }
 
     };
@@ -754,9 +925,9 @@ public class MainActivity extends BaseActivity {
     /*
      * 第一次定位用百度网络定位
      */
-    private void sendFirstLocation(double lat,double lon){
+    private void sendFirstLocation(double lat, double lon) {
 
-        if(isFirstLocation){
+        if (isFirstLocation) {
             Location myLocation = new Location("");
             myLocation.setLatitude(lat);
             myLocation.setLongitude(lon);
